@@ -18,7 +18,6 @@
     }
   },
   "scripts": {
-    "prepare": "npm run clean && npm run build:es && npm run build:cjs",
     "build": "vite build --config vite.config.js",
     "clean": "rm -rf ./dist",
     "lint": "node_modules/.bin/eslint ./ && npm run lint:translations && npm run lint:containers",
