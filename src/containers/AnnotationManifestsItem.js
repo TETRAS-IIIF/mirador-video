@@ -5,8 +5,12 @@ import { withPlugins } from '../extend/withPlugins';
 import * as actions from '../state/actions';
 import { AnnotationManifestsItem } from '../components/AnnotationManifestsItem';
 import {
-  getManifest, getManifestDescription, getManifestLogo,
-  getManifestProvider, getManifestThumbnail, getManifestTitle,
+  getManifest,
+  getManifestDescription,
+  getManifestLogo,
+  getManifestProviderName,
+  getManifestThumbnail,
+  getManifestTitle,
   getWindowManifests,
 } from '../state/selectors';
 
@@ -21,7 +25,7 @@ const mapStateToProps = (state, { manifestId }) => {
     error: manifest.error,
     isFetching: manifest.isFetching,
     manifestLogo: getManifestLogo(state, { manifestId }),
-    provider: getManifestProvider(state, { manifestId }),
+    provider: getManifestProviderName(state, { manifestId }),
     ready: !!manifest.json,
     thumbnail: getManifestThumbnail(state, { manifestId }),
     title: getManifestTitle(state, { manifestId }),
