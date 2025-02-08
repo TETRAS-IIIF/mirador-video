@@ -1,19 +1,24 @@
-import { useState } from 'react';
+import { useContext, useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import MoreVertIcon from '@mui/icons-material/MoreVertSharp';
 import Menu from '@mui/material/Menu';
+import { useTranslation } from 'react-i18next';
 import MiradorMenuButton from '../containers/MiradorMenuButton';
 import { PluginHook } from './PluginHook';
+import WorkspaceContext from '../contexts/WorkspaceContext';
 
 /**
  *
  */
 export function WindowTopBarPluginMenu({
-  container = null, PluginComponents = [], t, windowId, menuIcon = <MoreVertIcon />,
+  PluginComponents = [], windowId, menuIcon = <MoreVertIcon />,
 }) {
+  const { t } = useTranslation();
+  const container = useContext(WorkspaceContext);
   const pluginProps = arguments[0]; // eslint-disable-line prefer-rest-params
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
+  const windowPluginMenuId = useId();
 
   /** */
   const handleMenuClick = (event) => {
@@ -27,7 +32,6 @@ export function WindowTopBarPluginMenu({
     setOpen(false);
   };
 
-  const windowPluginMenuId = `window-plugin-menu_${windowId}`;
   if (!PluginComponents || PluginComponents.length === 0) return null;
 
   return (
@@ -71,6 +75,5 @@ WindowTopBarPluginMenu.propTypes = {
   PluginComponents: PropTypes.arrayOf(
     PropTypes.node,
   ),
-  t: PropTypes.func.isRequired,
   windowId: PropTypes.string.isRequired,
 };

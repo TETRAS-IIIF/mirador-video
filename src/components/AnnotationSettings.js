@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import VisibilityIcon from '@mui/icons-material/VisibilitySharp';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOffSharp';
+import { useTranslation } from 'react-i18next';
 import SyncIcon from '@mui/icons-material/Sync';
 import SyncDisabledIcon from '@mui/icons-material/SyncDisabled';
 import MiradorMenuButton from '../containers/MiradorMenuButton';
@@ -15,11 +16,11 @@ export function AnnotationSettings({
   autoScrollDisabled = true,
   displayAll,
   displayAllDisabled,
-  t,
   toggleAnnotationDisplay,
   toggleAnnotationAutoScroll = () => {},
   windowId,
 }) {
+  const { t } = useTranslation();
   const mediaIsVideo = typeof VideosReferences.get(windowId) !== 'undefined';
 
   return (

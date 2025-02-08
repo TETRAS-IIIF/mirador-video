@@ -8,6 +8,8 @@ import {
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
+import { useId } from 'react';
 import { WorkspaceDialog } from './WorkspaceDialog';
 import WorkspaceTypeElasticIcon from './icons/WorkspaceTypeElasticIcon';
 import WorkspaceTypeMosaicIcon from './icons/WorkspaceTypeMosaicIcon';
@@ -21,8 +23,11 @@ const StyledDetails = styled('div')(() => ({
 /**
  */
 export function WorkspaceSelectionDialog({
-  container = null, handleClose, open = false, children = null, t = k => k, updateWorkspace, workspaceType,
+  container = null, handleClose, open = false, children = null, updateWorkspace, workspaceType,
 }) {
+  const { t } = useTranslation();
+  const dialogTitleId = useId();
+
   /** */
   const handleWorkspaceTypeChange = (newWorkspaceType) => {
     updateWorkspace({
@@ -33,13 +38,12 @@ export function WorkspaceSelectionDialog({
 
   return (
     <WorkspaceDialog
-      aria-labelledby="workspace-selection-dialog-title"
+      aria-labelledby={dialogTitleId}
       container={container}
-      id="workspace-selection-dialog"
       onClose={handleClose}
       open={open}
     >
-      <DialogTitle id="workspace-selection-dialog-title">
+      <DialogTitle id={dialogTitleId}>
         {t('workspaceSelectionTitle')}
       </DialogTitle>
       <ScrollIndicatedDialogContent>
@@ -158,7 +162,6 @@ WorkspaceSelectionDialog.propTypes = {
   container: PropTypes.object, // eslint-disable-line react/forbid-prop-types
   handleClose: PropTypes.func.isRequired,
   open: PropTypes.bool,
-  t: PropTypes.func,
   updateWorkspace: PropTypes.func.isRequired,
   workspaceType: PropTypes.string.isRequired,
 };

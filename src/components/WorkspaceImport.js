@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import DialogTitle from '@mui/material/DialogTitle';
 import PropTypes from 'prop-types';
 import {
@@ -6,15 +6,18 @@ import {
   TextField,
 } from '@mui/material';
 import Button from '@mui/material/Button';
+import { useTranslation } from 'react-i18next';
 import { WorkspaceDialog } from './WorkspaceDialog';
 import ScrollIndicatedDialogContent from '../containers/ScrollIndicatedDialogContent';
 
 /**
  */
 export function WorkspaceImport({
-  addError, importConfig, classes = {}, handleClose, open = false, t = k => k,
+  addError, id = undefined, importConfig, classes = {}, handleClose, open = false,
 }) {
+  const { t } = useTranslation();
   const [configImportValue, setConfigImportValue] = useState('');
+  const titleId = useId();
 
   /** */
   const handleChange = (event) => {
@@ -35,14 +38,14 @@ export function WorkspaceImport({
 
   return (
     <WorkspaceDialog
-      aria-labelledby="workspace-import-title"
-      id="workspace-import"
+      aria-labelledby={titleId}
+      id={id}
       onClose={handleClose}
       open={open}
       fullWidth
       maxWidth="sm"
     >
-      <DialogTitle id="workspace-import-title">
+      <DialogTitle id={titleId}>
         {t('importWorkspace')}
       </DialogTitle>
       <ScrollIndicatedDialogContent>
@@ -77,7 +80,7 @@ WorkspaceImport.propTypes = {
   addError: PropTypes.func.isRequired,
   classes: PropTypes.objectOf(PropTypes.string),
   handleClose: PropTypes.func.isRequired,
+  id: PropTypes.string,
   importConfig: PropTypes.func.isRequired,
   open: PropTypes.bool,
-  t: PropTypes.func,
 };

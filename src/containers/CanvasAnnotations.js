@@ -1,6 +1,5 @@
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { withTranslation } from 'react-i18next';
 import { withPlugins } from '../extend/withPlugins';
 import * as actions from '../state/actions';
 import {
@@ -51,16 +50,8 @@ const mapDispatchToProps = {
   selectAnnotation: actions.selectAnnotation,
 };
 
-// const enhance = compose(
-//   withRef(),
-//   withTranslation(),
-//   connect(mapStateToProps, mapDispatchToProps, null, { forwardRef: true }),
-//   withPlugins('CanvasAnnotations'),
-// );
-
 const enhance = compose(
   withRef(),
-  withTranslation(),
   connect(mapStateToProps, mapDispatchToProps),
   withPlugins('CanvasAnnotations'),
 );

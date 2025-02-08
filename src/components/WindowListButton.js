@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import BookmarksIcon from '@mui/icons-material/BookmarksSharp';
+import { useTranslation } from 'react-i18next';
 import WindowList from '../containers/WindowList';
 import MiradorMenuButton from '../containers/MiradorMenuButton';
 
 /**
  * WindowListButton ~
 */
-export function WindowListButton({ disabled = false, t, windowCount }) {
+export function WindowListButton({ disabled = false, windowCount }) {
+  const { t } = useTranslation();
   const [windowListAnchor, setWindowListAnchor] = useState(null);
+  const id = useId();
 
   /** */
   const handleClose = () => { setWindowListAnchor(null); };
@@ -20,7 +23,7 @@ export function WindowListButton({ disabled = false, t, windowCount }) {
       <MiradorMenuButton
         aria-haspopup="true"
         aria-label={t('listAllOpenWindows')}
-        aria-owns={windowListAnchor ? 'window-list' : null}
+        aria-owns={windowListAnchor ? id : null}
         selected={Boolean(windowListAnchor)}
         disabled={disabled}
         badge
@@ -40,7 +43,7 @@ export function WindowListButton({ disabled = false, t, windowCount }) {
       {Boolean(windowListAnchor) && (
       <WindowList
         anchorEl={windowListAnchor}
-        id="window-list"
+        id={id}
         open={Boolean(windowListAnchor)}
         handleClose={handleClose}
       />
@@ -51,6 +54,5 @@ export function WindowListButton({ disabled = false, t, windowCount }) {
 
 WindowListButton.propTypes = {
   disabled: PropTypes.bool,
-  t: PropTypes.func.isRequired,
   windowCount: PropTypes.number.isRequired,
 };

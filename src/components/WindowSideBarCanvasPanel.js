@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useId, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import Tabs from '@mui/material/Tabs';
@@ -13,23 +13,16 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForwardSharp';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { useTranslation } from 'react-i18next';
 import CompanionWindow from '../containers/CompanionWindow';
 import SidebarIndexList from '../containers/SidebarIndexList';
 import SidebarIndexTableOfContents from '../containers/SidebarIndexTableOfContents';
+import { IIIFResourceLabel } from './IIIFResourceLabel';
 
 const StyledBreak = styled('div')(() => ({
   flexBasis: '100%',
   height: 0,
 }));
-
-/** */
-function getUseableLabel(resource, index) {
-  return (resource
-    && resource.getLabel
-    && resource.getLabel().length > 0)
-    ? resource.getLabel().getValue()
-    : resource.id;
-}
 
 /**
  * a panel showing the canvases for a given manifest
@@ -40,14 +33,15 @@ export function WindowSideBarCanvasPanel({
   showMultipart,
   sequenceId = null,
   sequences = [],
-  t,
   variant,
   showToc = false,
   updateSequence,
   updateVariant,
   windowId,
 }) {
+  const { t } = useTranslation();
   const containerRef = useRef();
+  const tabPanelId = useId();
 
   /** */
   const handleSequenceChange = (event) => {
@@ -111,7 +105,7 @@ export function WindowSideBarCanvasPanel({
                   }}
                   data-testid="sequence-select"
                 >
-                  { sequences.map((s, i) => <MenuItem value={s.id} key={s.id}><Typography variant="body2">{ getUseableLabel(s, i) }</Typography></MenuItem>) }
+                  { sequences.map((s, i) => <MenuItem value={s.id} key={s.id}><Typography variant="body2"><IIIFResourceLabel resource={s} /></Typography></MenuItem>) }
                 </Select>
               </FormControl>
             )
@@ -125,15 +119,15 @@ export function WindowSideBarCanvasPanel({
             textColor="primary"
           >
             {showToc && (
-              <Tooltip title={t('tableOfContentsList')} value="tableOfContents"><Tab sx={{ minWidth: 'auto' }} value="tableOfContents" aria-label={t('tableOfContentsList')} aria-controls={`tab-panel-${id}`} icon={<TocIcon style={{ transform: 'scale(-1, 1)' }} />} /></Tooltip>
+              <Tooltip title={t('tableOfContentsList')} value="tableOfContents"><Tab sx={{ minWidth: 'auto' }} value="tableOfContents" aria-label={t('tableOfContentsList')} aria-controls={tabPanelId} icon={<TocIcon style={{ transform: 'scale(-1, 1)' }} />} /></Tooltip>
             )}
-            <Tooltip title={t('itemList')} value="item"><Tab sx={{ minWidth: 'auto' }} value="item" aria-label={t('itemList')} aria-controls={`tab-panel-${id}`} icon={<ItemListIcon />} /></Tooltip>
-            <Tooltip title={t('thumbnailList')} value="thumbnail"><Tab sx={{ minWidth: 'auto' }} value="thumbnail" aria-label={t('thumbnailList')} aria-controls={`tab-panel-${id}`} icon={<ThumbnailListIcon />} /></Tooltip>
+            <Tooltip title={t('itemList')} value="item"><Tab sx={{ minWidth: 'auto' }} value="item" aria-label={t('itemList')} aria-controls={tabPanelId} icon={<ItemListIcon />} /></Tooltip>
+            <Tooltip title={t('thumbnailList')} value="thumbnail"><Tab sx={{ minWidth: 'auto' }} value="thumbnail" aria-label={t('thumbnailList')} aria-controls={tabPanelId} icon={<ThumbnailListIcon />} /></Tooltip>
           </Tabs>
         </>
       )}
     >
-      <div id={`tab-panel-${id}`}>
+      <div id={tabPanelId}>
         { collection && (
           <Button
             fullWidth
@@ -141,7 +135,7 @@ export function WindowSideBarCanvasPanel({
             endIcon={<ArrowForwardIcon />}
           >
             <Typography sx={{ textTransform: 'none' }}>
-              {getUseableLabel(collection)}
+              <IIIFResourceLabel resource={collection} />
             </Typography>
           </Button>
         )}
@@ -158,7 +152,6 @@ WindowSideBarCanvasPanel.propTypes = {
   sequences: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
   showMultipart: PropTypes.func.isRequired,
   showToc: PropTypes.bool,
-  t: PropTypes.func.isRequired,
   updateSequence: PropTypes.func.isRequired,
   updateVariant: PropTypes.func.isRequired,
   variant: PropTypes.oneOf(['item', 'thumbnail', 'tableOfContents']).isRequired,

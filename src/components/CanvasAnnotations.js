@@ -5,6 +5,7 @@ import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import { useTranslation } from 'react-i18next';
 import SearchIcon from '@mui/icons-material/SearchSharp';
 import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
@@ -43,7 +44,6 @@ export function CanvasAnnotations({
   index,
   label,
   selectedAnnotationId = undefined,
-  t,
   totalSize,
   listContainerComponent = 'li',
   htmlSanitizationRuleSet = 'iiif',
@@ -54,6 +54,7 @@ export function CanvasAnnotations({
   windowId,
   hoverAnnotation,
 }) {
+  const { t } = useTranslation();
   const [inputSearch, setInputSearch] = useState('');
 
   const handleClick = useCallback((_event, annotation) => {
@@ -129,7 +130,6 @@ export function CanvasAnnotations({
                 },
                 backgroundColor: hoveredAnnotationIds.includes(annotation.id) ? 'action.hover' : '',
               }}
-                            /* ref={containerRef} */ // TODO useful ?
               key={annotation.id}
               annotationid={annotation.id}
               selected={selectedAnnotationId === annotation.id}
@@ -213,7 +213,6 @@ CanvasAnnotations.propTypes = {
   listContainerComponent: PropTypes.elementType,
   selectAnnotation: PropTypes.func.isRequired,
   selectedAnnotationId: PropTypes.string,
-  t: PropTypes.func.isRequired,
   totalSize: PropTypes.number.isRequired,
   windowId: PropTypes.string.isRequired,
 };
