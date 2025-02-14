@@ -14,12 +14,12 @@ import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import createI18nInstance from '../i18n';
 import FullScreenContext from '../contexts/FullScreenContext';
+import LocaleContext from '../contexts/LocaleContext';
 
 /**
  * Allow applications to opt-out of (or provide their own) drag and drop context
  */
-const MaybeDndProvider = (props) => {
-  const { dndManager, children } = props;
+const MaybeDndProvider = ({ dndManager = undefined, children }) => {
   if (dndManager === false) {
     return children;
   }
@@ -45,7 +45,7 @@ MaybeDndProvider.propTypes = {
     undefined,
     false,
     PropTypes.object, // eslint-disable-line react/forbid-prop-types
-  ]).isRequired,
+  ]),
 };
 
 /**
@@ -72,9 +72,9 @@ FullScreenShim.propTypes = {
  * plugins + config to inject additional translations.
  */
 const StoreAwareI18nextProvider = ({ children, language, translations }) => {
-  const [i18n] = useState(createI18nInstance());
+  const [i18n] = useState(createI18nInstance({ lng: language }));
   useEffect(() => {
-    i18n.changeLanguage(language);
+    if (i18n && i18n.language !== language) i18n.changeLanguage(language);
   }, [i18n, language]);
 
   useEffect(() => {
@@ -120,15 +120,17 @@ export function AppProviders({
   return (
     <FullScreenShim>
       <StoreAwareI18nextProvider language={language} translations={translations}>
-        <StyledEngineProvider injectFirst>
-          <CacheProvider value={theme.direction === 'rtl' ? cacheRtl : cacheDefault}>
-            <ThemeProvider theme={createTheme((theme))}>
-              <MaybeDndProvider dndManager={dndManager}>
-                {children}
-              </MaybeDndProvider>
-            </ThemeProvider>
-          </CacheProvider>
-        </StyledEngineProvider>
+        <LocaleContext.Provider value={language}>
+          <StyledEngineProvider injectFirst>
+            <CacheProvider value={theme.direction === 'rtl' ? cacheRtl : cacheDefault}>
+              <ThemeProvider theme={createTheme((theme))}>
+                <MaybeDndProvider dndManager={dndManager}>
+                  {children}
+                </MaybeDndProvider>
+              </ThemeProvider>
+            </CacheProvider>
+          </StyledEngineProvider>
+        </LocaleContext.Provider>
       </StoreAwareI18nextProvider>
     </FullScreenShim>
   );

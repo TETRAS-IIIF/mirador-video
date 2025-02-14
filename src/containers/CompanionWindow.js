@@ -1,9 +1,6 @@
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { withTranslation } from 'react-i18next';
-import { withSize } from '../extend/withSize';
 import { withPlugins } from '../extend/withPlugins';
-import { withRef } from '../extend/withRef';
 import * as actions from '../state/actions';
 import { getCompanionWindow, getThemeDirection, getWindowConfig } from '../state/selectors';
 import { CompanionWindow } from '../components/CompanionWindow';
@@ -44,10 +41,20 @@ const mapDispatchToProps = (dispatch, { windowId, id }) => ({
   ),
 });
 
+// TODO Merge problem possible
+/*
 const enhance = compose(
   withSize(),
   withRef(),
   withTranslation(),
+  connect(mapStateToProps, mapDispatchToProps, null, { forwardRef: true }),
+  withPlugins('CompanionWindow'),
+);
+ */
+
+
+
+const enhance = compose(
   connect(mapStateToProps, mapDispatchToProps, null, { forwardRef: true }),
   withPlugins('CompanionWindow'),
 );

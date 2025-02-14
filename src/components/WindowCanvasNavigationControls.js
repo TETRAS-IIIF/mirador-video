@@ -7,6 +7,8 @@ import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import { visuallyHidden } from '@mui/utils';
+import { useElementSize } from '@custom-react-hooks/use-element-size';
+import mergeRefs from 'merge-refs';
 import ZoomControls from '../containers/ZoomControls';
 import ViewerInfo from '../containers/ViewerInfo';
 import ViewerNavigation from '../containers/ViewerNavigation';
@@ -32,10 +34,12 @@ const Root = styled(Paper, { name: 'WindowCanvasNavigationControls', slot: 'root
  * Represents the viewer controls in the mirador workspace.
  */
 export const WindowCanvasNavigationControls = forwardRef(({
-  showZoomControls = false, size, visible = true, windowId, zoomToWorld,
+  showZoomControls = false, visible = true, windowId, zoomToWorld, ...rest
 }, ref) => {
+  const [sizeRef, size] = useElementSize();
+
   const pluginProps = {
-    showZoomControls, size, visible, windowId,
+    showZoomControls, size, visible, windowId, ...rest,
   };
   /**
    * Determine if canvasNavControls are stacked (based on a hard-coded width)
@@ -54,7 +58,7 @@ export const WindowCanvasNavigationControls = forwardRef(({
         )
       }
       elevation={0}
-      ref={ref}
+      ref={mergeRefs(ref, sizeRef)}
     >
       <Stack
         direction={canvasNavControlsAreStacked ? 'column' : 'row'}
@@ -73,7 +77,6 @@ export const WindowCanvasNavigationControls = forwardRef(({
 
 WindowCanvasNavigationControls.propTypes = {
   showZoomControls: PropTypes.bool,
-  size: PropTypes.shape({ width: PropTypes.number }).isRequired,
   visible: PropTypes.bool,
   windowId: PropTypes.string.isRequired,
   zoomToWorld: PropTypes.func.isRequired,
@@ -83,3 +86,5 @@ WindowCanvasNavigationControls.defaultProps = {
   showZoomControls: false,
   visible: true,
 };
+
+WindowCanvasNavigationControls.displayName = 'WindowCanvasNavigationControls';

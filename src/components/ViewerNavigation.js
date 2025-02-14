@@ -1,6 +1,7 @@
 import NavigationIcon from '@mui/icons-material/PlayCircleOutlineSharp';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import MiradorMenuButton from '../containers/MiradorMenuButton';
 import ns from '../config/css-ns';
 
@@ -11,10 +12,10 @@ export function ViewerNavigation({
   hasPreviousCanvas = false,
   setNextCanvas = () => {},
   setPreviousCanvas = () => {},
-  t,
   beforeClick = () => {},
   viewingDirection = '',
 }) {
+  const { t } = useTranslation();
   let htmlDir = 'ltr';
   let previousIconStyle = {};
   let nextIconStyle = {};
@@ -68,6 +69,5 @@ ViewerNavigation.propTypes = {
   hasPreviousCanvas: PropTypes.bool,
   setNextCanvas: PropTypes.func,
   setPreviousCanvas: PropTypes.func,
-  t: PropTypes.func.isRequired,
   viewingDirection: PropTypes.string,
 };

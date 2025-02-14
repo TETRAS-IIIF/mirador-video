@@ -1,6 +1,5 @@
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { withTranslation } from 'react-i18next';
 import { withPlugins } from '../extend/withPlugins';
 import * as actions from '../state/actions';
 import { VideoViewer } from '../components/VideoViewer';
@@ -36,7 +35,6 @@ const mapDispatchToProps = (dispatch, { windowId }) => ({
 });
 
 const enhance = compose(
-  withTranslation(),
   connect(mapStateToProps, mapDispatchToProps),
   withPlugins('VideoViewer'),
 );

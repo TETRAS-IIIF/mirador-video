@@ -2,14 +2,16 @@ import PropTypes from 'prop-types';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeftSharp';
 import ChevronRightIcon from '@mui/icons-material/ChevronRightSharp';
 import Typography from '@mui/material/Typography';
+import { useTranslation } from 'react-i18next';
 import MiradorMenuButton from '../containers/MiradorMenuButton';
 
 /**
  * SearchPanelNavigation ~
 */
 export function SearchPanelNavigation({
-  numTotal = undefined, searchHits = [], selectedContentSearchAnnotation, t = k => k, direction, selectAnnotation,
+  numTotal = undefined, searchHits = [], selectedContentSearchAnnotation, direction, selectAnnotation,
 }) {
+  const { t } = useTranslation();
   /** */
   const nextSearchResult = (currentHitIndex) => {
     selectAnnotation(searchHits[currentHitIndex + 1].annotations[0]);
@@ -72,11 +74,7 @@ SearchPanelNavigation.propTypes = {
   direction: PropTypes.string.isRequired,
   numTotal: PropTypes.number,
   searchHits: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
-  searchService: PropTypes.shape({
-    id: PropTypes.string,
-  }).isRequired,
   selectAnnotation: PropTypes.func.isRequired,
   selectedContentSearchAnnotation: PropTypes.arrayOf(PropTypes.string).isRequired,
-  t: PropTypes.func,
   windowId: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
 };
