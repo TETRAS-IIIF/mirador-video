@@ -2,6 +2,9 @@
 
 Forked from official  https://github.com/ProjectMirador/mirador#
 
+[![Node.js CI](https://github.com/TETRAS-IIIF/mirador-video/workflows/Node.js%20CI/badge.svg)](https://github.com/TETRAS-IIIF/mirador-video/actions/workflows/node.js.yml) [![codecov](https://codecov.io/gh/TETRAS-IIIF/mirador-video/branch/main/graph/badge.svg)](https://codecov.io/gh/TETRAS-IIIF/mirador-video)
+
+
 ### Demo
 - https://tetras-iiif.github.io/mirador-video/
 
@@ -106,8 +109,8 @@ $ npm run lint
 
 The following browser extensions are useful for debugging a local development instance of Mirador:
 
-- [React DevTools](https://github.com/facebook/react-devtools)
-- [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension)
+ - [React DevTools](https://github.com/facebook/react-devtools)
+ - [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension)
 
 ### Test suite
 
