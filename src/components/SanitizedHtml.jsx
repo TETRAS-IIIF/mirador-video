@@ -22,7 +22,6 @@ export function SanitizedHtml({
   classes = {}, htmlString, ruleSet, ...rest
 }) {
   const stopIfAnchor = (e) => {
-    console.log('SanitizedHtml stopIfAnchor');
     const el = e.target instanceof Node ? e.target : null;
     if (el && (el.closest && el.closest('a'))) {
       // allow the browser default (open/focus tab), but don’t notify parents
