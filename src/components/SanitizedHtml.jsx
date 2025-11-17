@@ -21,9 +21,6 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
 export function SanitizedHtml({
   classes = {}, htmlString, ruleSet, ...rest
 }) {
-  console.log('SanitizedHtml render');
-  console.log(ruleSet);
-
   const stopIfAnchor = (e) => {
     console.log('SanitizedHtml stopIfAnchor');
     const el = e.target instanceof Node ? e.target : null;
