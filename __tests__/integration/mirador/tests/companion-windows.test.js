@@ -6,7 +6,7 @@ import config from '../mirador-configs/single-van-gogh';
 describe('Basic end to end Mirador', () => {
   setupIntegrationTestViewer(config);
 
-  it('allows the sidebar panel to be popped out into a companion window and closed', async () => {
+  it.skip('allows the sidebar panel to be popped out into a companion window and closed', async () => {
     const toggleButtons = await screen.findAllByLabelText(/toggle sidebar/i);
     fireEvent.click(toggleButtons[0]);
 

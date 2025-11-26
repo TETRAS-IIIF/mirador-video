@@ -14,17 +14,18 @@ function createWrapper(props, suspenseFallback) {
   );
 }
 
+// TODO enable these tests again when video support is added back to Mirador core
 describe('VideoViewer', () => {
   let wrapper;
   describe('render', () => {
-    it('video', () => {
+    it.skip('video', () => {
       wrapper = createWrapper({
         canvas: Utils.parseManifest(videoSimple).getSequences()[0].getCanvases()[0],
       }, true);
       expect(wrapper.exists('video[crossOrigin="anonymous"]')).toBe(true); // eslint-disable-line jsx-a11y/media-has-caption
       expect(wrapper.contains(<source src="https://fixtures.iiif.io/video/indiana/30-minute-clock/medium/30-minute-clock.mp4" type="video/mp4" />)).toBe(true);
     });
-    it('one caption', () => {
+    it.skip('one caption', () => {
       const canvas = Utils.parseManifest(videoCaptions).getSequences()[0].getCanvases()[0];
       /* cf selectors/annotations/getPresentAnnotationsCanvas */
       const annotations = canvas.__jsonld.annotations.flatMap((a) => AnnotationFactory.determineAnnotation(a));
@@ -35,7 +36,7 @@ describe('VideoViewer', () => {
       expect(wrapper.contains(<track src="https://fixtures.iiif.io/video/indiana/lunchroom_manners/lunchroom_manners.vtt" srcLang="en" />)).toBe(true);
       expect(wrapper.exists('video[crossOrigin="anonymous"]')).toBe(true); // eslint-disable-line jsx-a11y/media-has-caption
     });
-    it('multiples captions', () => {
+    it.skip('multiples captions', () => {
       const canvas = Utils.parseManifest(videoMultiCaptions).getSequences()[0].getCanvases()[0];
       /* cf selectors/annotations/getPresentAnnotationsCanvas */
       const annotations = canvas.__jsonld.annotations.flatMap((a) => AnnotationFactory.determineAnnotation(a));
@@ -47,7 +48,7 @@ describe('VideoViewer', () => {
       expect(wrapper.contains(<track src="https://fixtures.iiif.io/video/indiana/lunchroom_manners/lunchroom_manners.vtt#fr" srcLang="fr" />)).toBe(true);
       expect(wrapper.exists('video[crossOrigin="anonymous"]')).toBe(true); // eslint-disable-line jsx-a11y/media-has-caption
     });
-    it('multiples captions in multiples annotations', () => {
+    it.skip('multiples captions in multiples annotations', () => {
       const canvas = Utils.parseManifest(videoMultiCaptionsMultiAnno).getSequences()[0].getCanvases()[0];
       /* cf selectors/annotations/getPresentAnnotationsCanvas */
       const annotations = canvas.__jsonld.annotations.flatMap((a) => AnnotationFactory.determineAnnotation(a));
