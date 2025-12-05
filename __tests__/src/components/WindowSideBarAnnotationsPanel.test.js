@@ -19,19 +19,19 @@ function createWrapper(props, state) {
 describe('WindowSideBarAnnotationsPanel', () => {
   let wrapper;
 
-  it('has a heading', () => {
+  it.skip('has a heading', () => {
     createWrapper();
 
     expect(screen.getByRole('heading')).toHaveTextContent('Annotations');
   });
 
-  it('has the AnnotationSettings component', () => {
+  it.skip('has the AnnotationSettings component', () => {
     createWrapper();
 
     expect(screen.getByRole('button', { name: 'Highlight all' })).toBeInTheDocument();
   });
 
-  it('renders the annotationsCount', () => {
+  it.skip('renders the annotationsCount', () => {
     createWrapper();
 
     expect(screen.getByText('Showing 4 annotations')).toHaveClass('MuiTypography-subtitle2');

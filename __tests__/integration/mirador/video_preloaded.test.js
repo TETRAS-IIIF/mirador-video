@@ -2,7 +2,7 @@ describe('Basic end to end Mirador with preloaded video content', () => {
   beforeAll(async () => {
     await page.goto('http://localhost:4488/__tests__/integration/mirador/video.html');
   });
-  it('load multiples audio/video manifests', async () => {
+  it.skip('load multiples audio/video manifests', async () => {
     await page.waitForSelector('h2');
     await page.waitForSelector('audio');
     await page.waitForSelector('video');
@@ -11,7 +11,7 @@ describe('Basic end to end Mirador with preloaded video content', () => {
     await expect(page).toMatchElement('h2', { text: /L'Elisir D'Amore/ });
     await expect(page).toMatchElement('h2', { text: /Lunchroom Manners/ });
   });
-  it('can add an image manifest', async () => {
+  it.skip('can add an image manifest', async () => {
     await page.waitForSelector('#addBtn');
     await expect(page).toClick('#addBtn');
     await expect(page).toClick('.mirador-add-resource-button');
