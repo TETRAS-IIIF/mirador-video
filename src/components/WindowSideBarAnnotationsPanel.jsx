@@ -29,10 +29,6 @@ export function WindowSideBarAnnotationsPanel({
       ref={containerRef}
       titleControls={<AnnotationSettings windowId={windowId} />}
     >
-      <CompanionWindowSection>
-        <Typography component="p" variant="subtitle2">{t('showingNumAnnotations', { count: annotationCount, number: annotationCount })}</Typography>
-      </CompanionWindowSection>
-
       {canvasIds.map((canvasId, index) => (
         <CanvasAnnotations
           canvasId={canvasId}

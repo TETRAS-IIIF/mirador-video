@@ -2,3 +2,6 @@ dist/
 config/
 coverage/
 styles/
+vite*.config.*
+vite-umd.config.*
+vite.demo.config.*

@@ -2,7 +2,8 @@ describe('Basic end to end Mirador with video content', () => {
   beforeAll(async () => {
     await page.goto('http://localhost:4488/__tests__/integration/mirador/blank.html');
   });
-  it('loads a manifest and displays it', async () => {
+  // TODO: enable these tests again when video support is added back to Mirador core
+  it.skip('loads a manifest and displays it', async () => {
     await page.waitForSelector('#addBtn');
     await expect(page).toClick('#addBtn');
     await expect(page).toClick('.mirador-add-resource-button');
@@ -15,7 +16,8 @@ describe('Basic end to end Mirador with video content', () => {
       { text: /Video Example 3/ },
     );
   });
-  it('render subtitles', async () => {
+  // TODO: enable these tests again when video support is added back to Mirador core
+  it.skip('render subtitles', async () => {
     await page.waitForSelector('#addBtn');
     await expect(page).toClick('#addBtn');
     await expect(page).toClick('.mirador-add-resource-button');
