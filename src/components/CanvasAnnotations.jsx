@@ -66,7 +66,8 @@ export function CanvasAnnotations({
   const handleClick = useCallback((_event, annotation) => {
     if (selectedAnnotationId === annotation.id) {
       deselectAnnotation(windowId, annotation.id);
-      selectedAnnotationId = undefined;
+      // Why this exist ?
+      // selectedAnnotationId = undefined;
     } else {
       selectAnnotation(windowId, annotation.id);
     }

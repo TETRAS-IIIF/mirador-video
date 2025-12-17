@@ -179,21 +179,18 @@ export class AnnotationsOverlayVideo extends Component {
 
     const selectedAnnotationsUpdated = selectedAnnotationId !== prevProps.selectedAnnotationId;
     if (selectedAnnotationsUpdated && selectedAnnotationId) {
+      // TODO: When does this happens ?
       if (this.currentTimeNearestAnnotationId
-          && this.currentTimeNearestAnnotationId === selectedAnnotationId) {
+              && this.currentTimeNearestAnnotationId === selectedAnnotationId) {
         // go through
       } else {
         annotations.forEach((annotation) => {
           annotation.resources.forEach((resource) => {
             if (resource.id !== selectedAnnotationId) return;
             if (!canvasWorld.canvasIds.includes(resource.targetId)) return;
-            if (!AnnotationsOverlayVideo.isAnnotationInTemporalSegment(resource, currentTime)) {
-              const temporalfragment = resource.temporalfragmentSelector;
-              if (temporalfragment && temporalfragment.length > 0 && this.player) {
-                const seekto = temporalfragment[0] || 0;
-                this.seekTo(seekto, false);
-              }
-            }
+            const temporalfragment = resource.temporalfragmentSelector;
+            const seekto = temporalfragment[0] || 0;
+            this.seekTo(seekto, false);
           });
         });
       }
