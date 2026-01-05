@@ -7,8 +7,8 @@ import { globSync } from 'glob';
 import * as packageJson from './package.json';
 
 /**
-* Vite configuration
-*/
+ * Vite configuration
+ */
 export default defineConfig({
   ...(
     process.env.NETLIFY ? {
@@ -67,7 +67,7 @@ export default defineConfig({
     react(),
     {
       /**
-        * Middleware to rewrite HTML URLs to point to the deep path
+       * Middleware to rewrite HTML URLs to point to the deep path
        */
       configureServer(server) {
         server.middlewares.use(async (req, res, next) => {

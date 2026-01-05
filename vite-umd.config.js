@@ -3,8 +3,8 @@ import react from '@vitejs/plugin-react';
 import fs from 'fs/promises';
 
 /**
-* Vite configuration
-*/
+ * Vite configuration
+ */
 export default defineConfig({
   build: {
     emptyOutDir: false,
