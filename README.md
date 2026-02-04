@@ -4,6 +4,8 @@ Forked from official  https://github.com/ProjectMirador/mirador#
 
 [![Node.js CI](https://github.com/TETRAS-IIIF/mirador-video/workflows/Node.js%20CI/badge.svg)](https://github.com/TETRAS-IIIF/mirador-video/actions/workflows/node.js.yml) [![codecov](https://codecov.io/gh/TETRAS-IIIF/mirador-video/branch/main/graph/badge.svg)](https://codecov.io/gh/TETRAS-IIIF/mirador-video)
 
+We welcome contributions and collaborations, especially on the tests and documentation side. It's mainly the lack of tests that has prevented us from submitting a PR to the main Mirador repository so far.
+
 
 ### Demo
 - https://tetras-iiif.github.io/mirador-video/
@@ -14,6 +16,7 @@ We already support React 18/19, MUI7 and are up-to-date to Mirador 4 (4.0.0 vers
 We provide also a new plugin to display and edit annotations on videos : https://github.com/TETRAS-IIIF/mirador-annotation-editor-video
 
 We have also old version compatible with M3 and older version of React. Contact us to have more information.
+
 
 ## For Mirador Users
 
@@ -27,7 +30,7 @@ Before
 
 After
 ```json
-"mirador": "npm:mirador-video@^1.1.0"
+"mirador": "npm:mirador-video@^1.2.8"
 ```
 
 Then run `npm install` to refresh your package.
