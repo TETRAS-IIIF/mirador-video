@@ -6,9 +6,8 @@ import settings from '../mirador-configs/plugin-state';
 describe('how plugins relate to state', () => {
   setupIntegrationTestViewer(settings.config, settings.plugins);
 
-  // TODO
-  it.skip('plugin can read from state', async () => {
-    const text = 'Plugin:https://iiif.harvardartmuseums.org/manifests/object/299843';
+  it('plugin can read from state', async () => {
+    const text = 'Plugin:https://dms-data.stanford.edu/data/manifests/Parker/nb647fd0133/manifest.json';
     const elementWithText = await screen.findByText(text);
     expect(elementWithText).toHaveTextContent(text);
   });
