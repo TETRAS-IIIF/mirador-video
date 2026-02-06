@@ -111,6 +111,7 @@ export function WorkspaceAdd({
             container
             style={{
               height: '100%',
+              border: "solid red"
             }}
           >
             <Grid size={12}>
@@ -155,6 +156,7 @@ export function WorkspaceAdd({
               borderTop: '0',
               left: 'unset',
               width: refWidth,
+              zIndex: 1,
             },
             ...(!addResourcesOpen && {
               display: 'none',
@@ -166,7 +168,8 @@ export function WorkspaceAdd({
           ModalProps={{
             disablePortal: true,
             hideBackdrop: true,
-            style: { position: 'absolute' },
+            style: { position: 'absolute',
+            },
           }}
         >
           <Paper
