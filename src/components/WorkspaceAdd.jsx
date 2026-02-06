@@ -111,7 +111,7 @@ export function WorkspaceAdd({
             container
             style={{
               height: '100%',
-              border: "solid red"
+              border: 'solid red',
             }}
           >
             <Grid size={12}>
@@ -140,6 +140,7 @@ export function WorkspaceAdd({
             bottom: theme.spacing(2),
             position: 'absolute',
             right: theme.spacing(2),
+            zIndex: 1,
           })}
           className={classNames(ns('add-resource-button'))}
           aria-label={t('addResource')}
@@ -156,7 +157,7 @@ export function WorkspaceAdd({
               borderTop: '0',
               left: 'unset',
               width: refWidth,
-              zIndex: 1,
+              zIndex: 10,
             },
             ...(!addResourcesOpen && {
               display: 'none',
@@ -168,8 +169,7 @@ export function WorkspaceAdd({
           ModalProps={{
             disablePortal: true,
             hideBackdrop: true,
-            style: { position: 'absolute',
-            },
+            style: { position: 'absolute' },
           }}
         >
           <Paper
