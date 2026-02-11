@@ -139,6 +139,7 @@ export function WorkspaceAdd({
             bottom: theme.spacing(2),
             position: 'absolute',
             right: theme.spacing(2),
+            zIndex: 1,
           })}
           className={classNames(ns('add-resource-button'))}
           aria-label={t('addResource')}
@@ -155,6 +156,7 @@ export function WorkspaceAdd({
               borderTop: '0',
               left: 'unset',
               width: refWidth,
+              zIndex: 10,
             },
             ...(!addResourcesOpen && {
               display: 'none',
