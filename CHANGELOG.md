@@ -10,7 +10,7 @@ Entries types:
 - `SECURITY` to invite users to upgrade in case of vulnerabilities.
 - `UPSTREAM` to indicate code is pulled in from Mirador main repository.
 
-# [ 1.3.0 ]
+# [ 1.2.10 ]
 
 - FIXED : Update UI for MMU compatibility
 
