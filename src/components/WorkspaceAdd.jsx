@@ -111,7 +111,6 @@ export function WorkspaceAdd({
             container
             style={{
               height: '100%',
-              border: 'solid red',
             }}
           >
             <Grid size={12}>
