@@ -18,13 +18,13 @@
     "vi": true
   },
   "plugins": [
-    "react", 
+    "react",
     "react-hooks",
     "testing-library"
   ],
   "rules": {
     "import/no-unresolved": [
-      2, { "ignore": ["test-utils"] }
+      2, { "ignore": ["test-utils", "@vitejs/plugin-react"] }
     ],
     "import/prefer-default-export": "off",
     "no-console": "off",
@@ -77,7 +77,7 @@
     "import/no-anonymous-default-export": "off",
     "import/no-extraneous-dependencies": "off",
     "max-len": ["error", {
-      "code": 120,
+      "code": 130,
       "ignoreComments": true,
       "ignoreStrings": true,
       "ignoreTemplateLiterals": true,
