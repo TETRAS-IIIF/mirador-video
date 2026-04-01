@@ -7,8 +7,7 @@ import ns from '../config/css-ns';
  * Renders label/value pair metadata in a dl
  * @prop {object} labelValuePair
  */
-export function LabelValueMetadata({ defaultLabel = undefined, labelValuePairs, labelValueJoiner=', ' }) {
-  
+export function LabelValueMetadata({ defaultLabel = undefined, labelValuePairs, labelValueJoiner = ', ' }) {
   if (labelValuePairs.length === 0) {
     return null;
   }
@@ -31,6 +30,7 @@ export function LabelValueMetadata({ defaultLabel = undefined, labelValuePairs, 
 
 LabelValueMetadata.propTypes = {
   defaultLabel: PropTypes.string,
+  labelValueJoiner: PropTypes.string,
   labelValuePairs: PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string,
     values: PropTypes.arrayOf(PropTypes.string),

@@ -13,6 +13,7 @@ import { prefixer } from 'stylis';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import createI18nInstance from '../i18n';
+import FailedImageProvider from '../contexts/FailedImageProvider';
 import FullScreenContext from '../contexts/FullScreenContext';
 import LocaleContext from '../contexts/LocaleContext';
 
@@ -44,7 +45,7 @@ MaybeDndProvider.propTypes = {
   dndManager: PropTypes.oneOf([
     undefined,
     false,
-    PropTypes.object, // eslint-disable-line react/forbid-prop-types
+    PropTypes.object,
   ]),
 };
 
@@ -89,7 +90,7 @@ const StoreAwareI18nextProvider = ({ children, language, translations }) => {
 StoreAwareI18nextProvider.propTypes = {
   children: PropTypes.node.isRequired,
   language: PropTypes.string.isRequired,
-  translations: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  translations: PropTypes.object.isRequired,
 };
 
 /**
@@ -125,7 +126,9 @@ export function AppProviders({
             <CacheProvider value={theme.direction === 'rtl' ? cacheRtl : cacheDefault}>
               <ThemeProvider theme={createTheme((theme))}>
                 <MaybeDndProvider dndManager={dndManager}>
-                  {children}
+                  <FailedImageProvider>
+                    {children}
+                  </FailedImageProvider>
                 </MaybeDndProvider>
               </ThemeProvider>
             </CacheProvider>
@@ -138,8 +141,8 @@ export function AppProviders({
 
 AppProviders.propTypes = {
   children: PropTypes.node,
-  dndManager: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  dndManager: PropTypes.object,
   language: PropTypes.string.isRequired,
-  theme: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  translations: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  theme: PropTypes.object.isRequired,
+  translations: PropTypes.object.isRequired,
 };

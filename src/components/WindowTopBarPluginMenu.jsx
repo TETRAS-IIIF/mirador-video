@@ -11,7 +11,7 @@ import { usePlugins } from '../extend/usePlugins';
  *
  */
 export function WindowTopBarPluginMenu({
-  windowId, menuIcon = <MoreVertIcon />, pluginTarget = 'WindowTopBarPluginMenu', 
+  windowId, menuIcon = <MoreVertIcon />, pluginTarget = 'WindowTopBarPluginMenu',
 }) {
   const { t } = useTranslation();
   const container = useContext(WorkspaceContext);
@@ -69,7 +69,7 @@ export function WindowTopBarPluginMenu({
 }
 
 WindowTopBarPluginMenu.propTypes = {
-  anchorEl: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  anchorEl: PropTypes.object,
   container: PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
   menuIcon: PropTypes.element,
   open: PropTypes.bool,

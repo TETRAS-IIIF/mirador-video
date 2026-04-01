@@ -8,6 +8,8 @@ export default {
     height: 50,
     width: 50,
   },
+  // Override the default fallback image with a custom one for loading failures
+  // fallbackImage: 'path/to/your/custom/fallback.jpg',
   selectedTheme: 'light', // dark also available
   themes: {
     dark: {
@@ -441,7 +443,9 @@ export default {
   },
   annotations: {
     htmlSanitizationRuleSet: 'iiif', // See src/lib/htmlRules.js for acceptable values
-    filteredMotivations: ['oa:commenting', 'oa:tagging', 'sc:painting', 'commenting', 'tagging'],
+    // filteredMotivations: if empty, all annotation motivations will be shown.
+    // Otherwise, only annotations with motivations listed in the array will be shown.
+    filteredMotivations: [],
   },
   createGenerateClassNameOptions: { // Options passed directly to createGenerateClassName in Material-UI https://material-ui.com/styles/api/#creategenerateclassname-options-class-name-generator
     productionPrefix: 'mirador',
@@ -546,7 +550,7 @@ export default {
     alwaysBlend: false,
     blendTime: 0.1,
     preserveImageSizeOnResize: true,
-    preserveViewport: true,
+    preserveViewport: false,
     showNavigationControl: false,
     zoomPerClick: 1, // disable zoom-to-click
     zoomPerDoubleClick: 2.0

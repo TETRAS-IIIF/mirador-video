@@ -61,9 +61,9 @@ export function GalleryViewThumbnail({
 
   useEffect(() => {
     if (selected) {
-      myRef.current?.scrollIntoView({ block: 'nearest'});
+      myRef.current?.scrollIntoView({ block: 'nearest' });
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selected]);
 
   /** @private */
   const handleSelect = () => {
@@ -159,7 +159,7 @@ export function GalleryViewThumbnail({
 
 GalleryViewThumbnail.propTypes = {
   annotationsCount: PropTypes.number,
-  canvas: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  canvas: PropTypes.object.isRequired,
   config: PropTypes.shape({
     height: PropTypes.number,
     width: PropTypes.number,

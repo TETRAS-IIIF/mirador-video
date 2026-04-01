@@ -11,7 +11,10 @@ import { useTranslation } from 'react-i18next';
  *
  */
 export function SelectCollection({
-  collectionPath = [], manifestId = null, showCollectionDialog, windowId = null,
+  collectionPath = [],
+  manifestId = null,
+  showCollectionDialog,
+  windowId = null,
 }) {
   const { t } = useTranslation();
   const openCollectionDialog = useCallback(() => {
@@ -19,9 +22,9 @@ export function SelectCollection({
   }, [collectionPath, manifestId, showCollectionDialog, windowId]);
 
   return (
-    <Grid container sx={{ width: '100%', alignContent: 'center', justifyContent: 'center' }}>
+    <Grid container sx={{ alignContent: 'center', justifyContent: 'center', width: '100%' }}>
       <Stack>
-        <Typography variant="h4" component="p" sx={{ textAlign: 'center', mb: 2 }}>
+        <Typography variant="h4" component="p" sx={{ mb: 2, textAlign: 'center' }}>
           <em>
             {t('noItemSelected')}
           </em>

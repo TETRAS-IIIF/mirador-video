@@ -4,12 +4,18 @@
 [build]
   publish = "dist/"
 
+[context.main.environment]
+  NODE_VERSION = "20.18.1"
+
+[context.deploy-preview.environment]
+  NODE_VERSION = "20.18.1"
+
 [[redirects]]
   from = "/"
-  to = "/__tests__/integration/mirador/index.html"
+  to = "/demo/index.html"
   status = 200
 
 [[redirects]]
   from = "/:page"
-  to = "/__tests__/integration/mirador/:page"
+  to = "/demo/:page"
   status = 200
