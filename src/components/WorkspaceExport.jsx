@@ -1,4 +1,6 @@
-import { useCallback, useId, useMemo, useState } from 'react';
+import {
+  useCallback, useId, useMemo, useState,
+} from 'react';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -27,9 +29,8 @@ export function WorkspaceExport({
   const exportedState = useMemo(() => JSON.stringify(exportableState, null, 2), [exportableState]);
   const onCopyClick = useCallback(() => {
     copy(exportedState);
-    setCopied(true)
-  }, [exportedState, setCopied])
-
+    setCopied(true);
+  }, [exportedState, setCopied]);
 
   if (copied) {
     return (
@@ -91,8 +92,8 @@ export function WorkspaceExport({
 
 WorkspaceExport.propTypes = {
   children: PropTypes.node,
-  container: PropTypes.object, // eslint-disable-line react/forbid-prop-types
-  exportableState: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  container: PropTypes.object,
+  exportableState: PropTypes.object.isRequired,
   handleClose: PropTypes.func.isRequired,
   id: PropTypes.string,
   open: PropTypes.bool,

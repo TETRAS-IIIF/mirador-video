@@ -47,7 +47,7 @@ export function ManifestForm({
       >
         <Grid size={{ sm: 'grow', xs: 12 }}>
           <TextField
-            autoFocus
+            autoFocus // eslint-disable-line jsx-a11y/no-autofocus
             fullWidth
             value={formValue}
             id="manifestURL"
@@ -70,7 +70,7 @@ export function ManifestForm({
           </Grid>
         )}
         <Grid size="auto">
-          <Button 
+          <Button
             id="fetchBtn"
             type="submit"
             variant="contained"

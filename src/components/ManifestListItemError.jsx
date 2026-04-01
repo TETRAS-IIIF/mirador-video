@@ -8,30 +8,40 @@ import { useTranslation } from 'react-i18next';
 /**
  * ManifestListItemError renders a component displaying a
  * message to the user about a problem loading a manifest
-*/
+ */
 export function ManifestListItemError({
-  manifestId, onDismissClick, onTryAgainClick,
+  manifestId,
+  onDismissClick,
+  onTryAgainClick,
 }) {
   const { t } = useTranslation();
   return (
-    <Grid container sx={{ width: '100%', alignItems: 'center' }}>
-      <Grid container size={{ sm: 5, xs: 12 }} sx={{alignItems: 'center'}}>
+    <Grid container sx={{ alignItems: 'center', width: '100%' }}>
+      <Grid container size={{ sm: 5, xs: 12 }} sx={{ alignItems: 'center' }}>
         <ErrorIcon sx={{
           color: 'error.main',
           height: '2rem',
-          width: '2rem',
           marginRight: '0.5rem',
+          width: '2rem',
         }}
         />
-          <Typography>{t('manifestError')}</Typography>
-          <Typography sx={{ wordBreak: 'break-all' }}>{manifestId}</Typography>
+        <Typography>{t('manifestError')}</Typography>
+        <Typography sx={{ wordBreak: 'break-all' }}>{manifestId}</Typography>
       </Grid>
 
       <Grid container size={{ sm: 7, xs: 12 }}>
-        <Button onClick={() => { onDismissClick(manifestId); }}>
+        <Button
+          onClick={() => {
+            onDismissClick(manifestId);
+          }}
+        >
           {t('dismiss')}
         </Button>
-        <Button onClick={() => { onTryAgainClick(manifestId); }}>
+        <Button
+          onClick={() => {
+            onTryAgainClick(manifestId);
+          }}
+        >
           {t('tryAgain')}
         </Button>
       </Grid>

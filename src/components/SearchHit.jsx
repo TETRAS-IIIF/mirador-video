@@ -33,7 +33,7 @@ const CanvasLabel = styled('h4', { name: 'SearchHit', slot: 'canvasLabel' })(({ 
 }));
 
 const Counter = styled(Chip, { name: 'SearchHit', slot: 'counter' })(({ ownerState, theme }) => ({
-  // eslint-disable-next-line no-nested-ternary
+
   backgroundColor: theme.palette.hitCounter.default,
   ...(ownerState.windowSelected && {
     backgroundColor: theme.palette.highlights.primary,
@@ -48,11 +48,24 @@ const Counter = styled(Chip, { name: 'SearchHit', slot: 'counter' })(({ ownerSta
 }));
 
 /** */
-export function SearchHit({
-  adjacent = false, annotation = undefined, annotationId = undefined, annotationLabel = undefined,
-  announcer = undefined, canvasLabel = undefined, companionWindowId = undefined, containerRef = undefined,
-  focused = false, hit = undefined, index = undefined, selectAnnotation = () => {}, selected = false,
-  showDetails = () => {}, total = undefined, windowId, windowSelected = false,
+export function SearchHit({ // eslint-disable-line complexity
+  adjacent = false,
+  annotation = undefined,
+  annotationId = undefined,
+  annotationLabel = undefined,
+  announcer = undefined,
+  canvasLabel = undefined,
+  companionWindowId = undefined,
+  containerRef = undefined,
+  focused = false,
+  hit = undefined,
+  index = undefined,
+  selectAnnotation = () => {},
+  selected = false,
+  showDetails = () => {},
+  total = undefined,
+  windowId,
+  windowSelected = false,
 }) {
   const { t } = useTranslation();
   useEffect(() => {
@@ -198,6 +211,6 @@ SearchHit.propTypes = {
   selected: PropTypes.bool,
   showDetails: PropTypes.func,
   total: PropTypes.number,
-  windowId: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
+  windowId: PropTypes.string.isRequired,
   windowSelected: PropTypes.bool,
 };

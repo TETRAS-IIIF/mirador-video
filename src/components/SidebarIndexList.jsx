@@ -48,7 +48,7 @@ export function SidebarIndexList({
     <MenuList variant="selectedMenu">
       {
         canvasesIdAndLabel.map((canvas, canvasIndex) => {
-          const onClick = () => { setCanvas(windowId, canvas.id); }; // eslint-disable-line require-jsdoc, max-len
+          const onClick = () => { setCanvas(windowId, canvas.id); };
 
           return (
             <ScrollTo
@@ -75,7 +75,7 @@ export function SidebarIndexList({
 }
 
 SidebarIndexList.propTypes = {
-  canvases: PropTypes.array.isRequired, // eslint-disable-line react/forbid-prop-types
+  canvases: PropTypes.array.isRequired,
   containerRef: PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
