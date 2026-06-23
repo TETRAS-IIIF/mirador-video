@@ -10,5 +10,5 @@ export default defineConfig({
     sourcemap: true,
   },
   plugins: [react()],
-  root: fileURLToPath(new URL('./__tests__/integration/mirador/', import.meta.url)),
+  root: fileURLToPath(new URL('./demo/', import.meta.url)),
 });
