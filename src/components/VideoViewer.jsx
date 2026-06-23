@@ -9,7 +9,6 @@ import AnnotationsOverlayVideo from '../containers/AnnotationsOverlayVideo';
 import WindowCanvasNavigationControlsVideo from '../containers/WindowCanvasNavigationControlsVideo';
 import { setWindowSeekTo } from '../state/actions';
 
-
 // TODO Merge 4.1 capptions and func compo
 
 /** */
@@ -22,8 +21,7 @@ export class VideoViewer extends Component {
     this.state = {
       containerRatio: 1,
       handleVideoEventFunctions: {
-        onPlay: () => {
-        },
+        onPlay: () => {},
       },
       start: 0,
       time: 0,
@@ -40,9 +38,7 @@ export class VideoViewer extends Component {
 
   /** */
   componentDidUpdate(prevProps) {
-    const {
-      canvas, currentTime, paused, setCurrentTime, setPaused, windowId, setSeekTo,
-    } = this.props;
+    const { canvas, currentTime, paused, setCurrentTime, setPaused, windowId, setSeekTo } = this.props;
     if (paused !== prevProps.paused) {
       if (paused) {
         this.timerStop();
@@ -73,8 +69,8 @@ export class VideoViewer extends Component {
   }
 
   /**
-     * @param {S[string]} handleVideoEventFunctions
-     */
+   * @param {S[string]} handleVideoEventFunctions
+   */
   handleVideoEventFunctions = (handleVideoEventFunctions) => {
     this.setState({ handleVideoEventFunctions });
   };
@@ -92,7 +88,7 @@ export class VideoViewer extends Component {
     });
     this.timer = setInterval(() => {
       const { setCurrentTime } = this.props;
-      this.setState(prevState => ({
+      this.setState((prevState) => ({
         time: Date.now() - prevState.start,
       }));
       const { time } = this.state;
@@ -113,20 +109,18 @@ export class VideoViewer extends Component {
   /* eslint-disable jsx-a11y/media-has-caption */
   /** */
   render() {
-    const {
-      canvas, currentTime, windowId, paused, muted, debug,
-    } = this.props;
+    const { canvas, currentTime, windowId, paused, muted, debug } = this.props;
 
     const { containerRatio } = this.state;
 
     const videoResources = flatten(
       flattenDeep([
-        canvas.getContent().map(annot => {
+        canvas.getContent().map((annot) => {
           const annotaion = new AnnotationItem(annot.__jsonld);
           const temporalfragment = annotaion.temporalfragmentSelector;
           if (temporalfragment && temporalfragment.length > 0) {
             const start = temporalfragment[0] || 0;
-            const end = (temporalfragment.length > 1) ? temporalfragment[1] : Number.MAX_VALUE;
+            const end = temporalfragment.length > 1 ? temporalfragment[1] : Number.MAX_VALUE;
             if (start <= currentTime && currentTime < end) {
               //
             } else {
@@ -141,10 +135,8 @@ export class VideoViewer extends Component {
 
     // Only one video can be displayed at a time in this implementation.
     const len = videoResources.length;
-    const video = len > 0
-      ? videoResources[len - 1].body[0] : null;
-    const videoTargetTemporalfragment = len > 0
-      ? videoResources[len - 1].temporalfragment : [];
+    const video = len > 0 ? videoResources[len - 1].body[0] : null;
+    const videoTargetTemporalfragment = len > 0 ? videoResources[len - 1].temporalfragment : [];
 
     let videoAspectRatio;
 
@@ -153,14 +145,14 @@ export class VideoViewer extends Component {
     }
 
     const videoStyle = {
-      height: (videoAspectRatio < containerRatio ? '100%' : 'auto'),
-      width: (videoAspectRatio < containerRatio ? 'auto' : '100%'),
+      height: videoAspectRatio < containerRatio ? '100%' : 'auto',
+      width: videoAspectRatio < containerRatio ? 'auto' : '100%',
     };
 
     const playerStyle = {
       aspectRatio: `${videoAspectRatio}`,
-      height: (videoAspectRatio < containerRatio ? '100%' : 'auto'),
-      width: (videoAspectRatio < containerRatio ? 'auto' : '100%'),
+      height: videoAspectRatio < containerRatio ? '100%' : 'auto',
+      width: videoAspectRatio < containerRatio ? 'auto' : '100%',
     };
 
     const { handleVideoEventFunctions } = this.state;
@@ -178,87 +170,86 @@ export class VideoViewer extends Component {
         }}
       >
         {video && (
-        <>
-          <div style={{
-            alignItems: 'center',
-            backgroundColor: 'black',
-            border: debug ? '6px solid red' : 'none',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            marginBottom: '122px', // TODO Space for navigation controls
-            position: 'relative',
-            width: '100%',
-          }}
-          >
-            <ResizeObserver onResize={this.setContainerRatio} />
-            <div style={{
-              aspectRatio: playerStyle.aspectRatio,
-              border: debug ? '6px solid green' : 'none',
-              height: playerStyle.height,
-              maxHeight: '100%',
-              maxWidth: '100%',
-              width: playerStyle.width,
-              position: 'relative',
-            }}
+          <>
+            <div
+              style={{
+                alignItems: 'center',
+                backgroundColor: 'black',
+                border: debug ? '6px solid red' : 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                marginBottom: '122px', // TODO Space for navigation controls
+                position: 'relative',
+                width: '100%',
+              }}
             >
-              <ReactPlayer
-                width={videoStyle.width}
-                height={videoStyle.height}
-                ref={this.playerRef}
-                url={video.id}
-                controls={false} // Hide default controls
-                pip={false}
-                playbackRate={1}
-                playing={!paused}
-                muted={muted}
-                loop={false}
-                config={{
-                  peertube: {
-                    controls: 0,
-                    mode: 'p2p-media-loader',
-                  },
-                  youtube: {
-                    controls: 0,
-                    modestbranding: 0,
-                  },
-                }}
-                iiifVideoInfos={video}
+              <ResizeObserver onResize={this.setContainerRatio} />
+              <div
                 style={{
-                  aspectRatio: `${videoAspectRatio}`,
-                  border: debug ? '6px solid pink' : 'none', // 'absolute' or 'block
-                  height: (containerRatio < videoAspectRatio ? 'auto' : '100%'),
+                  aspectRatio: playerStyle.aspectRatio,
+                  border: debug ? '6px solid green' : 'none',
+                  height: playerStyle.height,
                   maxHeight: '100%',
                   maxWidth: '100%',
-                  position: 'absolute',
-                  width: (containerRatio < videoAspectRatio ? '100%' : 'auto'),
+                  width: playerStyle.width,
+                  position: 'relative',
                 }}
-                onPlay={handleVideoEventFunctions.onPlay}
-              />
-              {this.playerRef.current && (
-              <AnnotationsOverlayVideo
-                onFunctionsReady={this.handleVideoEventFunctions}
-                windowId={windowId}
-                playerRef={this.playerRef.current}
-                videoRef={this.playerRef.current.getInternalPlayer()}
-                videoTarget={videoTargetTemporalfragment}
-                key={`${windowId} ${video.id}`}
-                highlightAllAnnotations
-                style={{
-                  border: debug ? '6px solid yellow' : 'none',
-                  height: '100%',
-                  objectFit: 'contain',
-                  width: '100%',
-                }}
-              />
-              )}
+              >
+                <ReactPlayer
+                  width={videoStyle.width}
+                  height={videoStyle.height}
+                  ref={this.playerRef}
+                  url={video.id}
+                  controls={false} // Hide default controls
+                  pip={false}
+                  playbackRate={1}
+                  playing={!paused}
+                  muted={muted}
+                  loop={false}
+                  config={{
+                    peertube: {
+                      controls: 0,
+                      mode: 'p2p-media-loader',
+                    },
+                    youtube: {
+                      controls: 0,
+                      modestbranding: 0,
+                    },
+                  }}
+                  iiifVideoInfos={video}
+                  style={{
+                    aspectRatio: `${videoAspectRatio}`,
+                    border: debug ? '6px solid pink' : 'none', // 'absolute' or 'block
+                    height: containerRatio < videoAspectRatio ? 'auto' : '100%',
+                    maxHeight: '100%',
+                    maxWidth: '100%',
+                    position: 'absolute',
+                    width: containerRatio < videoAspectRatio ? '100%' : 'auto',
+                  }}
+                  onPlay={handleVideoEventFunctions.onPlay}
+                />
+                {this.playerRef.current && (
+                  <AnnotationsOverlayVideo
+                    onFunctionsReady={this.handleVideoEventFunctions}
+                    windowId={windowId}
+                    playerRef={this.playerRef.current}
+                    videoRef={this.playerRef.current.getInternalPlayer()}
+                    videoTarget={videoTargetTemporalfragment}
+                    key={`${windowId} ${video.id}`}
+                    highlightAllAnnotations
+                    style={{
+                      border: debug ? '6px solid yellow' : 'none',
+                      height: '100%',
+                      objectFit: 'contain',
+                      width: '100%',
+                    }}
+                  />
+                )}
+              </div>
             </div>
-          </div>
-          <WindowCanvasNavigationControlsVideo
-            windowId={windowId}
-            playerRef={this.playerRef}
-          />
-        </>
+            <WindowCanvasNavigationControlsVideo windowId={windowId} playerRef={this.playerRef} />
+          </>
         )}
       </div>
     );
@@ -270,7 +261,7 @@ export class VideoViewer extends Component {
 VideoViewer.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   canvas: PropTypes.object,
-    captions: PropTypes.arrayOf(PropTypes.object),
+  captions: PropTypes.arrayOf(PropTypes.object),
   currentTime: PropTypes.number,
   debug: PropTypes.bool.isRequired,
   muted: PropTypes.bool,
@@ -279,8 +270,8 @@ VideoViewer.propTypes = {
   setPaused: PropTypes.func,
   setSeekTo: PropTypes.func.isRequired,
   windowId: PropTypes.string.isRequired,
-    videoOptions: PropTypes.object,
-    videoResources: PropTypes.arrayOf(PropTypes.object),
+  videoOptions: PropTypes.object,
+  videoResources: PropTypes.arrayOf(PropTypes.object),
 };
 
 VideoViewer.defaultProps = {
@@ -288,8 +279,6 @@ VideoViewer.defaultProps = {
   currentTime: 0,
   muted: false,
   paused: true,
-  setCurrentTime: () => {
-  },
-  setPaused: () => {
-  },
+  setCurrentTime: () => {},
+  setPaused: () => {},
 };

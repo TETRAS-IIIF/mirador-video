@@ -35,7 +35,7 @@ export class AnnotationManifestsAccordion extends Component {
     // eslint-disable-next-line react/prop-types
     annotation.manifests = searchManifestInID(annotation.id);
     // eslint-disable-next-line react/prop-types
-    annotation.manifests = annotation.manifests?.map(id => ({ id })) ?? [];
+    annotation.manifests = annotation.manifests?.map((id) => ({ id })) ?? [];
 
     this.state = { annotation };
   }
@@ -65,31 +65,23 @@ export class AnnotationManifestsAccordion extends Component {
     return (
       <div>
         <Accordion>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            onClick={(e) => this.handleOpenAccordion(e)}
-          >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />} onClick={(e) => this.handleOpenAccordion(e)}>
             <Typography>{t('manifestFound')}</Typography>
           </AccordionSummary>
-          {
-            annotation.manifestsOpen && (
-            <AccordionDetails sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              flexWrap: 'wrap',
-              gap: '10px',
-            }}
+          {annotation.manifestsOpen && (
+            <AccordionDetails
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexWrap: 'wrap',
+                gap: '10px',
+              }}
             >
-              {annotation.manifests.map(manifest => (
-                <AnnotationManifestsItem
-                  manifestId={manifest.id}
-                  key={manifest}
-                  t={t}
-                />
+              {annotation.manifests.map((manifest) => (
+                <AnnotationManifestsItem manifestId={manifest.id} key={manifest} t={t} />
               ))}
             </AccordionDetails>
-            )
-          }
+          )}
         </Accordion>
       </div>
     );
@@ -110,5 +102,5 @@ AnnotationManifestsAccordion.propsTypes = {
 AnnotationManifestsAccordion.defaultProps = {
   annotation: undefined,
   htmlSanitizationRuleSet: 'iiif',
-  t: key => key,
+  t: (key) => key,
 };

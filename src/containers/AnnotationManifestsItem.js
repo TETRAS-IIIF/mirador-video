@@ -5,8 +5,12 @@ import { withPlugins } from '../extend/withPlugins';
 import * as actions from '../state/actions';
 import { AnnotationManifestsItem } from '../components/AnnotationManifestsItem';
 import {
-  getManifest, getManifestDescription, getManifestLogo,
-  getManifestProviderName, getManifestThumbnail, getManifestTitle,
+  getManifest,
+  getManifestDescription,
+  getManifestLogo,
+  getManifestProviderName,
+  getManifestThumbnail,
+  getManifestTitle,
   getWindowManifests,
 } from '../state/selectors';
 
@@ -15,8 +19,7 @@ const mapStateToProps = (state, { manifestId }) => {
   const manifest = getManifest(state, { manifestId }) || {};
 
   return {
-    active: getWindowManifests(state)
-      .includes(manifestId),
+    active: getWindowManifests(state).includes(manifestId),
     description: getManifestDescription(state, { manifestId }),
     error: manifest.error,
     isFetching: manifest.isFetching,
@@ -39,10 +42,6 @@ const mapDispatchToProps = {
   fetchManifest: actions.fetchManifest,
 };
 
-const enhance = compose(
-  withTranslation(),
-  connect(mapStateToProps, mapDispatchToProps),
-  withPlugins('AnnotationManifestsItem'),
-);
+const enhance = compose(withTranslation(), connect(mapStateToProps, mapDispatchToProps), withPlugins('AnnotationManifestsItem'));
 
 export default enhance(AnnotationManifestsItem);

@@ -1,9 +1,7 @@
 import { Component } from 'react';
 import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
-import {
-  Card, CardActionArea, CardActions, CardContent, CardMedia,
-} from '@mui/material';
+import { Card, CardActionArea, CardActions, CardContent, CardMedia } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 
@@ -23,7 +21,12 @@ export class AnnotationManifestsItem extends Component {
   componentDidMount() {
     const {
       // eslint-disable-next-line react/prop-types
-      fetchManifest, manifestId, ready, isFetching, error, provider,
+      fetchManifest,
+      manifestId,
+      ready,
+      isFetching,
+      error,
+      provider,
     } = this.props;
 
     if (!ready && !error && !isFetching && provider !== 'file') {
@@ -43,13 +46,17 @@ export class AnnotationManifestsItem extends Component {
   render() {
     const {
       // eslint-disable-next-line react/prop-types
-      t, manifestId, thumbnail, title, description, error, ready,
+      t,
+      manifestId,
+      thumbnail,
+      title,
+      description,
+      error,
+      ready,
     } = this.props;
 
     if (error) {
-      return (
-        <Typography sx={theme => ({ color: theme.palette.error.main })}>{t('resourceError', { manifestId })}</Typography>
-      );
+      return <Typography sx={(theme) => ({ color: theme.palette.error.main })}>{t('resourceError', { manifestId })}</Typography>;
     }
 
     if (!ready) {
@@ -63,31 +70,21 @@ export class AnnotationManifestsItem extends Component {
     return (
       <Card>
         <CardActionArea>
-          {
-            thumbnail && (
-              <CardMedia
-                sx={{
-                  maxWidth: '100%',
-                  objectFit: 'contain',
-                }}
-                component="img"
-                height="140"
-                image={thumbnail}
-                alt="green iguana"
-              />
-            )
-          }
+          {thumbnail && (
+            <CardMedia
+              sx={{
+                maxWidth: '100%',
+                objectFit: 'contain',
+              }}
+              component="img"
+              height="140"
+              image={thumbnail}
+              alt="green iguana"
+            />
+          )}
           <CardContent>
-            <Typography>
-              { title || manifestId }
-            </Typography>
-            {
-              description && (
-                <Typography>
-                  { description }
-                </Typography>
-              )
-            }
+            <Typography>{title || manifestId}</Typography>
+            {description && <Typography>{description}</Typography>}
           </CardContent>
         </CardActionArea>
         <CardActions>

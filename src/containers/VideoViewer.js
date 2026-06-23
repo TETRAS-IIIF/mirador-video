@@ -20,7 +20,7 @@ import {
 /** */
 const mapStateToProps = (state, { windowId }) => ({
   annotations: getPresentAnnotationsOnSelectedCanvases(state, { windowId }),
-  canvas: (getCurrentCanvas(state, { windowId }) || {}),
+  canvas: getCurrentCanvas(state, { windowId }) || {},
   canvasWorld: getCurrentCanvasWorld(state, { windowId }),
   captions: getVisibleCanvasCaptions(state, { windowId }) || [],
   currentTime: getWindowCurrentTime(state, { windowId }),
@@ -40,9 +40,6 @@ const mapDispatchToProps = (dispatch, { windowId }) => ({
   setSeekTo: (...args) => dispatch(actions.setWindowSeekTo(windowId, ...args)),
 });
 
-const enhance = compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  withPlugins('VideoViewer'),
-);
+const enhance = compose(connect(mapStateToProps, mapDispatchToProps), withPlugins('VideoViewer'));
 
 export default enhance(VideoViewer);

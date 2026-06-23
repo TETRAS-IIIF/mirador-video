@@ -36,9 +36,7 @@ export class ViewerNavigationVideo extends Component {
 
   /** */
   handleChange = (event, newValue) => {
-    const {
-      paused, setCurrentTime, setSeekTo, setPaused,
-    } = this.props;
+    const { paused, setCurrentTime, setSeekTo, setPaused } = this.props;
     if (!paused) {
       setPaused(true);
       setSeekTo(newValue);
@@ -52,20 +50,11 @@ export class ViewerNavigationVideo extends Component {
    * Renders things
    */
   render() {
-    const {
-      currentTime,
-      duration,
-      hasTextTrack,
-      muted,
-      paused,
-      setMuted,
-      setPaused,
-      setTextTrackDisabled,
-      textTrackDisabled,
-    } = this.props;
+    const { currentTime, duration, hasTextTrack, muted, paused, setMuted, setPaused, setTextTrackDisabled, textTrackDisabled } =
+      this.props;
 
-    const start = (duration > 3600 || duration === undefined) ? 11 : 14;
-    const len = (duration > 3600 || duration === undefined) ? 8 : 5;
+    const start = duration > 3600 || duration === undefined ? 11 : 14;
+    const len = duration > 3600 || duration === undefined ? 8 : 5;
     let durationLabel = new Date(currentTime * 1000).toISOString().substr(start, len);
     let slider = '';
     if (duration !== undefined) {
@@ -81,42 +70,48 @@ export class ViewerNavigationVideo extends Component {
         <MiradorMenuButton
           aria-label={paused ? 'Play' : 'Pause'}
           className={paused ? ns('next-canvas-button') : ns('next-canvas-button')}
-          onClick={() => { setPaused(!paused); }}
+          onClick={() => {
+            setPaused(!paused);
+          }}
         >
-          { paused ? <PlayArrowRoundedIcon /> : <PauseRoundedIcon /> }
+          {paused ? <PlayArrowRoundedIcon /> : <PauseRoundedIcon />}
         </MiradorMenuButton>
         {slider}
-        <span style={{
-          alignItems: 'center',
-          display: 'flex',
-        }}
+        <span
+          style={{
+            alignItems: 'center',
+            display: 'flex',
+          }}
         >
-          <Typography variant="caption">
-            {durationLabel}
-          </Typography>
+          <Typography variant="caption">{durationLabel}</Typography>
         </span>
         <MiradorMenuButton
           aria-label={muted ? 'Unmute' : 'Mute'}
           className={muted ? ns('next-canvas-button') : ns('next-canvas-button')}
-          onClick={() => { setMuted(!muted); }}
+          onClick={() => {
+            setMuted(!muted);
+          }}
         >
-          { muted ? <VolumeOffIcon /> : <VolumeUpIcon /> }
+          {muted ? <VolumeOffIcon /> : <VolumeUpIcon />}
         </MiradorMenuButton>
-        { hasTextTrack && (
+        {hasTextTrack && (
           <MiradorMenuButton
             aria-label={textTrackDisabled ? 'CC show' : 'CC hide'}
             className={textTrackDisabled ? ns('next-canvas-button') : ns('next-canvas-button')}
-            onClick={() => { setTextTrackDisabled(!textTrackDisabled); }}
+            onClick={() => {
+              setTextTrackDisabled(!textTrackDisabled);
+            }}
           >
-            { textTrackDisabled ? <ClosedCaptionOutlined /> : <ClosedCaption /> }
+            {textTrackDisabled ? <ClosedCaptionOutlined /> : <ClosedCaption />}
           </MiradorMenuButton>
         )}
-        <span style={{
-          borderRight: '1px solid #808080',
-          display: 'inline-block',
-          height: '24px',
-          margin: '12px 6px',
-        }}
+        <span
+          style={{
+            borderRight: '1px solid #808080',
+            display: 'inline-block',
+            height: '24px',
+            margin: '12px 6px',
+          }}
         />
       </StyledPlayControls>
     );

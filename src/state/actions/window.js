@@ -211,66 +211,66 @@ export function hideCollectionDialog(windowId) {
 
 /** */
 export function setWindowCurrentTime(windowId, currentTime) {
-  return ((dispatch) => {
+  return (dispatch) => {
     dispatch({
       currentTime,
       type: ActionTypes.SET_CURRENT_TIME,
       windowId,
     });
-  });
+  };
 }
 
 /** */
 export function setWindowSeekTo(windowId, seekToTime) {
-  return ((dispatch) => {
+  return (dispatch) => {
     dispatch({
       seekToTime,
       type: ActionTypes.SET_SEEK_TO_TIME,
       windowId,
     });
-  });
+  };
 }
 
 /** */
 export function setWindowPaused(windowId, paused) {
-  return ((dispatch) => {
+  return (dispatch) => {
     dispatch({
-      paused: (paused === undefined) ? true : paused,
+      paused: paused === undefined ? true : paused,
       type: ActionTypes.SET_VIDEO_PAUSED,
       windowId,
     });
-  });
+  };
 }
 
 /** */
 export function setWindowMuted(windowId, muted) {
-  return ((dispatch) => {
+  return (dispatch) => {
     dispatch({
-      muted: (muted === undefined) ? false : muted,
+      muted: muted === undefined ? false : muted,
       type: ActionTypes.SET_VIDEO_MUTED,
       windowId,
     });
-  });
+  };
 }
 
 /** */
 export function setWindowTextTrackDisabled(windowId, disabled) {
-  return ((dispatch) => {
+  return (dispatch) => {
     dispatch({
-      textTrackDisabled: (disabled === undefined) ? true : disabled,
+      textTrackDisabled: disabled === undefined ? true : disabled,
       type: ActionTypes.SET_VIDEO_TEXTTRACK_DISABLED,
       windowId,
     });
-  });
+  };
 }
 
 /** */
 export function setWindowHasTextTrack(windowId, hasTextTrack) {
-  return ((dispatch) => {
+  return (dispatch) => {
     dispatch({
-      hasTextTrack: (hasTextTrack === undefined) ? false : hasTextTrack,
+      hasTextTrack: hasTextTrack === undefined ? false : hasTextTrack,
       type: ActionTypes.SET_VIDEO_HAS_TEXTTRACK,
       windowId,
     });
-  });
+  };
 }

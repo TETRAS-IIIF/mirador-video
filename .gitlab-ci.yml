@@ -1,4 +1,3 @@
-
 upstream_tests:
   image: ghcr.io/puppeteer/puppeteer:latest
   before_script:

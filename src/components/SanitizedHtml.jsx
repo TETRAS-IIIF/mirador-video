@@ -17,13 +17,11 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
 });
 
 /**
-*/
-export function SanitizedHtml({
-  classes = {}, htmlString, ruleSet, ...rest
-}) {
+ */
+export function SanitizedHtml({ classes = {}, htmlString, ruleSet, ...rest }) {
   const stopIfAnchor = (e) => {
     const el = e.target instanceof Node ? e.target : null;
-    if (el && (el.closest && el.closest('a'))) {
+    if (el && el.closest && el.closest('a')) {
       // allow the browser default (open/focus tab), but don’t notify parents
       e.stopPropagation();
       window.open(el.closest('a').href, '_blank', 'noopener');

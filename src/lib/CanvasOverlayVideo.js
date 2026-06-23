@@ -20,7 +20,10 @@ export default class CanvasOverlayVideo {
     this.player = player; // TODO Rename video to player
     this.ref = ref;
     const [
-      _canvasX, _canvasY, canvasWidth, canvasHeight, // eslint-disable-line no-unused-vars
+      _canvasX,
+      _canvasY,
+      canvasWidth,
+      canvasHeight, // eslint-disable-line no-unused-vars
     ] = canvasSize;
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
@@ -81,7 +84,9 @@ export default class CanvasOverlayVideo {
    * resize - resizes the added Canvas overlay.
    */
   resize() {
-    if (!this.player || !this.canvas) { return; }
+    if (!this.player || !this.canvas) {
+      return;
+    }
 
     const displayedVideoWidth = this.player.wrapper.clientWidth;
     const displayedVideoHeight = this.player.wrapper.clientHeight;
@@ -102,7 +107,9 @@ export default class CanvasOverlayVideo {
    * @param {Function} update
    */
   canvasUpdate(update) {
-    if (!this.context2d) { return; }
+    if (!this.context2d) {
+      return;
+    }
 
     const ratio = this.scale;
     this.context2d.scale(ratio, ratio);

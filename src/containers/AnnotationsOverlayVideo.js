@@ -27,26 +27,27 @@ import {
  */
 const mapStateToProps = (state, { windowId }) => ({
   annotations: getPresentAnnotationsOnSelectedCanvases(state, { windowId }),
-  canvas: (getCurrentCanvas(state, { windowId }) || {}),
+  canvas: getCurrentCanvas(state, { windowId }) || {},
   canvasWorld: getCurrentCanvasWorld(state, { windowId }),
   currentTime: getWindowCurrentTime(state, { windowId }),
   debug: getConfig(state).debug || false,
-  drawAnnotations: getConfig(state).window.forceDrawAnnotations || getCompanionWindowsForContent(state, {
-    content: 'annotations',
-    windowId,
-  }).length > 0,
-  drawSearchAnnotations: getConfig(state).window.forceDrawAnnotations || getCompanionWindowsForContent(state, {
-    content: 'search',
-    windowId,
-  }).length > 0,
+  drawAnnotations:
+    getConfig(state).window.forceDrawAnnotations ||
+    getCompanionWindowsForContent(state, {
+      content: 'annotations',
+      windowId,
+    }).length > 0,
+  drawSearchAnnotations:
+    getConfig(state).window.forceDrawAnnotations ||
+    getCompanionWindowsForContent(state, {
+      content: 'search',
+      windowId,
+    }).length > 0,
   highlightAllAnnotations: getWindow(state, { windowId }).highlightAllAnnotations,
   hoveredAnnotationIds: getWindow(state, { windowId }).hoveredAnnotationIds,
   palette: getTheme(state).palette,
   paused: getWindowPausedStatus(state, { windowId }),
-  searchAnnotations: getSearchAnnotationsForWindow(
-    state,
-    { windowId },
-  ),
+  searchAnnotations: getSearchAnnotationsForWindow(state, { windowId }),
   seekToTime: getWindowSeekToTime(state, { windowId }),
   selectedAnnotationId: getSelectedAnnotationId(state, { windowId }),
 });
@@ -64,10 +65,6 @@ const mapDispatchToProps = (dispatch, { windowId }) => ({
   setPaused: (...args) => dispatch(actions.setWindowPaused(windowId, ...args)),
 });
 
-const enhance = compose(
-  withTranslation(),
-  connect(mapStateToProps, mapDispatchToProps),
-  withPlugins('AnnotationsOverlayVideo'),
-);
+const enhance = compose(withTranslation(), connect(mapStateToProps, mapDispatchToProps), withPlugins('AnnotationsOverlayVideo'));
 
 export default enhance(AnnotationsOverlayVideo);

@@ -33,9 +33,7 @@ const mapDispatchToProps = (dispatch, { windowId }) => ({
   setMuted: (...args) => dispatch(actions.setWindowMuted(windowId, ...args)),
   setPaused: (...args) => dispatch(actions.setWindowPaused(windowId, ...args)),
   setSeekTo: (...args) => dispatch(actions.setWindowSeekTo(windowId, ...args)),
-  setTextTrackDisabled: (...args) => dispatch(
-    actions.setWindowTextTrackDisabled(windowId, ...args),
-  ),
+  setTextTrackDisabled: (...args) => dispatch(actions.setWindowTextTrackDisabled(windowId, ...args)),
 });
 
 const enhance = compose(

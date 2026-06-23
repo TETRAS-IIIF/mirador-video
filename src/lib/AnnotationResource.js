@@ -141,10 +141,9 @@ export default class AnnotationResource {
     if (match) {
       const params = match[1].split(',');
       if (params.length < 3) {
-        return params.map(str => parseFloat(str));
+        return params.map((str) => parseFloat(str));
       }
     }
     return null;
   }
-
 }

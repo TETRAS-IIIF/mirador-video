@@ -116,7 +116,8 @@ export function toggleAnnotationDisplay(windowId) {
  */
 export function toggleAnnotationAutoScroll(windowId) {
   return {
-    type: ActionTypes.TOGGLE_ANNOTATION_AUTOSCROLL, windowId,
+    type: ActionTypes.TOGGLE_ANNOTATION_AUTOSCROLL,
+    windowId,
   };
 }
 

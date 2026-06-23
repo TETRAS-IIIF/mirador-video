@@ -15,9 +15,7 @@ const mapStateToProps = (state, { canvasId, windowId }) => ({
  * @memberof WindowSideBarAnnotationsPanel
  * @private
  */
-const mapDispatchToProps = {
-
-};
+const mapDispatchToProps = {};
 
 const enhance = compose(
   withTranslation(),

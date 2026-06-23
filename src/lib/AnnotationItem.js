@@ -122,7 +122,6 @@ export default class AnnotationItem {
     return match && match[1].split(',').map((str) => parseInt(str, 10));
   }
 
-
   /** */
   get temporalfragmentSelector() {
     const { selector } = this;
@@ -135,7 +134,7 @@ export default class AnnotationItem {
         match = selector.match(/t=(.*?)(&|$)/);
         break;
       case 'object':
-        temporalfragmentSelector = selector.find(s => s.type && s.type === 'FragmentSelector');
+        temporalfragmentSelector = selector.find((s) => s.type && s.type === 'FragmentSelector');
         match = temporalfragmentSelector && temporalfragmentSelector.value.match(/t=(.*?)(&|$)/);
         break;
       default:

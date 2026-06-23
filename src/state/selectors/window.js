@@ -1,68 +1,38 @@
 import { createSelector } from 'reselect';
 import { getWindow } from './getters';
 
-export const getWindowCurrentTime = createSelector(
-  [
-    getWindow,
-  ],
-  (window) => {
-    if (!window) return undefined;
+export const getWindowCurrentTime = createSelector([getWindow], (window) => {
+  if (!window) return undefined;
 
-    return window.currentTime;
-  },
-);
+  return window.currentTime;
+});
 
-export const getWindowSeekToTime = createSelector(
-  [
-    getWindow,
-  ],
-  (window) => {
-    if (!window) return undefined;
+export const getWindowSeekToTime = createSelector([getWindow], (window) => {
+  if (!window) return undefined;
 
-    return window.seekToTime;
-  },
-);
+  return window.seekToTime;
+});
 
-export const getWindowPausedStatus = createSelector(
-  [
-    getWindow,
-  ],
-  (window) => {
-    if (!window) return undefined;
+export const getWindowPausedStatus = createSelector([getWindow], (window) => {
+  if (!window) return undefined;
 
-    return window.paused;
-  },
-);
+  return window.paused;
+});
 
-export const getWindowMutedStatus = createSelector(
-  [
-    getWindow,
-  ],
-  (window) => {
-    if (!window) return undefined;
+export const getWindowMutedStatus = createSelector([getWindow], (window) => {
+  if (!window) return undefined;
 
-    return window.muted;
-  },
-);
+  return window.muted;
+});
 
-export const getWindowTextTrackDisabledStatus = createSelector(
-  [
-    getWindow,
-  ],
-  (window) => {
-    if (!window) return undefined;
+export const getWindowTextTrackDisabledStatus = createSelector([getWindow], (window) => {
+  if (!window) return undefined;
 
-    return window.textTrackDisabled;
-  },
-);
+  return window.textTrackDisabled;
+});
 
-export const getWindowHasTextTrack = createSelector(
-  [
-    getWindow,
-  ],
-  (window) => {
-    if (!window) return undefined;
+export const getWindowHasTextTrack = createSelector([getWindow], (window) => {
+  if (!window) return undefined;
 
-    return window.hasTextTrack;
-  },
-);
+  return window.hasTextTrack;
+});

@@ -14,7 +14,7 @@ const customStyles = {
     ...provided,
     fontFamily: 'Arial',
   }),
-  menuPortal: base => ({
+  menuPortal: (base) => ({
     ...base,
     zIndex: 9999,
   }),
@@ -32,12 +32,7 @@ const customStyles = {
  * @returns {JSX.Element}
  * @constructor
  */
-export function AnnotationsFilter({
-  availableTags,
-  setInputSearch,
-  setTagsSearch,
-  t,
-}) {
+export function AnnotationsFilter({ availableTags, setInputSearch, setTagsSearch, t }) {
   return (
     <>
       <TextField
@@ -48,10 +43,11 @@ export function AnnotationsFilter({
         }}
         InputProps={{
           endAdornment: (
-            <div style={{
-              position: 'absolute',
-              right: 0,
-            }}
+            <div
+              style={{
+                position: 'absolute',
+                right: 0,
+              }}
             >
               <MiradorMenuButton aria-label={t('searchAnnotationTooltip')} type="submit">
                 <SearchIcon />
@@ -60,21 +56,21 @@ export function AnnotationsFilter({
           ),
         }}
       />
-      {
-        availableTags.length > 0 && (
-          <Select
-            isMulti
-            name="tagsFilter"
-            options={availableTags.map(tag => ({ label: tag, value: tag }))}
-            className="basic-multi-select"
-            classNamePrefix="select"
-            onChange={(e) => { setTagsSearch(e.map(tag => tag.value)); }}
-            menuPortalTarget={document.body}
-            styles={customStyles}
-            placeholder={t('filteringByTags')}
-          />
-        )
-      }
+      {availableTags.length > 0 && (
+        <Select
+          isMulti
+          name="tagsFilter"
+          options={availableTags.map((tag) => ({ label: tag, value: tag }))}
+          className="basic-multi-select"
+          classNamePrefix="select"
+          onChange={(e) => {
+            setTagsSearch(e.map((tag) => tag.value));
+          }}
+          menuPortalTarget={document.body}
+          styles={customStyles}
+          placeholder={t('filteringByTags')}
+        />
+      )}
     </>
   );
 }

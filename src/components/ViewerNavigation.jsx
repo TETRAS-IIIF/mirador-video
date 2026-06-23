@@ -45,8 +45,8 @@ export function ViewerNavigation({
         className={ns('previous-canvas-button')}
         disabled={!hasPreviousCanvas}
         onClick={() => {
-            beforeClick();
-            hasNextCanvas && setNextCanvas();
+          beforeClick();
+          hasNextCanvas && setNextCanvas();
         }}
       >
         <NavigationIcon style={previousIconStyle} />
@@ -56,8 +56,8 @@ export function ViewerNavigation({
         className={ns('next-canvas-button')}
         disabled={!hasNextCanvas}
         onClick={() => {
-            beforeClick();
-            hasNextCanvas && setNextCanvas();
+          beforeClick();
+          hasNextCanvas && setNextCanvas();
         }}
       >
         <NavigationIcon style={nextIconStyle} />

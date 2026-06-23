@@ -24,10 +24,12 @@ export default {
     defaultSideBarPanel: 'annotations',
     sideBarOpenByDefault: true,
   },
-  windows: [{
-    canvasIndex: 0,
-    loadedManifest: 'https://files.tetras-libre.fr/dev/vertical_video_with_annot.json',
-    sideBarOpen: true,
-    view: 'single',
-  }],
+  windows: [
+    {
+      canvasIndex: 0,
+      loadedManifest: 'https://files.tetras-libre.fr/dev/vertical_video_with_annot.json',
+      sideBarOpen: true,
+      view: 'single',
+    },
+  ],
 };

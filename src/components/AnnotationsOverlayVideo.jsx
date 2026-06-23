@@ -23,20 +23,17 @@ export class AnnotationsOverlayVideo extends Component {
    */
   static annotationsMatch(currentAnnotations, prevAnnotations) {
     if (!currentAnnotations && !prevAnnotations) return true;
-    if (
-      (currentAnnotations && !prevAnnotations)
-      || (!currentAnnotations && prevAnnotations)
-    ) return false;
+    if ((currentAnnotations && !prevAnnotations) || (!currentAnnotations && prevAnnotations)) return false;
 
     if (currentAnnotations.length === 0 && prevAnnotations.length === 0) return true;
     if (currentAnnotations.length !== prevAnnotations.length) return false;
     return currentAnnotations.every((annotation, index) => {
-      const newIds = annotation.resources.map(r => r.id);
-      const prevIds = prevAnnotations[index].resources.map(r => r.id);
+      const newIds = annotation.resources.map((r) => r.id);
+      const prevIds = prevAnnotations[index].resources.map((r) => r.id);
       if (newIds.length === 0 && prevIds.length === 0) return true;
       if (newIds.length !== prevIds.length) return false;
 
-      if ((annotation.id === prevAnnotations[index].id) && (isEqual(newIds, prevIds))) {
+      if (annotation.id === prevAnnotations[index].id && isEqual(newIds, prevIds)) {
         return true;
       }
       return false;
@@ -48,7 +45,7 @@ export class AnnotationsOverlayVideo extends Component {
     const temporalfragment = resource.temporalfragmentSelector;
     if (temporalfragment && temporalfragment.length > 0) {
       const start = temporalfragment[0] || 0;
-      const end = (temporalfragment.length > 1) ? temporalfragment[1] : Number.MAX_VALUE;
+      const end = temporalfragment.length > 1 ? temporalfragment[1] : Number.MAX_VALUE;
       if (start <= time && time < end) {
         //
       } else {
@@ -128,8 +125,10 @@ export class AnnotationsOverlayVideo extends Component {
       currentTime,
       drawAnnotations,
       drawSearchAnnotations,
-      annotations, searchAnnotations,
-      hoveredAnnotationIds, selectedAnnotationId,
+      annotations,
+      searchAnnotations,
+      hoveredAnnotationIds,
+      selectedAnnotationId,
       highlightAllAnnotations,
       paused,
       seekToTime,
@@ -165,9 +164,7 @@ export class AnnotationsOverlayVideo extends Component {
     // eslint-disable-next-line max-len
     const searchAnnotationsUpdated = !AnnotationsOverlayVideo.annotationsMatch(searchAnnotations, prevProps.searchAnnotations);
 
-    const hoveredAnnotationsUpdated = (
-      xor(hoveredAnnotationIds, prevProps.hoveredAnnotationIds).length > 0
-    );
+    const hoveredAnnotationsUpdated = xor(hoveredAnnotationIds, prevProps.hoveredAnnotationIds).length > 0;
 
     if (this.canvasOverlay && this.canvasOverlay.canvas && hoveredAnnotationsUpdated) {
       if (hoveredAnnotationIds.length > 0) {
@@ -180,8 +177,7 @@ export class AnnotationsOverlayVideo extends Component {
     const selectedAnnotationsUpdated = selectedAnnotationId !== prevProps.selectedAnnotationId;
     if (selectedAnnotationsUpdated && selectedAnnotationId) {
       // TODO: When does this happens ?
-      if (this.currentTimeNearestAnnotationId
-              && this.currentTimeNearestAnnotationId === selectedAnnotationId) {
+      if (this.currentTimeNearestAnnotationId && this.currentTimeNearestAnnotationId === selectedAnnotationId) {
         // go through
       } else {
         annotations.forEach((annotation) => {
@@ -218,10 +214,7 @@ export class AnnotationsOverlayVideo extends Component {
       });
       if (candidateAnnotation) {
         if (candidateAnnotation.id !== prevProps.selectedAnnotationId) {
-          const {
-            selectAnnotation,
-            windowId,
-          } = this.props;
+          const { selectAnnotation, windowId } = this.props;
           if (selectedAnnotationId !== candidateAnnotation.id) {
             selectAnnotation(windowId, candidateAnnotation.id);
           }
@@ -230,16 +223,17 @@ export class AnnotationsOverlayVideo extends Component {
       }
     }
 
-    const redrawAnnotations = drawAnnotations !== prevProps.drawAnnotations
-      || drawSearchAnnotations !== prevProps.drawSearchAnnotations
-      || highlightAllAnnotations !== prevProps.highlightAllAnnotations;
+    const redrawAnnotations =
+      drawAnnotations !== prevProps.drawAnnotations ||
+      drawSearchAnnotations !== prevProps.drawSearchAnnotations ||
+      highlightAllAnnotations !== prevProps.highlightAllAnnotations;
 
     if (
-      searchAnnotationsUpdated
-      || annotationsUpdated
-      || selectedAnnotationsUpdated
-      || hoveredAnnotationsUpdated
-      || redrawAnnotations
+      searchAnnotationsUpdated ||
+      annotationsUpdated ||
+      selectedAnnotationsUpdated ||
+      hoveredAnnotationsUpdated ||
+      redrawAnnotations
     ) {
       this.updateCanvas = this.canvasUpdateCallback();
       this.updateCanvas();
@@ -274,7 +268,8 @@ export class AnnotationsOverlayVideo extends Component {
   /**
    * @event event
    * */
-  onVideoLoadedMetadata(event) { // eslint-disable-line class-methods-use-this
+  onVideoLoadedMetadata(event) {
+    // eslint-disable-line class-methods-use-this
     // if (this.video) {
     //   const { currentTime } = this.props;
     //   const { temporalOffset } = this;
@@ -357,8 +352,7 @@ export class AnnotationsOverlayVideo extends Component {
       annosWithScore = sortBy(annos.map(annosWithClickScore(radius)), 'score');
 
       const { width: canvasWidth, height: canvasHeight } = this.getCurrentCanvasSize();
-      while (radius < Math.max(canvasWidth, canvasHeight)
-        && annosWithScore[0].score === annosWithScore[1].score) {
+      while (radius < Math.max(canvasWidth, canvasHeight) && annosWithScore[0].score === annosWithScore[1].score) {
         radius *= 2;
         annosWithScore = sortBy(annos.map(annosWithClickScore(radius)), 'score');
       }
@@ -394,8 +388,16 @@ export class AnnotationsOverlayVideo extends Component {
     // const currentTime = this.video ? this.video.currentTime : undefined;
     const annos = this.annotationsAtPoint(canvas, point, currentTime);
 
-    if (xor(hoveredAnnotationIds, annos.map(a => a.id)).length > 0) {
-      hoverAnnotation(windowId, annos.map(a => a.id));
+    if (
+      xor(
+        hoveredAnnotationIds,
+        annos.map((a) => a.id),
+      ).length > 0
+    ) {
+      hoverAnnotation(
+        windowId,
+        annos.map((a) => a.id),
+      );
     }
   }
 
@@ -411,7 +413,7 @@ export class AnnotationsOverlayVideo extends Component {
   /**
    * Make sure that the annotation position on the Canvas is correct even when the video
    * display size is changed by opening and closing the side panel.
-  */
+   */
   onCanvasResize(event) {
     this.updateCanvas();
   }
@@ -420,7 +422,10 @@ export class AnnotationsOverlayVideo extends Component {
   getCurrentCanvasSize() {
     const { canvas, canvasWorld } = this.props;
     const [
-      _canvasX, _canvasY, _canvasWidth, _canvasHeight, // eslint-disable-line no-unused-vars
+      _canvasX,
+      _canvasY,
+      _canvasWidth,
+      _canvasHeight, // eslint-disable-line no-unused-vars
     ] = canvasWorld.canvasToWorldCoordinates(canvas.id);
     if (_canvasWidth && _canvasHeight) {
       return { height: _canvasHeight, width: _canvasWidth };
@@ -436,16 +441,20 @@ export class AnnotationsOverlayVideo extends Component {
   getResourceImage(resource) {
     const imageSource = [];
 
-    for (const body of resource.body.filter(b => b.type === 'Image')) {
+    for (const body of resource.body.filter((b) => b.type === 'Image')) {
       const src = body.id;
       if (this.imagesReady[src]) {
         imageSource.push(this.imagesReady[src]);
       } else if (!this.imagesLoading.includes(src)) {
         this.imagesLoading.push(src);
         const img = new Image();
-        img.addEventListener('load', () => {
-          this.imagesReady[src] = img;
-        }, false);
+        img.addEventListener(
+          'load',
+          () => {
+            this.imagesReady[src] = img;
+          },
+          false,
+        );
         img.src = src;
       }
     }
@@ -475,7 +484,10 @@ export class AnnotationsOverlayVideo extends Component {
   isCanvasSizeSpecified() {
     const { canvas, canvasWorld } = this.props;
     const [
-      _canvasX, _canvasY, _canvasWidth, _canvasHeight, // eslint-disable-line no-unused-vars
+      _canvasX,
+      _canvasY,
+      _canvasWidth,
+      _canvasHeight, // eslint-disable-line no-unused-vars
     ] = canvasWorld.canvasToWorldCoordinates(canvas.id);
     return _canvasWidth && _canvasHeight;
   }
@@ -544,14 +556,12 @@ export class AnnotationsOverlayVideo extends Component {
     if (resource.svgSelector) {
       const context = this.canvasOverlay.context2d;
       const { svgPaths } = new CanvasAnnotationDisplay({ resource });
-      return [...svgPaths].some(path => (
-        context.isPointInPath(new Path2D(path.attributes.d.nodeValue), relativeX, relativeY)
-      ));
+      return [...svgPaths].some((path) => context.isPointInPath(new Path2D(path.attributes.d.nodeValue), relativeX, relativeY));
     }
 
     if (resource.fragmentSelector) {
       const [x, y, w, h] = resource.fragmentSelector;
-      return (x <= relativeX && relativeX <= (x + w) && y <= relativeY && relativeY <= (y + h));
+      return x <= relativeX && relativeX <= x + w && y <= relativeY && relativeY <= y + h;
     }
 
     // If there is no svgSelector or fragmentSelector, assume that the target is the entire canvas.
@@ -563,7 +573,7 @@ export class AnnotationsOverlayVideo extends Component {
     const { annotations, searchAnnotations } = this.props;
 
     const lists = [...annotations, ...searchAnnotations];
-    const annos = flatten(lists.map(l => l.resources)).filter((resource) => {
+    const annos = flatten(lists.map((l) => l.resources)).filter((resource) => {
       if (canvas.id !== resource.targetId) return false;
 
       return this.isAnnotationAtPoint(resource, canvas, point, time);
@@ -574,12 +584,7 @@ export class AnnotationsOverlayVideo extends Component {
 
   /** */
   toggleAnnotation(id) {
-    const {
-      selectedAnnotationId,
-      selectAnnotation,
-      deselectAnnotation,
-      windowId,
-    } = this.props;
+    const { selectedAnnotationId, selectAnnotation, deselectAnnotation, windowId } = this.props;
 
     if (selectedAnnotationId === id) {
       deselectAnnotation(windowId, id);
@@ -592,9 +597,7 @@ export class AnnotationsOverlayVideo extends Component {
    * annotationsToContext - converts anontations to a canvas context
    */
   annotationsToContext(annotations, palette) {
-    const {
-      highlightAllAnnotations, hoveredAnnotationIds, selectedAnnotationId, canvasWorld, currentTime,
-    } = this.props;
+    const { highlightAllAnnotations, hoveredAnnotationIds, selectedAnnotationId, canvasWorld, currentTime } = this.props;
     const context = this.canvasOverlay.context2d;
     const zoomRatio = 1;
     annotations.forEach((annotation) => {
@@ -628,13 +631,7 @@ export class AnnotationsOverlayVideo extends Component {
 
   /** */
   renderAnnotations() {
-    const {
-      annotations,
-      drawAnnotations,
-      drawSearchAnnotations,
-      searchAnnotations,
-      palette,
-    } = this.props;
+    const { annotations, drawAnnotations, drawSearchAnnotations, searchAnnotations, palette } = this.props;
 
     if (drawSearchAnnotations) {
       this.annotationsToContext(searchAnnotations, palette.search);
@@ -650,14 +647,8 @@ export class AnnotationsOverlayVideo extends Component {
    */
   render() {
     const { showProgress } = this.state;
-    const {
-      currentTime,
-      debug,
-      paused,
-      seekToTime,
-      selectedAnnotationId,
-    } = this.props;
-    const circularProgress = (<CircularProgress style={{ left: '50%', position: 'absolute', top: '50%' }} />);
+    const { currentTime, debug, paused, seekToTime, selectedAnnotationId } = this.props;
+    const circularProgress = <CircularProgress style={{ left: '50%', position: 'absolute', top: '50%' }} />;
     return (
       <>
         <canvas
@@ -672,74 +663,25 @@ export class AnnotationsOverlayVideo extends Component {
           }}
         />
         <ResizeObserver onResize={this.onCanvasResize} />
-        { debug && (
-        <div style={{
-          bottom: 30,
-          color: 'white',
-          left: 0,
-          position: 'absolute',
-        }}
-        >
-          <span>
-            {' '}
-            Selected Annot
-            {' '}
-            {' '}
-            {selectedAnnotationId}
-            {' '}
-          </span>
-          <br />
-          <span>
-            {' '}
-            Current Time
-            {' '}
-            {' '}
-            {currentTime}
-            {' '}
-          </span>
-          {' '}
-          <br />
-          <span>
-            {' '}
-            Player Time
-            {' '}
-            {' '}
-            {this.player ? this.player.getCurrentTime() : 'player not ready'}
-            {' '}
-          </span>
-          {' '}
-          <br />
-          <span>
-            {' '}
-            Seek Time
-            {' '}
-            {' '}
-            {seekToTime}
-            {' '}
-          </span>
-          {' '}
-          <br />
-          <span>
-            {' '}
-            Video Duration Time
-            {' '}
-            {' '}
-            {this.player ? this.player.getDuration() : 'player not ready'}
-            {' '}
-          </span>
-          {' '}
-          <br />
-          <span>
-            {' '}
-            Paused
-            {' '}
-            {' '}
-            {paused ? 'Paused' : 'Not paused'}
-            {' '}
-          </span>
-        </div>
+        {debug && (
+          <div
+            style={{
+              bottom: 30,
+              color: 'white',
+              left: 0,
+              position: 'absolute',
+            }}
+          >
+            <span> Selected Annot {selectedAnnotationId} </span>
+            <br />
+            <span> Current Time {currentTime} </span> <br />
+            <span> Player Time {this.player ? this.player.getCurrentTime() : 'player not ready'} </span> <br />
+            <span> Seek Time {seekToTime} </span> <br />
+            <span> Video Duration Time {this.player ? this.player.getDuration() : 'player not ready'} </span> <br />
+            <span> Paused {paused ? 'Paused' : 'Not paused'} </span>
+          </div>
         )}
-        { showProgress && circularProgress }
+        {showProgress && circularProgress}
       </>
     );
   }

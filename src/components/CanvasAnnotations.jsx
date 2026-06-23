@@ -57,7 +57,7 @@ export function CanvasAnnotations({
   const [inputSearch, setInputSearch] = useState('');
   const [tagsSearch, setTagsSearch] = useState([]);
 
-  const allTagsFromAnnotations = annotations.map(annotation => annotation.tags).flat();
+  const allTagsFromAnnotations = annotations.map((annotation) => annotation.tags).flat();
 
   const allTags = [...new Set([...allTagsFromAnnotations, ...annotationTagsSuggestion])].sort((a, b) => a.localeCompare(b));
 
@@ -104,12 +104,7 @@ export function CanvasAnnotations({
         {t('annotationCanvasLabel', { context: `${index + 1}/${totalSize}`, label })}
       </Typography>
       <StyledAnnotationContainer>
-        <AnnotationsFilter
-          setInputSearch={setInputSearch}
-          setTagsSearch={setTagsSearch}
-          availableTags={allTags}
-          t={t}
-        />
+        <AnnotationsFilter setInputSearch={setInputSearch} setTagsSearch={setTagsSearch} availableTags={allTags} t={t} />
       </StyledAnnotationContainer>
 
       <MenuList variant="selectedMenu">
@@ -141,48 +136,34 @@ export function CanvasAnnotations({
               onMouseEnter={() => handleAnnotationHover(annotation)}
               onMouseLeave={handleAnnotationBlur}
             >
-              <ListItemText
-                component="div"
-                variant="body2"
-              >
-                <SanitizedHtml
-                  ruleSet={htmlSanitizationRuleSet}
-                  htmlString={annotation.content}
-                />
+              <ListItemText component="div" variant="body2">
+                <SanitizedHtml ruleSet={htmlSanitizationRuleSet} htmlString={annotation.content} />
                 <div>
-                  {
-                      annotation.tags.map(tag => (
-                        <Chip
-                          size="small"
-                          variant="outlined"
-                          label={tag}
-                          id={tag}
-                          sx={theme => ({
-                            backgroundColor: theme.palette.background.paper,
-                            marginRight: theme.spacing(0.5),
-                            marginTop: theme.spacing(1),
-                          })}
-                          key={tag.toString()}
-                        />
-                      ))
-                  }
-                  <AnnotationManifestsAccordion
-                    annotation={annotation}
-                    t={t}
-                  />
+                  {annotation.tags.map((tag) => (
+                    <Chip
+                      size="small"
+                      variant="outlined"
+                      label={tag}
+                      id={tag}
+                      sx={(theme) => ({
+                        backgroundColor: theme.palette.background.paper,
+                        marginRight: theme.spacing(0.5),
+                        marginTop: theme.spacing(1),
+                      })}
+                      key={tag.toString()}
+                    />
+                  ))}
+                  <AnnotationManifestsAccordion annotation={annotation} t={t} />
                 </div>
               </ListItemText>
             </MenuItem>
           </ScrollTo>
         ))}
         {annotationsFiltered.length === 0 && (
-        <MenuItem>
-          <Typography>
-            {t('noAnnotationFound')}
-          </Typography>
-        </MenuItem>
+          <MenuItem>
+            <Typography>{t('noAnnotationFound')}</Typography>
+          </MenuItem>
         )}
-
       </MenuList>
 
       <StyledFooterAnnotationContainer>
