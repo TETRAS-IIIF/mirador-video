@@ -70,12 +70,17 @@ export default class CanvasAnnotationDisplay {
       };
       Object.keys(svgToCanvasMap).forEach((key) => {
         if (element.attributes[key]) {
-          this.context[svgToCanvasMap[key]] = element.attributes[key].nodeValue;
+          const value = element.attributes[key].nodeValue;
+          if (key === 'stroke-width') {
+            const parsedStrokeWidth = Number.parseFloat(value);
+            this.context.lineWidth = Number.isFinite(parsedStrokeWidth) ? parsedStrokeWidth : this.context.lineWidth;
+          } else {
+            this.context[svgToCanvasMap[key]] = value;
+          }
         }
       });
 
-      // Resize the stroke based off of the zoomRatio (currentZoom / maxZoom)
-      this.context.lineWidth /= this.zoomRatio;
+      this.context.lineWidth = Number.isFinite(this.context.lineWidth) ? this.context.lineWidth : 1;
 
       // Reset the color if it is selected or hovered on
       if (this.selected || this.hovered) {
