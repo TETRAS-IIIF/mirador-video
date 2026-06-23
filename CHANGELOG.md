@@ -10,6 +10,11 @@ Entries types:
 - `SECURITY` to invite users to upgrade in case of vulnerabilities.
 - `UPSTREAM` to indicate code is pulled in from Mirador main repository.
 
+# [ 4.1.0 ]
+
+- UPSTREAM update to 4.1 upstream 
+- FIXED : Use upstream package number to follow Mirador versioning
+
 # [ 1.2.13 ]
 
 - SECURITY : Update dependencies to fix vulnerabilities
