@@ -46,7 +46,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: '20.18.1'
+          node-version: '26.3.0'
           cache: 'npm'
           cache-dependency-path: |
             demo_src/package-lock.json
