@@ -2,7 +2,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withPlugins } from '../extend/withPlugins';
 import * as actions from '../state/actions';
-import { getWindowConfig, isFocused } from '../state/selectors';
+import { getWindow, getWindowConfig, isFocused } from '../state/selectors';
 import { WindowTopBar } from '../components/WindowTopBar';
 
 /** mapStateToProps */
@@ -17,6 +17,7 @@ const mapStateToProps = (state, { windowId }) => {
     allowWindowSideBar: config.allowWindowSideBar,
     focused: isFocused(state, { windowId }),
     maximized: config.maximized,
+    sideBarOpen: (getWindow(state, { windowId }) || {}).sideBarOpen,
   };
 };
 
@@ -33,9 +34,6 @@ const mapDispatchToProps = (dispatch, { windowId }) => ({
   toggleWindowSideBar: () => dispatch(actions.toggleWindowSideBar(windowId)),
 });
 
-const enhance = compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  withPlugins('WindowTopBar'),
-);
+const enhance = compose(connect(mapStateToProps, mapDispatchToProps), withPlugins('WindowTopBar'));
 
 export default enhance(WindowTopBar);

@@ -16,8 +16,6 @@ const StyledRnd = styled(Rnd)({
   margin: 0,
   position: 'absolute',
   transitionDuration: '.7s',
-  // order matters
-  // eslint-disable-next-line sort-keys
   '&.react-draggable-dragging': {
     transitionDuration: 'unset',
   },
@@ -28,12 +26,7 @@ const StyledRnd = styled(Rnd)({
  * @memberof Workspace
  * @private
  */
-function WorkspaceElastic({
-  workspace,
-  elasticLayout,
-  setWorkspaceViewportDimensions,
-  setWorkspaceViewportPosition,
-}) {
+function WorkspaceElastic({ workspace, elasticLayout, setWorkspaceViewportDimensions, setWorkspaceViewportPosition }) {
   const { viewportPosition } = workspace;
   const offsetX = workspace.width / 2;
   const offsetY = workspace.height / 2;
@@ -42,7 +35,9 @@ function WorkspaceElastic({
     <Root>
       <ResizeObserver
         onReflow={() => {}}
-        onResize={(rect) => { setWorkspaceViewportDimensions(rect); }}
+        onResize={(rect) => {
+          setWorkspaceViewportDimensions(rect);
+        }}
       />
 
       <StyledRnd
@@ -51,7 +46,8 @@ function WorkspaceElastic({
           width: workspace.width,
         }}
         position={{
-          x: -1 * viewportPosition.x - offsetX, y: -1 * viewportPosition.y - offsetY,
+          x: -1 * viewportPosition.x - offsetX,
+          y: -1 * viewportPosition.y - offsetY,
         }}
         enableResizing={{
           bottom: false,
@@ -70,24 +66,19 @@ function WorkspaceElastic({
         className={ns('workspace')}
         disableDragging={!workspace.draggingEnabled}
       >
-        {
-          Object.keys(elasticLayout).map(windowId => (
-            <WorkspaceElasticWindow
-              key={windowId}
-              windowId={windowId}
-            />
-          ))
-        }
+        {Object.keys(elasticLayout).map((windowId) => (
+          <WorkspaceElasticWindow key={windowId} windowId={windowId} />
+        ))}
       </StyledRnd>
     </Root>
   );
 }
 
 WorkspaceElastic.propTypes = {
-  elasticLayout: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  elasticLayout: PropTypes.object.isRequired,
   setWorkspaceViewportDimensions: PropTypes.func.isRequired,
   setWorkspaceViewportPosition: PropTypes.func.isRequired,
-  workspace: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  workspace: PropTypes.object.isRequired,
 };
 
 export default WorkspaceElastic;

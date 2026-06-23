@@ -7,11 +7,9 @@ import { useTranslation } from 'react-i18next';
 
 /**
  * Provides a form for user input of a manifest url
- * @prop {Function} fetchManifest
+ * @prop {Function} addResource
  */
-export function ManifestForm({
-  addResourcesOpen, addResource, onSubmit = () => {}, onCancel = null,
-}) {
+export function ManifestForm({ addResourcesOpen, addResource, onSubmit = () => {}, onCancel = null }) {
   const { t } = useTranslation();
   const [formValue, setFormValue] = useState('');
 
@@ -39,14 +37,10 @@ export function ManifestForm({
 
   return (
     <form onSubmit={formSubmit}>
-      <Grid
-        container
-        spacing={2}
-        columns={12}
-        sx={{ mt: 0.5 }}
-      >
+      <Grid container spacing={2} columns={12} sx={{ mt: 0.5 }}>
         <Grid size={{ sm: 'grow', xs: 12 }}>
           <TextField
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
             fullWidth
             value={formValue}
@@ -64,18 +58,11 @@ export function ManifestForm({
         </Grid>
         {onCancel && (
           <Grid size="auto">
-            <Button onClick={handleCancel}>
-              {t('cancel')}
-            </Button>
+            <Button onClick={handleCancel}>{t('cancel')}</Button>
           </Grid>
         )}
         <Grid size="auto">
-          <Button 
-            id="fetchBtn"
-            type="submit"
-            variant="contained"
-            color="primary"
-          >
+          <Button id="fetchBtn" type="submit" variant="contained" color="primary">
             {t('fetchManifest')}
           </Button>
         </Grid>

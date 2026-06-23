@@ -26,7 +26,10 @@ const Root = styled(ListItem, { name: 'ManifestListItem', slot: 'root' })(({ own
   },
 }));
 
-const StyledThumbnail = styled(Img, { name: 'ManifestListItem', slot: 'thumbnail' })(({ theme }) => ({
+const StyledThumbnail = styled(Img, {
+  name: 'ManifestListItem',
+  slot: 'thumbnail',
+})(({ theme }) => ({
   maxWidth: '100%',
   objectFit: 'contain',
 }));
@@ -66,7 +69,7 @@ export function ManifestListItem({
   fetchManifest,
   isFetching = false,
   addWindow,
-  handleClose = () => { },
+  handleClose = () => {},
   active = false,
   buttonRef = undefined,
   manifestId,
@@ -85,7 +88,8 @@ export function ManifestListItem({
     if (!ready && !error && !isFetching && provider !== 'file') fetchManifest(manifestId);
   }, [manifestId, provider, fetchManifest, ready, error, isFetching]);
 
-  const ownerState = arguments[0]; // eslint-disable-line prefer-rest-params
+  // eslint-disable-next-line prefer-rest-params
+  const ownerState = arguments[0];
 
   /** */
   const handleOpenButtonClick = () => {
@@ -95,13 +99,7 @@ export function ManifestListItem({
 
   if (error) {
     return (
-      <Root
-        ownerState={ownerState}
-        divider
-        selected={active}
-        className={active ? 'active' : ''}
-        data-manifestid={manifestId}
-      >
+      <Root ownerState={ownerState} divider selected={active} className={active ? 'active' : ''} data-manifestid={manifestId}>
         <ManifestListItemError manifestId={manifestId} />
       </Root>
     );
@@ -117,46 +115,31 @@ export function ManifestListItem({
       sx={{ width: '100%' }}
     >
       {ready ? (
-        <Grid
-          container
-          className={ns('manifest-list-item')}
-          sx={{ width: '100%', alignItems: 'center' }}
-        >
+        <Grid container className={ns('manifest-list-item')} sx={{ alignItems: 'center', width: '100%' }}>
           <Grid size={{ sm: 5, xs: 12 }}>
             <ButtonBase
               ref={buttonRef}
               className={ns('manifest-list-item-title')}
               onClick={handleOpenButtonClick}
-              sx={{ justifyContent: 'flex-start', alignItems: 'center', width: '100%' }}
+              sx={{ alignItems: 'center', justifyContent: 'flex-start', width: '100%' }}
             >
               <Grid container component="div" sx={{ width: '100%' }}>
-                <Grid size={3} sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }} >
+                <Grid size={3} sx={{ alignItems: 'center', display: 'flex', justifyContent: 'flex-start' }}>
                   {thumbnail ? (
                     <StyledThumbnail
                       className={[ns('manifest-list-item-thumb')]}
                       src={[thumbnail]}
                       alt=""
                       height="80"
-                      unloader={(
-                        <Skeleton
-                          variant="rectangular"
-                          animation={false}
-                          sx={{ bgcolor: 'grey[300]' }}
-                          height={80}
-                          width={120}
-                        />
-                      )}
+                      unloader={
+                        <Skeleton variant="rectangular" animation={false} sx={{ bgcolor: 'grey[300]' }} height={80} width={120} />
+                      }
                     />
                   ) : (
-                    <Skeleton
-                      sx={{ bgcolor: 'grey[300]' }}
-                      variant="rectangular"
-                      height={80}
-                      width={120}
-                    />
+                    <Skeleton sx={{ bgcolor: 'grey[300]' }} variant="rectangular" height={80} width={120} />
                   )}
                 </Grid>
-                <Grid size={9} sx={{ paddingLeft: 2, alignContent: 'center' }}>
+                <Grid size={9} sx={{ alignContent: 'center', paddingLeft: 2 }}>
                   {isCollection && (
                     <Typography component="div" variant="overline" sx={{ textAlign: 'left' }}>
                       {t(isMultipart ? 'multipartCollection' : 'collection')}
@@ -170,13 +153,9 @@ export function ManifestListItem({
             </ButtonBase>
           </Grid>
 
-          <Grid size={{ sm: 4, xs: 8 }} >
-            <Typography className={ns('manifest-list-item-provider')}>
-              {provider}
-            </Typography>
-            <Typography>
-              {t('numItems', { count: size, number: size })}
-            </Typography>
+          <Grid size={{ sm: 4, xs: 8 }}>
+            <Typography className={ns('manifest-list-item-provider')}>{provider}</Typography>
+            <Typography>{t('numItems', { count: size, number: size })}</Typography>
           </Grid>
 
           <Grid size={{ sm: 3, xs: 4 }}>
@@ -185,15 +164,9 @@ export function ManifestListItem({
                 src={[manifestLogo]}
                 alt=""
                 role="presentation"
-                unloader={(
-                  <Skeleton
-                    variant="rectangular"
-                    animation={false}
-                    sx={{ bgcolor: 'grey[300]' }}
-                    height={60}
-                    width={60}
-                  />
-                )}
+                unloader={
+                  <Skeleton variant="rectangular" animation={false} sx={{ bgcolor: 'grey[300]' }} height={60} width={60} />
+                }
               />
             )}
           </Grid>

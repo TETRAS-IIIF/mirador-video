@@ -2,12 +2,18 @@ import Openseadragon from 'openseadragon';
 import PropTypes from 'prop-types';
 import { useContext, useEffect, useRef } from 'react';
 import OpenSeadragonViewerContext from '../contexts/OpenSeadragonViewerContext';
+import FailedImageContext from '../contexts/FailedImageContext';
 
 /** OSD tile source shim that adds + updates its tile source data */
 export default function OpenSeadragonTileSource({
-  index = undefined, opacity = undefined, fitBounds = undefined, tileSource = {}, url = undefined,
+  index = undefined,
+  opacity = undefined,
+  fitBounds = undefined,
+  tileSource = {},
+  url = undefined,
 }) {
   const viewer = useContext(OpenSeadragonViewerContext);
+  const { notifyFailure, fallbackImage } = useContext(FailedImageContext);
   const tiledImage = useRef(undefined);
 
   useEffect(() => {
@@ -31,33 +37,61 @@ export default function OpenSeadragonTileSource({
   useEffect(() => {
     if (!viewer?.current) return undefined;
 
-    const promise = new Promise((resolve, reject) => {
-      const localTileSource = (url && { type: 'image', url })
-        || (((typeof tileSource === 'string' || tileSource instanceof String) && tileSource)
-        // OSD mutates this object, so we give it a shallow copy
-        || { ...tileSource });
+    const loadFallback = () => {
+      if (!fallbackImage) {
+        return;
+      }
 
-      viewer.current?.addTiledImage({
-        error: (event) => reject(event),
-        fitBounds: (fitBounds ? new Openseadragon.Rect(...fitBounds) : undefined),
+      viewer.current.addTiledImage({
+        tileSource: { type: 'image', url: fallbackImage },
         index,
         opacity,
-        success: (event) => resolve(event),
-        tileSource: localTileSource,
+        fitBounds: fitBounds ? new Openseadragon.Rect(...fitBounds) : undefined,
+        success: (ev) => {
+          tiledImage.current = ev.item;
+        },
       });
-    }).then((event) => {
-      tiledImage.current = event.item;
-    });
+    };
+
+    const promise = new Promise((resolve, reject) => {
+      const localTileSource = (url && { type: 'image', url }) ||
+        ((typeof tileSource === 'string' || tileSource instanceof String) && tileSource) ||
+          // OSD mutates this object, so we give it a shallow copy
+          { ...tileSource };
+
+      viewer.current?.addTiledImage({
+        tileSource: localTileSource,
+        index,
+        opacity,
+        fitBounds: fitBounds ? new Openseadragon.Rect(...fitBounds) : undefined,
+
+        success: (event) => resolve(event),
+
+        error: (event) => {
+          const imageUrl = url || (typeof tileSource === 'string' ? tileSource : tileSource?.['@id']);
+          if (imageUrl) notifyFailure(imageUrl);
+          loadFallback();
+
+          reject(event);
+        },
+      });
+    })
+      .then((event) => {
+        tiledImage.current = event.item;
+      })
+      .catch((err) => {
+        console.warn('[Mirador: OSD tile image load failed]', err);
+      });
 
     const osd = viewer.current;
-    return () => (
+    return () =>
       promise.finally(() => {
         if (osd && tiledImage.current) {
           osd.world.removeItem(tiledImage.current);
         }
-      })
-    );
-  }, [viewer?.current, url]); // eslint-disable-line react-hooks/exhaustive-deps
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewer?.current, url]);
 
   return null;
 }

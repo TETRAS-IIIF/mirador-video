@@ -22,8 +22,7 @@ export default class CanvasAnnotationDisplay {
     this.context = context;
     if (this.resource.svgSelector) {
       this.svgContext();
-    }
-    if (this.resource.fragmentSelector) {
+    } else if (this.resource.fragmentSelector) { // TODO Merge 4.1, subtil change in condition
       this.fragmentContext();
     }
   }

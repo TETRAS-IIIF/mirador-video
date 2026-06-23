@@ -5,6 +5,7 @@ import ActionTypes from '../actions/action-types';
 /**
  * windowsReducer
  */
+// eslint-disable-next-line complexity
 export const windowsReducer = (state = {}, action) => {
   switch (action.type) {
     case ActionTypes.ADD_WINDOW:
@@ -28,7 +29,7 @@ export const windowsReducer = (state = {}, action) => {
       };
 
     case ActionTypes.UPDATE_WINDOW:
-      return update([action.id], orig => ({ ...(orig || {}), ...action.payload }), state);
+      return update([action.id], (orig) => ({ ...(orig || {}), ...action.payload }), state);
 
     case ActionTypes.REMOVE_WINDOW:
       return omit(state, [action.windowId]);
@@ -71,21 +72,22 @@ export const windowsReducer = (state = {}, action) => {
     case ActionTypes.SET_CANVAS:
       if (!state[action.windowId]) return state;
 
-      return update([action.windowId], orig => (
-        {
+      return update(
+        [action.windowId],
+        (orig) => ({
           ...(orig || {}),
           canvasId: action.canvasId,
           visibleCanvases: action.visibleCanvases || [],
-        }), state);
+        }),
+        state,
+      );
     case ActionTypes.ADD_COMPANION_WINDOW:
       return {
         ...state,
         [action.windowId]: {
           ...state[action.windowId],
           companionWindowIds: state[action.windowId].companionWindowIds.concat([action.id]),
-          ...(action.payload.position === 'left'
-            ? { companionAreaOpen: true, sideBarPanel: action.payload.content }
-            : {}),
+          ...(action.payload.position === 'left' ? { companionAreaOpen: true, sideBarPanel: action.payload.content } : {}),
         },
       };
     case ActionTypes.UPDATE_COMPANION_WINDOW:
@@ -103,8 +105,7 @@ export const windowsReducer = (state = {}, action) => {
         ...state,
         [action.windowId]: {
           ...state[action.windowId],
-          companionWindowIds: state[action.windowId]
-            .companionWindowIds.filter(id => id !== action.id),
+          companionWindowIds: state[action.windowId].companionWindowIds.filter((id) => id !== action.id),
         },
       };
     case ActionTypes.SELECT_ANNOTATION:

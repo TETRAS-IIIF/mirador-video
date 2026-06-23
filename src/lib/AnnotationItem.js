@@ -13,13 +13,13 @@ export default class AnnotationItem {
 
   /** */
   isOnlyTag() {
-    return (this.motivations.length === 1 && this.motivations[0] === 'tagging');
+    return this.motivations.length === 1 && this.motivations[0] === 'tagging';
   }
 
   /** */
   get id() {
-    this._id = this._id || this.resource.id || uuid(); // eslint-disable-line no-underscore-dangle
-    return this._id; // eslint-disable-line no-underscore-dangle
+    this._id = this._id || this.resource.id || uuid();
+    return this._id;
   }
 
   /** */
@@ -55,9 +55,9 @@ export default class AnnotationItem {
   /** */
   get tags() {
     if (this.isOnlyTag()) {
-      return this.body.map(r => r.value);
+      return this.body.map((r) => r.value);
     }
-    return this.body.filter(r => r.purpose === 'tagging').map(r => r.value);
+    return this.body.filter((r) => r.purpose === 'tagging').map((r) => r.value);
   }
 
   /** */
@@ -68,7 +68,10 @@ export default class AnnotationItem {
   /** */
   get chars() {
     if (this.isOnlyTag()) return null;
-    return this.body.filter(r => r.purpose !== 'tagging').map(r => r.value).join(' ');
+    return this.body
+      .filter((r) => r.purpose !== 'tagging')
+      .map((r) => r.value)
+      .join(' ');
   }
 
   /** */
@@ -91,7 +94,7 @@ export default class AnnotationItem {
       case 'string':
         return null;
       case 'object':
-        return selector.find(s => s.type && s.type === 'SvgSelector');
+        return selector.find((s) => s.type && s.type === 'SvgSelector');
       default:
         return null;
     }
@@ -106,24 +109,19 @@ export default class AnnotationItem {
 
     switch (typeof selector) {
       case 'string':
-        match = selector.match(/xywh=(.*?)(&|$)/);
+        match = selector.match(/xywh=(.*)$/);
         break;
       case 'object':
-        fragmentSelector = selector.find(s => s.type && s.type === 'FragmentSelector');
-        match = fragmentSelector && fragmentSelector.value.match(/xywh=(.*?)(&|$)/);
+        fragmentSelector = selector.find((s) => s.type && s.type === 'FragmentSelector');
+        match = fragmentSelector && fragmentSelector.value.match(/xywh=(.*)$/);
         break;
       default:
         return null;
     }
 
-    if (match) {
-      const params = match[1].split(',');
-      if (params.length === 4) {
-        return params.map(str => parseInt(str, 10));
-      }
-    }
-    return null;
+    return match && match[1].split(',').map((str) => parseInt(str, 10));
   }
+
 
   /** */
   get temporalfragmentSelector() {
@@ -147,7 +145,7 @@ export default class AnnotationItem {
     if (match) {
       const params = match[1].split(',');
       if (params.length < 3) {
-        return params.map(str => parseFloat(str));
+        return params.map((str) => parseFloat(str));
       }
     }
     return null;

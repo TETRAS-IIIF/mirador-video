@@ -15,10 +15,7 @@ export default defineConfig({
       name: 'Mirador',
     },
     rollupOptions: {
-      external: [
-        '__tests__/*',
-        '__mocks__/*',
-      ],
+      external: ['__tests__/*', '__mocks__/*'],
       output: {
         assetFileNames: 'mirador.[ext]',
         exports: 'named',

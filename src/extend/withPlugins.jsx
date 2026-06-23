@@ -4,7 +4,7 @@ import isEmpty from 'lodash/isEmpty';
 import PluginContext from './PluginContext';
 
 /** withPlugins should be the innermost HOC */
-function _withPlugins(targetName, TargetComponent) { // eslint-disable-line no-underscore-dangle
+function _withPlugins(targetName, TargetComponent) {
   /** */
   function PluginHoc(props, ref) {
     const pluginMap = useContext(PluginContext);
@@ -25,17 +25,15 @@ function _withPlugins(targetName, TargetComponent) { // eslint-disable-line no-u
       const WrapPluginComponent = plugin.component;
 
       return (
-        <WrapPluginComponent
-          targetProps={passDownProps}
-          {...passDownProps}
-          TargetComponent={TargetComponent}
-        >
+        <WrapPluginComponent targetProps={passDownProps} {...passDownProps} TargetComponent={TargetComponent}>
           {children}
         </WrapPluginComponent>
       );
     };
 
-    return plugins.wrap.slice().reverse()
+    return plugins.wrap
+      .slice()
+      .reverse()
       .reduce(pluginWrapper, <TargetComponent {...passDownProps} />);
   }
   const whatever = forwardRef(PluginHoc);

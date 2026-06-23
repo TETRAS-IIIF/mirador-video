@@ -11,16 +11,13 @@ export default class AnnotationResource {
 
   /** */
   isOnlyTag() {
-    return (this.motivations.length === 1 && this.motivations[0] === 'oa:tagging');
+    return this.motivations.length === 1 && this.motivations[0] === 'oa:tagging';
   }
 
   /** */
   get id() {
-    this._id = this._id
-      || this.resource['@id']
-      || (this.resources[0] && this.resources[0]['@id'])
-      || uuid();
-    return this._id; // eslint-disable-line no-underscore-dangle
+    this._id = this._id || this.resource['@id'] || (this.resources[0] && this.resources[0]['@id']) || uuid();
+    return this._id;
   }
 
   /** */
@@ -28,9 +25,9 @@ export default class AnnotationResource {
     const on = this.on[0];
     switch (typeof on) {
       case 'string':
-        return on.replace(/#(.*)$/, '');
+        return on.replace(/#?xywh=(.*)$/, ''); // TODO Merge 4.1
       case 'object':
-        return on.full.replace(/#(.*)$/, '');
+        return on.full.replace(/#?xywh=(.*)$/, ''); // TODO Merge 4.1
       default:
         return null;
     }
@@ -56,14 +53,17 @@ export default class AnnotationResource {
   /** */
   get tags() {
     if (this.isOnlyTag()) {
-      return this.resources.map(r => r.chars);
+      return this.resources.map((r) => r.chars);
     }
-    return this.resources.filter(r => r['@type'] === 'oa:Tag').map(r => r.chars);
+    return this.resources.filter((r) => r['@type'] === 'oa:Tag').map((r) => r.chars);
   }
 
   /** */
   get chars() {
-    return this.resources.filter(r => r['@type'] !== 'oa:Tag').map(r => r.chars).join(' ');
+    return this.resources
+      .filter((r) => r['@type'] !== 'oa:Tag')
+      .map((r) => r.chars)
+      .join(' ');
   }
 
   /** */
@@ -109,22 +109,16 @@ export default class AnnotationResource {
 
     switch (typeof selector) {
       case 'string':
-        match = selector.match(/xywh=(.*?)(&|$)/);
+        match = selector.match(/xywh=(.*)$/);
         break;
       case 'object':
-        match = selector.value.match(/xywh=(.*?)(&|$)/);
+        match = selector.value.match(/xywh=(.*)$/);
         break;
       default:
         return null;
     }
 
-    if (match) {
-      const params = match[1].split(',');
-      if (params.length === 4) {
-        return params.map(str => parseInt(str, 10));
-      }
-    }
-    return null;
+    return match && match[1].split(',').map((str) => parseInt(str, 10));
   }
 
   /** */
@@ -152,4 +146,5 @@ export default class AnnotationResource {
     }
     return null;
   }
+
 }

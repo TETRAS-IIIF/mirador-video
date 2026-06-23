@@ -10,12 +10,11 @@ import { usePlugins } from '../extend/usePlugins';
 /**
  *
  */
-export function WindowTopBarPluginMenu({
-  windowId, menuIcon = <MoreVertIcon />, pluginTarget = 'WindowTopBarPluginMenu', 
-}) {
+export function WindowTopBarPluginMenu({ windowId, menuIcon = <MoreVertIcon />, pluginTarget = 'WindowTopBarPluginMenu' }) {
   const { t } = useTranslation();
   const container = useContext(WorkspaceContext);
-  const pluginProps = arguments[0]; // eslint-disable-line prefer-rest-params
+  // eslint-disable-next-line prefer-rest-params
+  const pluginProps = arguments[0];
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
   const windowPluginMenuId = useId();
@@ -38,6 +37,7 @@ export function WindowTopBarPluginMenu({
   return (
     <>
       <MiradorMenuButton
+        aria-expanded={!!anchorEl}
         aria-haspopup="true"
         aria-label={t('windowPluginMenu')}
         aria-owns={open ? windowPluginMenuId : undefined}
@@ -69,7 +69,7 @@ export function WindowTopBarPluginMenu({
 }
 
 WindowTopBarPluginMenu.propTypes = {
-  anchorEl: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  anchorEl: PropTypes.object,
   container: PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
   menuIcon: PropTypes.element,
   open: PropTypes.bool,

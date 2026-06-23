@@ -1,72 +1,94 @@
 import Openseadragon from 'openseadragon';
 import PropTypes from 'prop-types';
-import {
-  useEffect, useId, useRef, useReducer,
-  useState, useCallback,
-} from 'react';
+import { useEffect, useId, useRef, useReducer, useState, useCallback } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { useTranslation } from 'react-i18next';
 import OpenSeadragonViewerContext from '../contexts/OpenSeadragonViewerContext';
 
 /** Handle setting up OSD for use in mirador + react */
 function OpenSeadragonComponent({
-  children = undefined, Container = 'div', osdConfig = {}, viewerConfig = {}, onUpdateViewport = () => {}, setViewer = () => {}, style = {}, ...passThruProps
+  children = undefined,
+  Container = 'div',
+  osdConfig = {},
+  viewerConfig = {},
+  onUpdateViewport = () => {},
+  setViewer = () => {},
+  style = {},
+  ...passThruProps
 }) {
   const id = useId();
   const ref = useRef();
   const [grabbing, setGrabbing] = useState(false);
   const viewerRef = useRef(undefined);
   const initialViewportSet = useRef(false);
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const lastAppliedBounds = useRef(null);
+  const isResettingViewport = useRef(false);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
-  const moveHandler = useDebouncedCallback(useCallback((event) => {
-    /** Shim to provide a mouse-move event coming from the viewer */
-    viewerRef.current?.raiseEvent('mouse-move', event);
-  }, [viewerRef]), 10);
+  const moveHandler = useDebouncedCallback(
+    useCallback(
+      (event) => {
+        /** Shim to provide a mouse-move event coming from the viewer */
+        viewerRef.current?.raiseEvent('mouse-move', event);
+      },
+      [viewerRef],
+    ),
+    10,
+  );
 
-  const onViewportChange = useCallback((event) => {
-    const { viewport } = event.eventSource;
+  const onViewportChange = useCallback(
+    (event) => {
+      const { viewport } = event.eventSource;
 
-    if (!initialViewportSet.current) return;
+      if (!initialViewportSet.current) return;
 
-    onUpdateViewport({
-      bounds: viewport.getBounds(),
-      flip: viewport.getFlip(),
-      rotation: viewport.getRotation(),
-      x: Math.round(viewport.centerSpringX.target.value),
-      y: Math.round(viewport.centerSpringY.target.value),
-      zoom: viewport.zoomSpring.target.value,
-    });
-  }, [onUpdateViewport, initialViewportSet]);
+      // Don't save viewport changes during automatic recentering
+      if (isResettingViewport.current) return;
 
-  const setInitialBounds = useCallback(({ viewport }) => {
-    if (initialViewportSet.current) return;
-    initialViewportSet.current = true;
+      onUpdateViewport({
+        bounds: viewport.getBounds(),
+        flip: viewport.getFlip(),
+        rotation: viewport.getRotation(),
+        x: Math.round(viewport.centerSpringX.target.value),
+        y: Math.round(viewport.centerSpringY.target.value),
+        zoom: viewport.zoomSpring.target.value,
+      });
+    },
+    [onUpdateViewport, initialViewportSet],
+  );
 
-    if (viewerConfig.x != null && viewerConfig.y != null) {
-      viewport.panTo(new Openseadragon.Point(viewerConfig.x, viewerConfig.y), true);
-    }
+  const setInitialBounds = useCallback(
+    ({ viewport }) => {
+      if (initialViewportSet.current) return;
+      initialViewportSet.current = true;
 
-    if (viewerConfig.zoom != null) {
-      viewport.zoomTo(viewerConfig.zoom, new Openseadragon.Point(viewerConfig.x, viewerConfig.y), true);
-    }
-
-    if (viewerConfig.rotation != null && viewerConfig.rotation !== viewport.getRotation()) {
-      viewport.setRotation(viewerConfig.rotation);
-    }
-
-    if (viewerConfig.flip != null && (viewerConfig.flip || false) !== viewport.getFlip()) {
-      viewport.setFlip(viewerConfig.flip);
-    }
-
-    if (!viewerConfig.x && !viewerConfig.y && !viewerConfig.zoom) {
-      if (viewerConfig.bounds) {
-        viewport.fitBounds(new Openseadragon.Rect(...viewerConfig.bounds), true);
-      } else {
-        viewport.goHome(true);
+      if (viewerConfig.x != null && viewerConfig.y != null) {
+        viewport.panTo(new Openseadragon.Point(viewerConfig.x, viewerConfig.y), true);
       }
-    }
-  }, [initialViewportSet, viewerConfig]);
+
+      if (viewerConfig.zoom != null) {
+        viewport.zoomTo(viewerConfig.zoom, new Openseadragon.Point(viewerConfig.x, viewerConfig.y), true);
+      }
+
+      if (viewerConfig.rotation != null && viewerConfig.rotation !== viewport.getRotation()) {
+        viewport.setRotation(viewerConfig.rotation);
+      }
+
+      if (viewerConfig.flip != null && (viewerConfig.flip || false) !== viewport.getFlip()) {
+        viewport.setFlip(viewerConfig.flip);
+      }
+
+      if (!viewerConfig.x && !viewerConfig.y && !viewerConfig.zoom) {
+        if (viewerConfig.bounds) {
+          viewport.fitBounds(new Openseadragon.Rect(...viewerConfig.bounds), true);
+          lastAppliedBounds.current = viewerConfig.bounds;
+        } else {
+          viewport.goHome(true);
+        }
+      }
+    },
+    [initialViewportSet, viewerConfig],
+  );
 
   useEffect(() => {
     const viewer = viewerRef.current;
@@ -79,11 +101,44 @@ function OpenSeadragonComponent({
       return;
     }
 
+    // Check if bounds changed - always recenter when bounds change)
+    if (viewerConfig.bounds) {
+      const boundsChanged =
+        !lastAppliedBounds.current ||
+        viewerConfig.bounds.length !== lastAppliedBounds.current.length ||
+        viewerConfig.bounds.some((val, idx) => val !== lastAppliedBounds.current[idx]);
+
+      // Bounds changed - recenter regardless of whether x/y/zoom exist
+      if (boundsChanged) {
+        isResettingViewport.current = true;
+        lastAppliedBounds.current = viewerConfig.bounds;
+
+        // Wait for the tiles to be fully loaded before recentering
+        const handleTilesLoaded = () => {
+          const rect = new Openseadragon.Rect(...viewerConfig.bounds);
+          viewport.fitBoundsWithConstraints(rect, true);
+          isResettingViewport.current = false;
+        };
+
+        viewer.addOnceHandler('tile-loaded', handleTilesLoaded);
+        return;
+      }
+    }
+
+    // Apply preserved viewport only if bounds haven't changed
+    // Don't apply x/y/zoom if we don't have them (rely on bounds instead)
+    if (!viewerConfig.x || !viewerConfig.y || !viewerConfig.zoom) {
+      return;
+    }
+
     // @ts-expect-error
-    if (viewerConfig.x != null && viewerConfig.y != null
-      && (Math.round(viewerConfig.x) !== Math.round(viewport.centerSpringX.target.value)
-      // @ts-expect-error
-      || Math.round(viewerConfig.y) !== Math.round(viewport.centerSpringY.target.value))) {
+    if (
+      viewerConfig.x != null &&
+      viewerConfig.y != null &&
+      (Math.round(viewerConfig.x) !== Math.round(viewport.centerSpringX.target.value) ||
+        // @ts-expect-error
+        Math.round(viewerConfig.y) !== Math.round(viewport.centerSpringY.target.value))
+    ) {
       viewport.panTo(new Openseadragon.Point(viewerConfig.x, viewerConfig.y), false);
     }
 
@@ -98,13 +153,6 @@ function OpenSeadragonComponent({
 
     if (viewerConfig.flip != null && (viewerConfig.flip || false) !== viewport.getFlip()) {
       viewport.setFlip(viewerConfig.flip);
-    }
-
-    if (viewerConfig.bounds && !viewerConfig.x && !viewerConfig.y && !viewerConfig.zoom) {
-      const rect = new Openseadragon.Rect(...viewerConfig.bounds);
-      if (rect.equals(viewport.getBounds())) {
-        viewport.fitBounds(rect, false);
-      }
     }
   }, [initialViewportSet, setInitialBounds, viewerConfig, viewerRef]);
 
@@ -127,7 +175,7 @@ function OpenSeadragonComponent({
       if (!osdConfig.zoomPerDoubleClick) return;
 
       const currentZoom = viewer.viewport.getZoom();
-      const zoomRatio = (shift ? 1.0 / osdConfig.zoomPerDoubleClick : osdConfig.zoomPerDoubleClick);
+      const zoomRatio = shift ? 1.0 / osdConfig.zoomPerDoubleClick : osdConfig.zoomPerDoubleClick;
       viewer.viewport.zoomTo(currentZoom * zoomRatio, viewer.viewport.pointFromPixel(position), false);
     });
 
@@ -144,26 +192,31 @@ function OpenSeadragonComponent({
     });
 
     forceUpdate();
-  }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ref]);
 
   // cleanup OSD viewer cruft when this component is unmounted
-  useEffect(() => () => {
-    const viewer = viewerRef.current;
+  useEffect(
+    () => () => {
+      const viewer = viewerRef.current;
 
-    if (!viewer) return;
+      if (!viewer) return;
 
-    // @ts-expect-error
-    if (viewer.innerTracker?.moveHandler === moveHandler) {
       // @ts-expect-error
-      viewer.innerTracker.moveHandler = () => {};
-    }
-    // @ts-expect-error
-    viewer.removeAllHandlers();
+      if (viewer.innerTracker?.moveHandler === moveHandler) {
+        // @ts-expect-error
+        viewer.innerTracker.moveHandler = () => {};
+      }
+      // @ts-expect-error
+      viewer.removeAllHandlers();
 
-    viewer.destroy();
-    viewerRef.current = undefined;
-    setViewer(null);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+      viewer.destroy();
+      viewerRef.current = undefined;
+      setViewer(null);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const { t } = useTranslation();
 
@@ -189,9 +242,9 @@ OpenSeadragonComponent.propTypes = {
   children: PropTypes.node,
   Container: PropTypes.elementType,
   onUpdateViewport: PropTypes.func,
-  osdConfig: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  osdConfig: PropTypes.object,
   setViewer: PropTypes.func,
-  style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  style: PropTypes.object,
   viewerConfig: PropTypes.shape({
     bounds: PropTypes.arrayOf(PropTypes.number),
     flip: PropTypes.bool,

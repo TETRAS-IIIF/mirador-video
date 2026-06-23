@@ -17,8 +17,8 @@ export function ViewerNavigation({
 }) {
   const { t } = useTranslation();
   let htmlDir = 'ltr';
-  let previousIconStyle = {};
-  let nextIconStyle = {};
+  let previousIconStyle;
+  let nextIconStyle;
   switch (viewingDirection) {
     case 'top-to-bottom':
       previousIconStyle = { transform: 'rotate(270deg)' };
@@ -39,15 +39,15 @@ export function ViewerNavigation({
   }
 
   return (
-    <div
-      className={classNames(ns('osd-navigation'))}
-      dir={htmlDir}
-    >
+    <div className={classNames(ns('osd-navigation'))} dir={htmlDir}>
       <MiradorMenuButton
         aria-label={t('previousCanvas')}
         className={ns('previous-canvas-button')}
         disabled={!hasPreviousCanvas}
-        onClick={() => { beforeClick(); hasPreviousCanvas && setPreviousCanvas(); }}
+        onClick={() => {
+            beforeClick();
+            hasNextCanvas && setNextCanvas();
+        }}
       >
         <NavigationIcon style={previousIconStyle} />
       </MiradorMenuButton>
@@ -55,7 +55,10 @@ export function ViewerNavigation({
         aria-label={t('nextCanvas')}
         className={ns('next-canvas-button')}
         disabled={!hasNextCanvas}
-        onClick={() => { beforeClick(); hasNextCanvas && setNextCanvas(); }}
+        onClick={() => {
+            beforeClick();
+            hasNextCanvas && setNextCanvas();
+        }}
       >
         <NavigationIcon style={nextIconStyle} />
       </MiradorMenuButton>

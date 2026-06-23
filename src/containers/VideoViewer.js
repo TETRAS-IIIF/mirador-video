@@ -1,13 +1,15 @@
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { withTranslation } from 'react-i18next';
 import { withPlugins } from '../extend/withPlugins';
 import * as actions from '../state/actions';
 import { VideoViewer } from '../components/VideoViewer';
+
 import {
   getConfig,
   getCurrentCanvas,
   getCurrentCanvasWorld,
+  getVisibleCanvasCaptions,
+  getVisibleCanvasVideoResources,
   getWindowMutedStatus,
   getWindowPausedStatus,
   getWindowCurrentTime,
@@ -20,12 +22,14 @@ const mapStateToProps = (state, { windowId }) => ({
   annotations: getPresentAnnotationsOnSelectedCanvases(state, { windowId }),
   canvas: (getCurrentCanvas(state, { windowId }) || {}),
   canvasWorld: getCurrentCanvasWorld(state, { windowId }),
+  captions: getVisibleCanvasCaptions(state, { windowId }) || [],
   currentTime: getWindowCurrentTime(state, { windowId }),
   debug: getConfig(state).debug || false,
   muted: getWindowMutedStatus(state, { windowId }),
   paused: getWindowPausedStatus(state, { windowId }),
   textTrackDisabled: getWindowTextTrackDisabledStatus(state, { windowId }),
   videoOptions: getConfig(state).videoOptions,
+  videoResources: getVisibleCanvasVideoResources(state, { windowId }) || [],
 });
 
 /** */
@@ -37,7 +41,6 @@ const mapDispatchToProps = (dispatch, { windowId }) => ({
 });
 
 const enhance = compose(
-  withTranslation(), // TODO Merge probably useless
   connect(mapStateToProps, mapDispatchToProps),
   withPlugins('VideoViewer'),
 );

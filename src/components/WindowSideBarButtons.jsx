@@ -58,14 +58,7 @@ function TabButton({ value, ...tabProps }) {
   const { t } = useTranslation();
   return (
     <Tooltip title={t('openCompanionWindow', { context: value })}>
-      <StyledTabButton
-        {...tabProps}
-        value={value}
-        aria-label={
-          t('openCompanionWindow', { context: value })
-        }
-        disableRipple
-      />
+      <StyledTabButton {...tabProps} value={value} aria-label={t('openCompanionWindow', { context: value })} disableRipple />
     </Tooltip>
   );
 }
@@ -89,9 +82,11 @@ export function WindowSideBarButtons({
   sideBarPanel = 'closed',
 }) {
   const { t } = useTranslation();
-  const { PluginComponents } = usePlugins("WindowSideBarButtons");
+  const { PluginComponents } = usePlugins('WindowSideBarButtons');
   /** */
-  const handleChange = (event, value) => { addCompanionWindow(value); };
+  const handleChange = (event, value) => {
+    addCompanionWindow(value);
+  };
 
   return (
     <Root
@@ -101,64 +96,43 @@ export function WindowSideBarButtons({
       indicatorColor="primary"
       textColor="primary"
       orientation="vertical"
-      aria-orientation="vertical"
-      aria-label={t('sidebarPanelsNavigation')}
     >
-      { panels.info && (
-        <TabButton
-          value="info"
-          icon={(<InfoIcon />)}
-        />
-      )}
-      { panels.attribution && (
-        <TabButton
-          value="attribution"
-          icon={(<AttributionIcon />)}
-        />
-      )}
-      { panels.canvas && (
-        <TabButton
-          value="canvas"
-          icon={(<CanvasIndexIcon />)}
-        />
-      )}
+      {panels.info && <TabButton value="info" icon={<InfoIcon />} />}
+      {panels.attribution && <TabButton value="attribution" icon={<AttributionIcon />} />}
+      {panels.canvas && <TabButton value="canvas" icon={<CanvasIndexIcon />} />}
       {panels.annotations && (hasAnnotations || hasAnyAnnotations) && (
         <TabButton
           value="annotations"
-          icon={(
+          icon={
             <Badge overlap="rectangular" color="notification" invisible={!hasAnnotations} variant="dot">
               <AnnotationIcon />
             </Badge>
-          )}
+          }
         />
       )}
       {panels.search && hasSearchService && (
         <TabButton
           value="search"
-          icon={(
+          icon={
             <Badge overlap="rectangular" color="notification" invisible={!hasSearchResults} variant="dot">
               <SearchIcon />
             </Badge>
-          )}
+          }
         />
       )}
-      { panels.layers && hasAnyLayers && (
+      {panels.layers && hasAnyLayers && (
         <TabButton
           value="layers"
-          icon={(
+          icon={
             <Badge overlap="rectangular" color="notification" invisible={!hasCurrentLayers} variant="dot">
               <LayersIcon />
             </Badge>
-          )}
+          }
         />
       )}
-      { PluginComponents
-        && PluginComponents.map(PluginComponent => (
-          <TabButton
-            key={PluginComponent.value}
-            value={PluginComponent.value}
-            icon={<PluginComponent />}
-          />
+      {PluginComponents &&
+        PluginComponents.map((PluginComponent) => (
+          <TabButton key={PluginComponent.value} value={PluginComponent.value} icon={<PluginComponent />} />
         ))}
     </Root>
   );

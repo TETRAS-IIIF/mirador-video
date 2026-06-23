@@ -28,6 +28,7 @@ export function WindowTopMenuButton({ classes = {}, windowId }) {
   return (
     <>
       <MiradorMenuButton
+        aria-expanded={!!anchorEl}
         aria-haspopup="true"
         aria-label={t('windowMenu')}
         aria-owns={open ? menuId : undefined}
@@ -37,13 +38,7 @@ export function WindowTopMenuButton({ classes = {}, windowId }) {
       >
         <WindowOptionsIcon />
       </MiradorMenuButton>
-      <WindowTopMenu
-        windowId={windowId}
-        anchorEl={anchorEl}
-        handleClose={handleMenuClose}
-        id={menuId}
-        open={open}
-      />
+      <WindowTopMenu windowId={windowId} anchorEl={anchorEl} handleClose={handleMenuClose} id={menuId} open={open} />
     </>
   );
 }

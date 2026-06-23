@@ -1,6 +1,4 @@
-import {
-  useRef, Children, cloneElement, useCallback, useState, useEffect,
-} from 'react';
+import { useRef, Children, cloneElement, useCallback, useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import OpenSeadragon from 'openseadragon';
@@ -13,6 +11,7 @@ import { PluginHook } from './PluginHook';
 import { OSDReferences } from '../plugins/OSDReferences';
 import OpenSeadragonComponent from './OpenSeadragonComponent';
 import TileSource from './OpenSeadragonTileSource';
+import { ImageFailureMessage } from './ImageFailureMessage';
 
 const StyledSection = styled('section')({
   cursor: 'grab',
@@ -25,33 +24,42 @@ const StyledSection = styled('section')({
  * and rendering OSD.
  */
 export function OpenSeadragonViewer({
-  children = null, label = null, windowId, osdConfig = {}, viewerConfig = null,
-  drawAnnotations = false, infoResponses = [], canvasWorld, nonTiledImages = [], updateViewport,
+  children = null,
+  label = null,
+  windowId,
+  osdConfig = {},
+  viewerConfig = null,
+  drawAnnotations = false,
+  infoResponses = [],
+  canvasWorld,
+  nonTiledImages = [],
+  updateViewport,
   ...rest
 }) {
   const { t } = useTranslation();
   const apiRef = useRef();
   const [viewer, setViewer] = useState(null);
-  const onViewportChange = useCallback(({
-    flip, rotation, x, y, zoom,
-  }) => {
-    updateViewport(windowId, {
-      flip,
-      rotation,
-      x,
-      y,
-      zoom,
-    });
-  }, [updateViewport, windowId]);
+  const onViewportChange = useCallback(
+    ({ flip, rotation, x, y, zoom }) => {
+      updateViewport(windowId, {
+        flip,
+        rotation,
+        x,
+        y,
+        zoom,
+      });
+    },
+    [updateViewport, windowId],
+  );
 
-  const zoomToWorld = useCallback((immediately = true) => {
-    if (!apiRef.current?.viewport) return;
+  const zoomToWorld = useCallback(
+    (immediately = true) => {
+      if (!apiRef.current?.viewport) return;
 
-    apiRef.current.viewport.fitBounds(
-      new OpenSeadragon.Rect(...canvasWorld.worldBounds()),
-      immediately,
-    );
-  }, [canvasWorld, apiRef]);
+      apiRef.current.viewport.fitBounds(new OpenSeadragon.Rect(...canvasWorld.worldBounds()), immediately);
+    },
+    [canvasWorld, apiRef],
+  );
 
   useEffect(() => {
     OSDReferences.set(windowId, apiRef);
@@ -61,14 +69,11 @@ export function OpenSeadragonViewer({
     apiRef.current = viewer;
   }, [apiRef, viewer]);
 
-  const enhancedChildren = Children.map(children, child => (
-    cloneElement(
-      child,
-      {
-        zoomToWorld,
-      },
-    )
-  ));
+  const enhancedChildren = Children.map(children, (child) =>
+    cloneElement(child, {
+      zoomToWorld,
+    }),
+  );
 
   const pluginProps = {
     canvasWorld,
@@ -84,6 +89,11 @@ export function OpenSeadragonViewer({
     ...rest,
   };
 
+  const imageUrls = useMemo(
+    () => [...infoResponses.map((info) => info.id), ...nonTiledImages.map((img) => img.id)],
+    [infoResponses, nonTiledImages],
+  );
+
   return (
     <OpenSeadragonComponent
       className={classNames(ns('osd-container'))}
@@ -95,7 +105,7 @@ export function OpenSeadragonViewer({
       aria-label={t('item', { label })}
       aria-live="polite"
     >
-      { infoResponses.map((infoResponse) => {
+      {infoResponses.map((infoResponse) => {
         const contentResource = canvasWorld.contentResource(infoResponse.id);
 
         if (!contentResource) return null;
@@ -114,7 +124,7 @@ export function OpenSeadragonViewer({
           />
         );
       })}
-      { nonTiledImages.map((contentResource) => {
+      {nonTiledImages.map((contentResource) => {
         const type = contentResource.getProperty('type');
         const format = contentResource.getProperty('format') || '';
 
@@ -125,18 +135,12 @@ export function OpenSeadragonViewer({
         const opacity = canvasWorld.layerOpacityOfImageResource(contentResource);
 
         return (
-          <TileSource
-            key={contentResource.id}
-            url={contentResource.id}
-            fitBounds={fitBounds}
-            index={index}
-            opacity={opacity}
-          />
+          <TileSource key={contentResource.id} url={contentResource.id} fitBounds={fitBounds} index={index} opacity={opacity} />
         );
       })}
-      { drawAnnotations
-          && <AnnotationsOverlay viewer={viewer} windowId={windowId} /> }
-      { enhancedChildren }
+      {drawAnnotations && <AnnotationsOverlay viewer={viewer} windowId={windowId} />}
+      {enhancedChildren}
+      <ImageFailureMessage imageUrls={imageUrls} />
       <PluginHook targetName="OpenSeadragonViewer" viewer={viewer} {...pluginProps} />
     </OpenSeadragonComponent>
   );
@@ -146,11 +150,11 @@ OpenSeadragonViewer.propTypes = {
   canvasWorld: PropTypes.instanceOf(CanvasWorld).isRequired,
   children: PropTypes.node,
   drawAnnotations: PropTypes.bool,
-  infoResponses: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
+  infoResponses: PropTypes.arrayOf(PropTypes.object),
   label: PropTypes.string,
-  nonTiledImages: PropTypes.array, // eslint-disable-line react/forbid-prop-types
-  osdConfig: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  nonTiledImages: PropTypes.array,
+  osdConfig: PropTypes.object,
   updateViewport: PropTypes.func.isRequired,
-  viewerConfig: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  viewerConfig: PropTypes.object,
   windowId: PropTypes.string.isRequired,
 };

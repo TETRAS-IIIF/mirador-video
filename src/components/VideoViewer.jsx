@@ -9,6 +9,9 @@ import AnnotationsOverlayVideo from '../containers/AnnotationsOverlayVideo';
 import WindowCanvasNavigationControlsVideo from '../containers/WindowCanvasNavigationControlsVideo';
 import { setWindowSeekTo } from '../state/actions';
 
+
+// TODO Merge 4.1 capptions and func compo
+
 /** */
 export class VideoViewer extends Component {
   /** */
@@ -267,6 +270,7 @@ export class VideoViewer extends Component {
 VideoViewer.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   canvas: PropTypes.object,
+    captions: PropTypes.arrayOf(PropTypes.object),
   currentTime: PropTypes.number,
   debug: PropTypes.bool.isRequired,
   muted: PropTypes.bool,
@@ -275,6 +279,8 @@ VideoViewer.propTypes = {
   setPaused: PropTypes.func,
   setSeekTo: PropTypes.func.isRequired,
   windowId: PropTypes.string.isRequired,
+    videoOptions: PropTypes.object,
+    videoResources: PropTypes.arrayOf(PropTypes.object),
 };
 
 VideoViewer.defaultProps = {

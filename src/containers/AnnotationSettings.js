@@ -2,10 +2,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import * as actions from '../state/actions';
 import { withPlugins } from '../extend/withPlugins';
-import {
-  getAnnotationResourcesByMotivation,
-  getWindow,
-} from '../state/selectors';
+import { getAnnotationResourcesByMotivation, getWindow } from '../state/selectors';
 import { AnnotationSettings } from '../components/AnnotationSettings';
 
 /**
@@ -15,10 +12,7 @@ const mapStateToProps = (state, { windowId }) => ({
   autoScroll: getWindow(state, { windowId }).autoScrollAnnotationList,
   autoScrollDisabled: getAnnotationResourcesByMotivation(state, { windowId }).length < 2,
   displayAll: getWindow(state, { windowId }).highlightAllAnnotations,
-  displayAllDisabled: getAnnotationResourcesByMotivation(
-    state,
-    { windowId },
-  ).length < 2,
+  displayAllDisabled: getAnnotationResourcesByMotivation(state, { windowId }).length < 2,
 });
 
 /**
@@ -33,9 +27,6 @@ const mapDispatchToProps = (dispatch, { windowId }) => ({
   },
 });
 
-const enhance = compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  withPlugins('AnnotationSettings'),
-);
+const enhance = compose(connect(mapStateToProps, mapDispatchToProps), withPlugins('AnnotationSettings'));
 
 export default enhance(AnnotationSettings);

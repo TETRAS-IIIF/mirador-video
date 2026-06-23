@@ -26,60 +26,41 @@ const Root = styled('div', { name: 'PrimaryWindow', slot: 'root' })(() => ({
 
 /**  */
 const TypeSpecificViewer = ({
-  audioResources = [], isCollection = false, isFetching = false, textResources = [],
-  videoResources = [], view = undefined, windowId,
+  audioResources = [],
+  isCollection = false,
+  isFetching = false,
+  textResources = [],
+  videoResources = [],
+  view = undefined,
+  windowId,
 }) => {
   if (isCollection) {
-    return (
-      <SelectCollection
-        windowId={windowId}
-      />
-    );
+    return <SelectCollection windowId={windowId} />;
   }
   if (isFetching === false) {
     if (view === 'gallery') {
-      return (
-        <GalleryView
-          windowId={windowId}
-        />
-      );
+      return <GalleryView windowId={windowId} />;
     }
     if (videoResources.length > 0) {
-      return (
-        <VideoViewer
-          windowId={windowId}
-        />
-      );
+      return <VideoViewer windowId={windowId} />;
     }
     if (audioResources.length > 0) {
-      return (
-        <AudioViewer
-          windowId={windowId}
-        />
-      );
+      return <AudioViewer windowId={windowId} />;
     }
     if (textResources.length > 0) {
-      return (
-        <TextViewer
-          windowId={windowId}
-        />
-      );
+      return <TextViewer windowId={windowId} />;
     }
-    return (
-      <WindowViewer
-        windowId={windowId}
-      />
-    );
+    return <WindowViewer windowId={windowId} />;
   }
   return null;
 };
 
 TypeSpecificViewer.propTypes = {
-  audioResources: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
+  audioResources: PropTypes.arrayOf(PropTypes.object),
   isCollection: PropTypes.bool,
   isFetching: PropTypes.bool,
-  textResources: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
-  videoResources: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
+  textResources: PropTypes.arrayOf(PropTypes.object),
+  videoResources: PropTypes.arrayOf(PropTypes.object),
   view: PropTypes.string,
   windowId: PropTypes.string.isRequired,
 };
@@ -89,9 +70,16 @@ TypeSpecificViewer.propTypes = {
  * window. Right now this differentiates between a Image, Video, or Audio viewer.
  */
 export function PrimaryWindow({
-  audioResources = undefined, children = null, className = undefined, isCollection = false,
-  isCollectionDialogVisible = false, isFetching = false, textResources = undefined, videoResources = undefined,
-  view = undefined, windowId,
+  audioResources = undefined,
+  children = null,
+  className = undefined,
+  isCollection = false,
+  isCollectionDialogVisible = false,
+  isFetching = false,
+  textResources = undefined,
+  videoResources = undefined,
+  view = undefined,
+  windowId,
 }) {
   const viewerProps = {
     audioResources,
@@ -107,23 +95,21 @@ export function PrimaryWindow({
     <Root data-testid="test-window" className={classNames(ns('primary-window'), className)}>
       <WindowSideBar windowId={windowId} />
       <CompanionArea windowId={windowId} position="left" />
-      { isCollectionDialogVisible && <CollectionDialog windowId={windowId} /> }
-      <Suspense fallback={<div />}>
-        {children || <TypeSpecificViewer {...viewerProps} />}
-      </Suspense>
+      {isCollectionDialogVisible && <CollectionDialog windowId={windowId} />}
+      <Suspense fallback={<div />}>{children || <TypeSpecificViewer {...viewerProps} />}</Suspense>
     </Root>
   );
 }
 
 PrimaryWindow.propTypes = {
-  audioResources: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
+  audioResources: PropTypes.arrayOf(PropTypes.object),
   children: PropTypes.node,
   className: PropTypes.string,
   isCollection: PropTypes.bool,
   isCollectionDialogVisible: PropTypes.bool,
   isFetching: PropTypes.bool,
-  textResources: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
-  videoResources: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
+  textResources: PropTypes.arrayOf(PropTypes.object),
+  videoResources: PropTypes.arrayOf(PropTypes.object),
   view: PropTypes.string,
   windowId: PropTypes.string.isRequired,
 };

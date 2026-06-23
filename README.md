@@ -19,6 +19,7 @@ We have also old version compatible with M3 and older version of React. Contact 
 
 
 ## For Mirador Users
+We recommend installing Mirador using a JavaScript package manager like [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/).
 
 Our fork of Mirador is available as a package on npm.
 To use it change your existing Mirador dependency to `mirador-video` in your `package.json` file.
@@ -97,7 +98,7 @@ $ npm test -- --ui
 
 You can run Vitest without the additional linting and size checks in our `npm test` command. You can also test a single file:
 ```sh
-$ npx vitest __tests__/integration/mirador/tests/sequence-switching.test.js --ui
+$ npx vitest __tests__/integration/tests/sequence-switching.test.js --ui
 ```
 
 ## Linting the project
@@ -105,6 +106,17 @@ $ npx vitest __tests__/integration/mirador/tests/sequence-switching.test.js --ui
 ```sh
 $ npm run lint
 ```
+## Image Fallback
+
+Mirador automatically displays a simple fallback placeholder when images fail to load. Customize the fallback image via configuration:
+
+```javascript
+const config = {
+  fallbackImage: 'https://example.com/custom-fallback.jpg',
+};
+```
+
+The error message is translatable via the `imageFailedToLoad` translation key. Detailed error information is logged to the console for debugging.
 
 ## Debugging
 

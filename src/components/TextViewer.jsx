@@ -21,7 +21,7 @@ export function TextViewer({ textOptions = {}, textResources = [], windowId }) {
   return (
     <StyledContainer>
       <StyledText {...textOptions}>
-        {textResources.map(text => (
+        {textResources.map((text) => (
           <source key={text.id} src={text.id} type={text.getFormat()} />
         ))}
         <WindowCanvasNavigationControls windowId={windowId} />
@@ -31,7 +31,7 @@ export function TextViewer({ textOptions = {}, textResources = [], windowId }) {
 }
 
 TextViewer.propTypes = {
-  textOptions: PropTypes.object, // eslint-disable-line react/forbid-prop-types
-  textResources: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
+  textOptions: PropTypes.object,
+  textResources: PropTypes.arrayOf(PropTypes.object),
   windowId: PropTypes.string.isRequired,
 };

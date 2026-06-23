@@ -1,11 +1,10 @@
-import {
-  useMemo, useEffect, useState,
-} from 'react';
+import { useMemo, useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { useInView } from 'react-intersection-observer';
 import { IIIFResourceLabel } from './IIIFResourceLabel';
 import { useThumbnailService } from '../hooks';
+import FailedImageContext from '../contexts/FailedImageContext';
 
 const Root = styled('div', { name: 'IIIFThumbnail', slot: 'root' })({});
 
@@ -23,12 +22,21 @@ const Image = styled('img', { name: 'IIIFThumbnail', slot: 'image' })(() => ({
  * try to load the image (or even calculate that the image url/height/width are)
  */
 const LazyLoadedImage = ({
-  border = false, placeholder, style = {}, thumbnail = null,
-  resource, maxHeight = null, maxWidth = null, ...props
+  border = false,
+  placeholder,
+  style = {},
+  thumbnail = null,
+  resource,
+  maxHeight = null,
+  maxWidth = null,
+  ...props
 }) => {
   const { ref, inView } = useInView();
   const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
   const thumbnailService = useThumbnailService(maxHeight, maxWidth);
+  const { notifyFailure, fallbackImage } = useContext(FailedImageContext);
+
   /**
    * Handles the intersection (visibility) of a given thumbnail, by requesting
    * the image and then updating the state.
@@ -57,15 +65,26 @@ const LazyLoadedImage = ({
       width: undefined,
     };
 
+    // If we're using a fallback image due to failure, use object-fit to preserve aspect ratio
+    if (failed && fallbackImage) {
+      return {
+        ...styleProps,
+        ...style,
+        maxWidth,
+        maxHeight,
+        objectFit: 'contain',
+      };
+    }
+
     if (!image) return { ...style, height: maxHeight, width: maxWidth };
 
     const { height: thumbHeight, width: thumbWidth } = image;
     if (thumbHeight && thumbWidth) {
-      if ((maxHeight && (thumbHeight > maxHeight)) || (maxWidth && (thumbWidth > maxWidth))) {
+      if ((maxHeight && thumbHeight > maxHeight) || (maxWidth && thumbWidth > maxWidth)) {
         const aspectRatio = thumbWidth / thumbHeight;
 
         if (maxHeight && maxWidth) {
-          if ((maxWidth / maxHeight) < aspectRatio) {
+          if (maxWidth / maxHeight < aspectRatio) {
             styleProps.height = Math.round(maxWidth / aspectRatio);
             styleProps.width = maxWidth;
           } else {
@@ -99,18 +118,24 @@ const LazyLoadedImage = ({
       ...styleProps,
       ...style,
     };
-  }, [image, maxWidth, maxHeight, style]);
+  }, [image, maxWidth, maxHeight, style, failed, fallbackImage]);
 
   const { url: src = placeholder } = (loaded && (thumbnail || image)) || {};
+  // Decide final image source: normal, failed fallback, or placeholder
+  const finalSrc = failed ? fallbackImage || placeholder : src;
 
   return (
     <Image
       ownerState={{ border }}
       ref={ref}
-      alt=""
-      role="presentation"
-      src={src}
+      alt={failed ? 'Thumbnail image unavailable' : ''}
+      role={failed ? undefined : 'presentation'}
+      src={finalSrc}
       style={imageStyles}
+      onError={() => {
+        setFailed(true);
+        if (finalSrc) notifyFailure(finalSrc);
+      }}
       {...props}
     />
   );
@@ -121,8 +146,8 @@ LazyLoadedImage.propTypes = {
   maxHeight: PropTypes.number,
   maxWidth: PropTypes.number,
   placeholder: PropTypes.string.isRequired,
-  resource: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  resource: PropTypes.object.isRequired,
+  style: PropTypes.object,
   thumbnail: PropTypes.shape({
     height: PropTypes.number,
     url: PropTypes.string.isRequired,
@@ -130,7 +155,8 @@ LazyLoadedImage.propTypes = {
   }),
 };
 
-const defaultPlaceholder = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mMMDQmtBwADgwF/Op8FmAAAAABJRU5ErkJggg==';
+const defaultPlaceholder =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mMMDQmtBwADgwF/Op8FmAAAAABJRU5ErkJggg==';
 
 /**
  * Uses InteractionObserver to "lazy" load canvas thumbnails that are in view.
@@ -147,7 +173,8 @@ export function IIIFThumbnail({
   style = {},
   thumbnail = null,
 }) {
-  const ownerState = arguments[0]; // eslint-disable-line prefer-rest-params
+  // eslint-disable-next-line prefer-rest-params
+  const ownerState = arguments[0];
 
   return (
     <Root ownerState={ownerState}>
@@ -161,11 +188,7 @@ export function IIIFThumbnail({
         border={border}
       />
 
-      { labelled && (
-        <Label ownerState={ownerState}>
-          {label || <IIIFResourceLabel resource={resource} />}
-        </Label>
-      )}
+      {labelled && <Label ownerState={ownerState}>{label || <IIIFResourceLabel resource={resource} />}</Label>}
       {children}
     </Root>
   );
@@ -179,12 +202,13 @@ IIIFThumbnail.propTypes = {
   labelled: PropTypes.bool,
   maxHeight: PropTypes.number,
   maxWidth: PropTypes.number,
-  resource: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  resource: PropTypes.object.isRequired,
+  style: PropTypes.object,
   thumbnail: PropTypes.shape({
     height: PropTypes.number,
     url: PropTypes.string.isRequired,
     width: PropTypes.number,
   }),
-  variant: PropTypes.oneOf(['inside', 'outside']), // eslint-disable-line react/no-unused-prop-types
+  // eslint-disable-next-line react/no-unused-prop-types
+  variant: PropTypes.oneOf(['inside', 'outside']),
 };

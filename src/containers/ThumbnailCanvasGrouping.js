@@ -10,8 +10,8 @@ import { ThumbnailCanvasGrouping } from '../components/ThumbnailCanvasGrouping';
  * @memberof ThumbnailCanvasGrouping
  * @private
  */
-const mapDispatchToProps = (dispatch, { data }) => ({
-  setCanvas: (...args) => dispatch(actions.setCanvas(data.windowId, ...args)),
+const mapDispatchToProps = (dispatch, { windowId }) => ({
+  setCanvas: (...args) => dispatch(actions.setCanvas(windowId, ...args)),
 });
 
 /**
@@ -19,14 +19,11 @@ const mapDispatchToProps = (dispatch, { data }) => ({
  * @memberof ThumbnailCanvasGrouping
  * @private
  */
-const mapStateToProps = (state, { data }) => ({
-  currentCanvasId: (getCurrentCanvas(state, { windowId: data.windowId }) || {}).id,
+const mapStateToProps = (state, { windowId }) => ({
+  currentCanvasId: (getCurrentCanvas(state, { windowId }) || {}).id,
   showThumbnailLabels: getConfig(state).thumbnailNavigation.showThumbnailLabels,
 });
 
-const enhance = compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  withPlugins('ThumbnailCanvasGrouping'),
-);
+const enhance = compose(connect(mapStateToProps, mapDispatchToProps), withPlugins('ThumbnailCanvasGrouping'));
 
 export default enhance(ThumbnailCanvasGrouping);

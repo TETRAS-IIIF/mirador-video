@@ -1,7 +1,11 @@
 import {
-  createRemoveUpdate, updateTree,
-  getNodeAtPath, getOtherDirection, getPathToCorner, Corner,
-} from 'react-mosaic-component2';
+  createRemoveUpdate,
+  updateTree,
+  getNodeAtPath,
+  getOtherDirection,
+  getPathToCorner,
+  Corner,
+} from 'react-mosaic-component';
 import dropRight from 'lodash/dropRight';
 
 /** */
@@ -38,22 +42,19 @@ export default class MosaicLayout {
       const parent = this.pathToParent(path);
       const destination = this.nodeAtPath(path);
       const direction = parent ? getOtherDirection(parent.direction) : 'row';
-      let first;
-      let second;
+      let children;
       if (direction === 'row') {
-        first = destination;
-        second = addedWindowIds[i];
+        children = [destination, addedWindowIds[i]];
       } else {
-        first = addedWindowIds[i];
-        second = destination;
+        children = [addedWindowIds[i], destination];
       }
       const update = {
         path,
         spec: {
           $set: {
+            type: 'split',
             direction,
-            first,
-            second,
+            children,
           },
         },
       };
@@ -70,10 +71,7 @@ export default class MosaicLayout {
    * @param  {Object} windowPaths - a lookup table for window paths
    */
   removeWindows(removedWindowIds, windowPaths) {
-    const removeUpdates = removedWindowIds
-      .map(windowId => (
-        createRemoveUpdate(this.layout, windowPaths[windowId])
-      ));
+    const removeUpdates = removedWindowIds.map((windowId) => createRemoveUpdate(this.layout, windowPaths[windowId]));
     this.layout = updateTree(this.layout, removeUpdates);
   }
 }

@@ -36,8 +36,8 @@ const StyledFooterAnnotationContainer = styled('div')(({ theme }) => ({
 }));
 
 /**
- * CanvasAnnotations ~
-*/
+ * CanvasAnnotations ~ TODO MERGE 4.1 whole component has change
+ */
 export function CanvasAnnotations({
   annotations = [],
   annotationTagsSuggestion = [],
@@ -62,20 +62,23 @@ export function CanvasAnnotations({
   const allTags = [...new Set([...allTagsFromAnnotations, ...annotationTagsSuggestion])].sort((a, b) => a.localeCompare(b));
 
   const { t } = useTranslation();
+  const handleClick = useCallback(
+    (_event, annotation) => {
+      if (selectedAnnotationId === annotation.id) {
+        deselectAnnotation(windowId, annotation.id);
+      } else {
+        selectAnnotation(windowId, annotation.id);
+      }
+    },
+    [windowId, deselectAnnotation, selectAnnotation, selectedAnnotationId],
+  );
 
-  const handleClick = useCallback((_event, annotation) => {
-    if (selectedAnnotationId === annotation.id) {
-      deselectAnnotation(windowId, annotation.id);
-      // Why this exist ?
-      // selectedAnnotationId = undefined;
-    } else {
-      selectAnnotation(windowId, annotation.id);
-    }
-  }, [windowId, deselectAnnotation, selectAnnotation, selectedAnnotationId]);
-
-  const handleAnnotationHover = useCallback((annotation) => {
-    hoverAnnotation(windowId, [annotation.id]);
-  }, [hoverAnnotation, windowId]);
+  const handleAnnotationHover = useCallback(
+    (annotation) => {
+      hoverAnnotation(windowId, [annotation.id]);
+    },
+    [hoverAnnotation, windowId],
+  );
 
   const handleAnnotationBlur = useCallback(() => {
     hoverAnnotation(windowId, []);
@@ -124,12 +127,11 @@ export function CanvasAnnotations({
               variant="multiline"
               divider
               sx={{
-                '&:hover': {
+                '&:hover,&:focus': {
                   backgroundColor: 'action.hover',
                 },
                 backgroundColor: hoveredAnnotationIds.includes(annotation.id) ? 'action.hover' : '',
               }}
-                            /* ref={containerRef} */ // TODO useful ?
               key={annotation.id}
               annotationid={annotation.id}
               selected={selectedAnnotationId === annotation.id}
@@ -203,10 +205,7 @@ CanvasAnnotations.propTypes = {
     }),
   ),
   annotationTagsSuggestion: PropTypes.arrayOf(PropTypes.string),
-  containerRef: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
-  ]),
+  containerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.instanceOf(Element) })]),
   deselectAnnotation: PropTypes.func.isRequired,
   hoverAnnotation: PropTypes.func.isRequired,
   hoveredAnnotationIds: PropTypes.arrayOf(PropTypes.string),
