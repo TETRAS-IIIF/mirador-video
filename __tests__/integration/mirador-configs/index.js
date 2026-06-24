@@ -3,6 +3,9 @@ import { PRIMARY_CANVAS_FIXTURE_URL, PRIMARY_MANIFEST_FIXTURE_URL } from './cons
 // has 2 windows, one gaugin and one bodleian
 export default {
   catalog: [
+    {
+      manifestId: 'https://files.tetras-libre.fr/dev/sun-400x400-with-svg-target.json',
+    },
     { manifestId: PRIMARY_MANIFEST_FIXTURE_URL },
     {
       manifestId: 'https://iiif.bodleian.ox.ac.uk/iiif/manifest/e32a277e-91e2-4a6d-8ba6-cc4bad230410.json',
@@ -55,13 +58,16 @@ export default {
   },
   windows: [
     {
-      canvasId: PRIMARY_CANVAS_FIXTURE_URL,
-      manifestId: PRIMARY_MANIFEST_FIXTURE_URL,
+      manifestId: 'https://files.tetras-libre.fr/dev/sun-400x400-with-svg-target.json',
     },
-    {
-      canvasId: 'https://iiif.bodleian.ox.ac.uk/iiif/canvas/e58b8c60-005c-4c41-a22f-07d49cb25ede.json',
-      manifestId: 'https://iiif.bodleian.ox.ac.uk/iiif/manifest/e32a277e-91e2-4a6d-8ba6-cc4bad230410.json',
-      thumbnailNavigationPosition: 'far-bottom',
-    },
+    // {
+    //   canvasId: PRIMARY_CANVAS_FIXTURE_URL,
+    //   manifestId: PRIMARY_MANIFEST_FIXTURE_URL,
+    // },
+    // {
+    //   canvasId: 'https://iiif.bodleian.ox.ac.uk/iiif/canvas/e58b8c60-005c-4c41-a22f-07d49cb25ede.json',
+    //   manifestId: 'https://iiif.bodleian.ox.ac.uk/iiif/manifest/e32a277e-91e2-4a6d-8ba6-cc4bad230410.json',
+    //   thumbnailNavigationPosition: 'far-bottom',
+    // },
   ],
 };

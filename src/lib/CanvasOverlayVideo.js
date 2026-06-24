@@ -19,12 +19,7 @@ export default class CanvasOverlayVideo {
   constructor(player, ref, canvasSize) {
     this.player = player; // TODO Rename video to player
     this.ref = ref;
-    const [
-      _canvasX,
-      _canvasY,
-      canvasWidth,
-      canvasHeight, // eslint-disable-line no-unused-vars
-    ] = canvasSize;
+    const [_canvasX, _canvasY, canvasWidth, canvasHeight] = canvasSize;
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
 

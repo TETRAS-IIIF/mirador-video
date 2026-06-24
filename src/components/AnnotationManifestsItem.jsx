@@ -7,6 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 
 /**
  * AnnotationManifestsItem
+ * TODO Convert as functionnal component
  */
 export class AnnotationManifestsItem extends Component {
   /**
@@ -19,15 +20,8 @@ export class AnnotationManifestsItem extends Component {
 
   /** */
   componentDidMount() {
-    const {
-      // eslint-disable-next-line react/prop-types
-      fetchManifest,
-      manifestId,
-      ready,
-      isFetching,
-      error,
-      provider,
-    } = this.props;
+    // eslint-disable-next-line react/prop-types
+    const { fetchManifest, manifestId, ready, isFetching, error, provider } = this.props;
 
     if (!ready && !error && !isFetching && provider !== 'file') {
       fetchManifest(manifestId);
@@ -44,16 +38,8 @@ export class AnnotationManifestsItem extends Component {
 
   /** */
   render() {
-    const {
-      // eslint-disable-next-line react/prop-types
-      t,
-      manifestId,
-      thumbnail,
-      title,
-      description,
-      error,
-      ready,
-    } = this.props;
+    // eslint-disable-next-line react/prop-types
+    const { t, manifestId, thumbnail, title, description, error, ready } = this.props;
 
     if (error) {
       return <Typography sx={(theme) => ({ color: theme.palette.error.main })}>{t('resourceError', { manifestId })}</Typography>;
@@ -114,6 +100,7 @@ AnnotationManifestsItem.propsTypes = {
   fetchManifest: PropTypes.func.isRequired,
   isFetching: PropTypes.bool,
   manifestLogo: PropTypes.string,
+  manifestId: PropTypes.string.isRequired,
   manifests: PropTypes.arrayOf(PropTypes.string),
   provider: PropTypes.string,
   ready: PropTypes.bool,

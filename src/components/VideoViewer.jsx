@@ -106,7 +106,6 @@ export class VideoViewer extends Component {
     this.setState({ time: 0 });
   }
 
-  /* eslint-disable jsx-a11y/media-has-caption */
   /** */
   render() {
     const { canvas, currentTime, windowId, paused, muted, debug } = this.props;
@@ -254,14 +253,11 @@ export class VideoViewer extends Component {
       </div>
     );
   }
-
-  /* eslint-enable jsx-a11y/media-has-caption */
 }
 
 VideoViewer.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   canvas: PropTypes.object,
-  captions: PropTypes.arrayOf(PropTypes.object),
   currentTime: PropTypes.number,
   debug: PropTypes.bool.isRequired,
   muted: PropTypes.bool,
@@ -270,8 +266,6 @@ VideoViewer.propTypes = {
   setPaused: PropTypes.func,
   setSeekTo: PropTypes.func.isRequired,
   windowId: PropTypes.string.isRequired,
-  videoOptions: PropTypes.object,
-  videoResources: PropTypes.arrayOf(PropTypes.object),
 };
 
 VideoViewer.defaultProps = {

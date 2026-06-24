@@ -61,11 +61,10 @@ export class AnnotationsOverlayVideo extends Component {
   constructor(props) {
     super(props);
 
-    // eslint-disable-next-line react/no-unused-class-component-methods
     this.drawAnnotations = true; // TODO force
-    // eslint-disable-next-line react/no-unused-class-component-methods
+
     this.highlightAllAnnotations = true; // TODO force
-    // eslint-disable-next-line react/no-unused-class-component-methods
+
     this.drawSearchAnnotations = true; // TODO force
 
     this.ref = createRef();
@@ -87,7 +86,7 @@ export class AnnotationsOverlayVideo extends Component {
     const { onFunctionsReady, iiifVideoInfos } = this.props;
 
     // Used by plugin by ref // TODO Can be immproved
-    // eslint-disable-next-line react/no-unused-class-component-methods
+
     this.iiifVideoInfos = iiifVideoInfos;
 
     onFunctionsReady({
@@ -103,7 +102,7 @@ export class AnnotationsOverlayVideo extends Component {
     } else {
       this.temporalOffset = 0;
     }
-    // eslint-disable-next-line react/no-unused-class-component-methods
+
     this.currentTimeNearestAnnotationId = null;
 
     this.state = {
@@ -161,7 +160,7 @@ export class AnnotationsOverlayVideo extends Component {
     // }
 
     const annotationsUpdated = !AnnotationsOverlayVideo.annotationsMatch(annotations, prevProps.annotations);
-    // eslint-disable-next-line max-len
+
     const searchAnnotationsUpdated = !AnnotationsOverlayVideo.annotationsMatch(searchAnnotations, prevProps.searchAnnotations);
 
     const hoveredAnnotationsUpdated = xor(hoveredAnnotationIds, prevProps.hoveredAnnotationIds).length > 0;
@@ -269,7 +268,6 @@ export class AnnotationsOverlayVideo extends Component {
    * @event event
    * */
   onVideoLoadedMetadata(event) {
-    // eslint-disable-line class-methods-use-this
     // if (this.video) {
     //   const { currentTime } = this.props;
     //   const { temporalOffset } = this;
@@ -347,9 +345,8 @@ export class AnnotationsOverlayVideo extends Component {
         };
       };
 
-      let annosWithScore = [];
       let radius = 1;
-      annosWithScore = sortBy(annos.map(annosWithClickScore(radius)), 'score');
+      let annosWithScore = sortBy(annos.map(annosWithClickScore(radius)), 'score');
 
       const { width: canvasWidth, height: canvasHeight } = this.getCurrentCanvasSize();
       while (radius < Math.max(canvasWidth, canvasHeight) && annosWithScore[0].score === annosWithScore[1].score) {
@@ -421,12 +418,7 @@ export class AnnotationsOverlayVideo extends Component {
   /** @private */
   getCurrentCanvasSize() {
     const { canvas, canvasWorld } = this.props;
-    const [
-      _canvasX,
-      _canvasY,
-      _canvasWidth,
-      _canvasHeight, // eslint-disable-line no-unused-vars
-    ] = canvasWorld.canvasToWorldCoordinates(canvas.id);
+    const [_canvasX, _canvasY, _canvasWidth, _canvasHeight] = canvasWorld.canvasToWorldCoordinates(canvas.id);
     if (_canvasWidth && _canvasHeight) {
       return { height: _canvasHeight, width: _canvasWidth };
     }
@@ -483,12 +475,7 @@ export class AnnotationsOverlayVideo extends Component {
   /** @private */
   isCanvasSizeSpecified() {
     const { canvas, canvasWorld } = this.props;
-    const [
-      _canvasX,
-      _canvasY,
-      _canvasWidth,
-      _canvasHeight, // eslint-disable-line no-unused-vars
-    ] = canvasWorld.canvasToWorldCoordinates(canvas.id);
+    const [_canvasX, _canvasY, _canvasWidth, _canvasHeight] = canvasWorld.canvasToWorldCoordinates(canvas.id);
     return _canvasWidth && _canvasHeight;
   }
 
@@ -709,8 +696,8 @@ AnnotationsOverlayVideo.defaultProps = {
 };
 
 AnnotationsOverlayVideo.propTypes = {
-  annotations: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
-  canvas: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  annotations: PropTypes.arrayOf(PropTypes.object),
+  canvas: PropTypes.object,
   canvasWorld: PropTypes.instanceOf(CanvasWorld).isRequired,
   currentTime: PropTypes.number,
   debug: PropTypes.bool.isRequired,
@@ -718,21 +705,21 @@ AnnotationsOverlayVideo.propTypes = {
   drawAnnotations: PropTypes.bool,
   drawSearchAnnotations: PropTypes.bool,
   highlightAllAnnotations: PropTypes.bool,
-  hoverAnnotation: PropTypes.func, // eslint-disable-line react/forbid-prop-types
+  hoverAnnotation: PropTypes.func,
   hoveredAnnotationIds: PropTypes.arrayOf(PropTypes.string),
   // iiifVideoInfos is used by plugin by ref
-  iiifVideoInfos: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  onFunctionsReady: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  palette: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+  iiifVideoInfos: PropTypes.object.isRequired,
+  onFunctionsReady: PropTypes.object.isRequired,
+  palette: PropTypes.object,
   paused: PropTypes.bool,
-  playerRef: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  searchAnnotations: PropTypes.arrayOf(PropTypes.object), // eslint-disable-line react/forbid-prop-types
+  playerRef: PropTypes.object.isRequired,
+  searchAnnotations: PropTypes.arrayOf(PropTypes.object),
   seekToTime: PropTypes.number,
   selectAnnotation: PropTypes.func,
   selectedAnnotationId: PropTypes.string,
   setCurrentTime: PropTypes.func,
-  setPaused: PropTypes.func, // eslint-disable-line react/forbid-prop-types
-  videoRef: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  setPaused: PropTypes.func,
+  videoRef: PropTypes.object.isRequired,
   videoTarget: PropTypes.arrayOf(PropTypes.number),
   windowId: PropTypes.string.isRequired,
 };

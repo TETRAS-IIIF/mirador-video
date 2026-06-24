@@ -3,7 +3,6 @@
  * */
 export const filterAnnotation = (annotations, query) =>
   annotations.filter((annotation) => {
-    // eslint-disable-next-line max-len
     const queryLowered = query.toLowerCase();
     console.log('Annotation', annotation);
     return (
