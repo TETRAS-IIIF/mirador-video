@@ -90,7 +90,9 @@ export const setupIntegrationTestViewer = (config, plugins) => {
 
     // Wait for the viewer to render
     expect(await screen.findByTestId('mirador')).toBeInTheDocument();
-    expect(await screen.findByLabelText('Workspace')).toBeInTheDocument();
+    // Use the i18n instance to get the translated label so tests don't
+    // depend on a hardcoded English string.
+    expect(await screen.findByLabelText(i18n.t('workspace'))).toBeInTheDocument();
 
     await failIfErrorDialogPresent({ waitForRole: 'main' });
 

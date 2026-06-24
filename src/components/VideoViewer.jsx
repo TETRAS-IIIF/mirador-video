@@ -256,7 +256,6 @@ export class VideoViewer extends Component {
 }
 
 VideoViewer.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   canvas: PropTypes.object,
   currentTime: PropTypes.number,
   debug: PropTypes.bool.isRequired,
