@@ -46,7 +46,7 @@ export function ViewerNavigation({
         disabled={!hasPreviousCanvas}
         onClick={() => {
           beforeClick();
-          hasNextCanvas && setNextCanvas();
+          hasPreviousCanvas && setPreviousCanvas();
         }}
       >
         <NavigationIcon style={previousIconStyle} />
