@@ -108,49 +108,38 @@ export class VideoViewer extends Component {
 
   /** */
   render() {
-    const { canvas, currentTime, windowId, paused, muted, debug, videoResources, captions, videoOptions } = this.props;
+    const { canvas, currentTime, windowId, paused, muted, debug } = this.props;
 
     const { containerRatio } = this.state;
 
-    // Backwards-compatible rendering path used by unit tests: if `videoResources` is
-    // supplied directly as a prop, render a simple <video> element with <source>
-    // and <track> children. Otherwise, derive videoResources from the canvas
-    // (existing behaviour).
-    let computedVideoResources = videoResources;
-    if (!computedVideoResources || computedVideoResources.length === 0) {
-      if (canvas && typeof canvas.getContent === 'function') {
-        computedVideoResources = flatten(
-          flattenDeep([
-            canvas.getContent().map((annot) => {
-              const annotaion = new AnnotationItem(annot.__jsonld);
-              const temporalfragment = annotaion.temporalfragmentSelector;
-              if (temporalfragment && temporalfragment.length > 0) {
-                const start = temporalfragment[0] || 0;
-                const end = temporalfragment.length > 1 ? temporalfragment[1] : Number.MAX_VALUE;
-                if (start <= currentTime && currentTime < end) {
-                  //
-                } else {
-                  return {};
-                }
-              }
-              const body = annot.getBody();
-              return { body, temporalfragment };
-            }),
-          ]).filter((resource) => resource.body && resource.body[0].__jsonld && resource.body[0].__jsonld.type === 'Video'),
-        );
-      } else {
-        computedVideoResources = [];
-      }
-    }
+    const videoResources = flatten(
+      flattenDeep([
+        canvas.getContent().map((annot) => {
+          const annotaion = new AnnotationItem(annot.__jsonld);
+          const temporalfragment = annotaion.temporalfragmentSelector;
+          if (temporalfragment && temporalfragment.length > 0) {
+            const start = temporalfragment[0] || 0;
+            const end = temporalfragment.length > 1 ? temporalfragment[1] : Number.MAX_VALUE;
+            if (start <= currentTime && currentTime < end) {
+              //
+            } else {
+              return {};
+            }
+          }
+          const body = annot.getBody();
+          return { body, temporalfragment };
+        }),
+      ]).filter((resource) => resource.body && resource.body[0].__jsonld && resource.body[0].__jsonld.type === 'Video'),
+    );
 
     // Only one video can be displayed at a time in this implementation.
-    const len = computedVideoResources.length;
-    const video = len > 0 ? (computedVideoResources[len - 1].body ? computedVideoResources[len - 1].body[0] : computedVideoResources[len - 1]) : null;
-    const videoTargetTemporalfragment = len > 0 ? computedVideoResources[len - 1].temporalfragment : [];
+    const len = videoResources.length;
+    const video = len > 0 ? videoResources[len - 1].body[0] : null;
+    const videoTargetTemporalfragment = len > 0 ? videoResources[len - 1].temporalfragment : [];
 
     let videoAspectRatio;
 
-    if (video && typeof video.getWidth === 'function' && typeof video.getHeight === 'function') {
+    if (video) {
       videoAspectRatio = video.getWidth() / video.getHeight();
     }
 
@@ -166,38 +155,6 @@ export class VideoViewer extends Component {
     };
 
     const { handleVideoEventFunctions } = this.state;
-
-    // If `videoResources` prop was provided directly (tests), render a plain
-    // <video> element with <source> and <track> children so tests can inspect DOM.
-    if (videoResources && videoResources.length > 0) {
-      return (
-        <div
-          className="outerContainer"
-          style={{
-            border: debug ? '6px solid blue' : 'none',
-            display: 'flex',
-            height: '100%',
-            justifyContent: 'center',
-            position: 'relative',
-            width: '100%',
-          }}
-        >
-          <video {...videoOptions}>
-            {videoResources.map((res, idx) => (
-              <source key={res.id || idx} src={res.id} type={res.getFormat ? res.getFormat() : undefined} />
-            ))}
-            {captions && captions.map((c, idx) => (
-              <track
-                key={c.id || idx}
-                kind="subtitles"
-                srcLang={c.getProperty ? c.getProperty() : undefined}
-                label={c.getDefaultLabel ? c.getDefaultLabel() : undefined}
-              />
-            ))}
-          </video>
-        </div>
-      );
-    }
 
     return (
       <div
@@ -299,15 +256,8 @@ export class VideoViewer extends Component {
 }
 
 VideoViewer.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   canvas: PropTypes.object,
   currentTime: PropTypes.number,
-  // eslint-disable-next-line react/forbid-prop-types
-  videoResources: PropTypes.array,
-  // eslint-disable-next-line react/forbid-prop-types
-  captions: PropTypes.array,
-  // eslint-disable-next-line react/forbid-prop-types
-  videoOptions: PropTypes.object,
   debug: PropTypes.bool.isRequired,
   muted: PropTypes.bool,
   paused: PropTypes.bool,
@@ -320,9 +270,6 @@ VideoViewer.propTypes = {
 VideoViewer.defaultProps = {
   canvas: {},
   currentTime: 0,
-  videoResources: [],
-  captions: [],
-  videoOptions: {},
   muted: false,
   paused: true,
   setCurrentTime: () => {},
