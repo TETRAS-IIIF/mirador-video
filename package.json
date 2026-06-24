@@ -1,6 +1,6 @@
 {
   "name": "mirador-video",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Mirador IIIF Viewer with annotation on video support",
   "type": "module",
   "main": "./dist/mirador.min.js",
@@ -22,7 +22,7 @@
     "clean": "rm -rf ./dist",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "node_modules/.bin/eslint ./ && npm run lint:translations && npm run lint:containers",
+    "lint": "eslint ./ && npm run lint:translations && npm run lint:containers",
     "lint:containers": "node ./scripts/container-lint.js",
     "lint:translations": "node ./scripts/i18n-lint.js",
     "size": "bundlewatch --config bundlewatch.config.json",
@@ -37,7 +37,10 @@
     "David Rouquet <david.rouquet@tetras-libre.fr> (https://www.tetras-libre.fr)",
     "Antoine Roy <antoine.roy@tetras-libre.fr> (https://www.tetras-libre.fr)"
   ],
-  "repository": "https://github.com/Tetras-IIIF/mirador-video",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tetras-IIIF/mirador-video.git"
+  },
   "dependencies": {
     "@celluloid/react-player": "^2.14.0",
     "@custom-react-hooks/use-element-size": "^1.5.1",
