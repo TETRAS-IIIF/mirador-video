@@ -7,8 +7,9 @@ import ReactPlayer from '@celluloid/react-player';
 import AnnotationItem from '../lib/AnnotationItem';
 import AnnotationsOverlayVideo from '../containers/AnnotationsOverlayVideo';
 import WindowCanvasNavigationControlsVideo from '../containers/WindowCanvasNavigationControlsVideo';
+import { setWindowSeekTo } from '../state/actions';
 
-// TODO Merge 4.1 captions and func compo
+// TODO Merge 4.1 capptions and func compo
 
 /** */
 export class VideoViewer extends Component {
@@ -37,7 +38,7 @@ export class VideoViewer extends Component {
 
   /** */
   componentDidUpdate(prevProps) {
-    const { canvas, currentTime, paused, setCurrentTime, setPaused, setSeekTo } = this.props;
+    const { canvas, currentTime, paused, setCurrentTime, setPaused, windowId, setSeekTo } = this.props;
     if (paused !== prevProps.paused) {
       if (paused) {
         this.timerStop();
@@ -144,12 +145,7 @@ export class VideoViewer extends Component {
 
     // Only one video can be displayed at a time in this implementation.
     const len = computedVideoResources.length;
-    const video =
-      len > 0
-        ? computedVideoResources[len - 1].body
-          ? computedVideoResources[len - 1].body[0]
-          : computedVideoResources[len - 1]
-        : null;
+    const video = len > 0 ? (computedVideoResources[len - 1].body ? computedVideoResources[len - 1].body[0] : computedVideoResources[len - 1]) : null;
     const videoTargetTemporalfragment = len > 0 ? computedVideoResources[len - 1].temporalfragment : [];
 
     let videoAspectRatio;
@@ -186,20 +182,18 @@ export class VideoViewer extends Component {
             width: '100%',
           }}
         >
-          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
           <video {...videoOptions}>
             {videoResources.map((res, idx) => (
               <source key={res.id || idx} src={res.id} type={res.getFormat ? res.getFormat() : undefined} />
             ))}
-            {captions &&
-              captions.map((c, idx) => (
-                <track
-                  key={c.id || idx}
-                  kind="subtitles"
-                  srcLang={c.getProperty ? c.getProperty() : undefined}
-                  label={c.getDefaultLabel ? c.getDefaultLabel() : undefined}
-                />
-              ))}
+            {captions && captions.map((c, idx) => (
+              <track
+                key={c.id || idx}
+                kind="subtitles"
+                srcLang={c.getProperty ? c.getProperty() : undefined}
+                label={c.getDefaultLabel ? c.getDefaultLabel() : undefined}
+              />
+            ))}
           </video>
         </div>
       );
@@ -305,19 +299,20 @@ export class VideoViewer extends Component {
 }
 
 VideoViewer.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
   canvas: PropTypes.object,
   currentTime: PropTypes.number,
-
+  // eslint-disable-next-line react/forbid-prop-types
   videoResources: PropTypes.array,
-
+  // eslint-disable-next-line react/forbid-prop-types
   captions: PropTypes.array,
-
+  // eslint-disable-next-line react/forbid-prop-types
   videoOptions: PropTypes.object,
   debug: PropTypes.bool.isRequired,
   muted: PropTypes.bool,
   paused: PropTypes.bool,
-  setCurrentTime: PropTypes.func.isRequired,
-  setPaused: PropTypes.func.isRequired,
+  setCurrentTime: PropTypes.func,
+  setPaused: PropTypes.func,
   setSeekTo: PropTypes.func.isRequired,
   windowId: PropTypes.string.isRequired,
 };
@@ -330,4 +325,6 @@ VideoViewer.defaultProps = {
   videoOptions: {},
   muted: false,
   paused: true,
+  setCurrentTime: () => {},
+  setPaused: () => {},
 };
