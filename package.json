@@ -1,6 +1,6 @@
 {
   "name": "mirador-video",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "Mirador IIIF Viewer with annotation on video support",
   "type": "module",
   "main": "./dist/mirador.min.js",
