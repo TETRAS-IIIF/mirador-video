@@ -31,13 +31,13 @@ jobs:
 
       # --- checkout both branches ---
       - name: Checkout stable (demo)
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: demo
           path: demo_src
 
       - name: Checkout latest (main)
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: main
           path: main_src
@@ -238,13 +238,13 @@ jobs:
 
       # -------- deploy --------
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
       - name: Deploy
         id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
