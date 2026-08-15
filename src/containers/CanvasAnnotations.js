@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withPlugins } from '../extend/withPlugins';
 import * as actions from '../state/actions';
 import {
-  getAnnotationResourcesByMotivationForCanvas,
+  getAnnotationResourcesDataForCanvas,
   getCanvasLabel,
   getSelectedAnnotationId,
   getConfig,
@@ -29,9 +29,9 @@ function getIdAndContentOfResources(resources) {
 
 /** For connect */
 const mapStateToProps = (state, { canvasId, windowId }) => ({
-  annotations: getIdAndContentOfResources(getAnnotationResourcesByMotivationForCanvas(state, { canvasId, windowId })),
+  annotations: getIdAndContentOfResources(getAnnotationResourcesDataForCanvas(state, { canvasId, windowId })),
   annotationTagsSuggestion: getConfig(state)?.annotation?.tagsSuggestions ?? [],
-  autoScroll: getWindow(state, { windowId }).autoScrollAnnotationList,
+  autoScroll: getWindow(state, { windowId }).autoScrollAnnotationList, // TODO merge 4.2 is this always usefull ?
   htmlSanitizationRuleSet: getConfig(state).annotations.htmlSanitizationRuleSet,
   label: getCanvasLabel(state, {
     canvasId,

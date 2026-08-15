@@ -19,7 +19,6 @@ function Item({ manifest, canvasNavigation, variant, ...otherProps }) {
   return (
     <MenuItem
       alignItems="flex-start"
-      button
       divider
       component="li"
       variant="multiline"
@@ -69,6 +68,8 @@ export function WindowSideBarCollectionPanel({
     if (!collection) return false;
 
     const behaviors = collection.getProperty('behavior');
+
+    if (!behaviors) return false;
 
     if (Array.isArray(behaviors)) return behaviors.includes('multi-part');
 

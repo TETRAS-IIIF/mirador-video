@@ -12,7 +12,7 @@ const mapStateToProps = (state, { windowId }) => ({
   autoScroll: getWindow(state, { windowId }).autoScrollAnnotationList,
   autoScrollDisabled: getAnnotationResourcesByMotivation(state, { windowId }).length < 2,
   displayAll: getWindow(state, { windowId }).highlightAllAnnotations,
-  displayAllDisabled: getAnnotationResourcesByMotivation(state, { windowId }).length < 2,
+  displayAllDisabled: getAnnotationResourcesByMotivation(state, { windowId }).length < 1,
 });
 
 /**

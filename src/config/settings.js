@@ -291,7 +291,7 @@ export default {
             }),
             ...(ownerState?.variant === 'inside' && {
               background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-              bottom: '5px',
+              bottom: '0px',
               boxSizing: 'border-box',
               left: '0px',
               padding: '4px',
@@ -540,7 +540,6 @@ export default {
   workspace: {
     allowNewWindows: true,
     draggingEnabled: true,
-    exposeModeOn: false, // unused?
     height: 5000, // height of the elastic mode's virtual canvas
     id: uuid(),
     isWorkspaceAddVisible: false, // Catalog/Workspace add window feature visible by default

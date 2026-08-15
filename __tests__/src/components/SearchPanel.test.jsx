@@ -23,7 +23,7 @@ function createWrapper(props) {
 describe('SearchPanel', () => {
   it('renders a CompanionWindow', () => {
     createWrapper();
-    expect(screen.getByRole('complementary')).toBeInTheDocument();
+    expect(screen.getByRole('region')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Search' })).toBeInTheDocument();
   });
 
@@ -77,6 +77,21 @@ describe('SearchPanel', () => {
     expect(screen.getByRole('button', { name: 'Search this document for "abc"' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Search this document for "abc"' }));
     expect(fetchSearch).toHaveBeenCalledWith('http://example.com/search?q=abc', 'abc');
+  });
+
+  it('encodes special characters in suggested search URLs', async () => {
+    const user = userEvent.setup();
+    const fetchSearch = vi.fn();
+    createWrapper({
+      fetchSearch,
+      query: '',
+      suggestedSearches: ['hel^lo'],
+      t,
+    });
+
+    expect(screen.getByRole('button', { name: 'Search this document for "hel^lo"' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Search this document for "hel^lo"' }));
+    expect(fetchSearch).toHaveBeenCalledWith('http://example.com/search?q=hel%5Elo', 'hel^lo');
   });
 
   it('does not suggest searches if the user has made a query', () => {
