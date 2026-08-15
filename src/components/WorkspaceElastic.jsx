@@ -1,9 +1,15 @@
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Rnd } from 'react-rnd';
-import ResizeObserver from 'react-resize-observer';
+import * as ResizeObserverModule from 'react-resize-observer';
 import WorkspaceElasticWindow from '../containers/WorkspaceElasticWindow';
 import ns from '../config/css-ns';
+import unwrapDefault from '../lib/unwrapDefault';
+
+// Some bundler/CJS-interop combinations (notably esbuild's dependency
+// pre-bundling in Vite dev mode) leave this double-wrapped as
+// { default: { default: Component } } instead of unwrapping to Component.
+const ResizeObserver = unwrapDefault(ResizeObserverModule);
 
 const Root = styled('div', { name: 'WorkspaceElastic', slot: 'root' })({
   height: '100%',

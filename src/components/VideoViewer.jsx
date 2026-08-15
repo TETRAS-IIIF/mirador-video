@@ -2,12 +2,19 @@ import flatten from 'lodash/flatten';
 import flattenDeep from 'lodash/flattenDeep';
 import { createRef, Component } from 'react';
 import PropTypes from 'prop-types';
-import ResizeObserver from 'react-resize-observer';
-import ReactPlayer from '@celluloid/react-player';
+import * as ResizeObserverModule from 'react-resize-observer';
+import * as ReactPlayerModule from '@celluloid/react-player';
+import unwrapDefault from '../lib/unwrapDefault';
 import AnnotationItem from '../lib/AnnotationItem';
 import AnnotationsOverlayVideo from '../containers/AnnotationsOverlayVideo';
 import WindowCanvasNavigationControlsVideo from '../containers/WindowCanvasNavigationControlsVideo';
 import { setWindowSeekTo } from '../state/actions';
+
+// Some bundler/CJS-interop combinations (notably esbuild's dependency
+// pre-bundling in Vite dev mode) leave these double-wrapped as
+// { default: { default: Component } } instead of unwrapping to Component.
+const ResizeObserver = unwrapDefault(ResizeObserverModule);
+const ReactPlayer = unwrapDefault(ReactPlayerModule);
 
 // TODO Merge 4.1 capptions and func compo
 
