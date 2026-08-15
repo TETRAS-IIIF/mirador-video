@@ -252,11 +252,10 @@ export class AnnotationsOverlayVideo extends Component {
       this.resizeObserver.disconnect();
     }
     if (this.video) {
-      // this.video.removeEventListener('timeupdate', this.onVideoTimeUpdate);
-      // this.video.removeEventListener('loadedmetadata', this.onVideoLoadedMetadata);
-      // this.video.removeEventListener('waiting', this.onVideoWaiting);
-      // this.video.removeEventListener('playing', this.onVideoPlaying);
-      // this.video.removeEventListener('seeked', this.onVideoPlaying);
+      this.video.removeEventListener('timeupdate', this.onVideoTimeUpdate);
+      this.video.removeEventListener('loadedmetadata', this.onVideoLoadedMetadata);
+      this.video.removeEventListener('waiting', this.onVideoWaiting);
+      this.video.removeEventListener('seeked', this.onVideoPlaying);
     }
     if (this.canvasOverlay && this.canvasOverlay.canvas) {
       this.canvasOverlay.canvas.removeEventListener('click', this.onCanvasClick);
@@ -715,7 +714,7 @@ AnnotationsOverlayVideo.propTypes = {
   hoveredAnnotationIds: PropTypes.arrayOf(PropTypes.string),
   // iiifVideoInfos is used by plugin by ref
   iiifVideoInfos: PropTypes.object.isRequired,
-  onFunctionsReady: PropTypes.object.isRequired,
+  onFunctionsReady: PropTypes.func.isRequired,
   palette: PropTypes.object,
   paused: PropTypes.bool,
   playerRef: PropTypes.object.isRequired,

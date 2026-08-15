@@ -1,5 +1,3 @@
-import flatten from 'lodash/flatten';
-import flattenDeep from 'lodash/flattenDeep';
 import { createRef, Component } from 'react';
 import PropTypes from 'prop-types';
 import * as ResizeObserverModule from 'react-resize-observer';
@@ -45,7 +43,7 @@ export class VideoViewer extends Component {
 
   /** */
   componentDidUpdate(prevProps) {
-    const { canvas, currentTime, paused, setCurrentTime, setPaused, windowId, setSeekTo } = this.props;
+    const { canvas, currentTime, paused, setCurrentTime, setPaused, setSeekTo } = this.props;
     if (paused !== prevProps.paused) {
       if (paused) {
         this.timerStop();
@@ -56,7 +54,7 @@ export class VideoViewer extends Component {
     // Ensure `currentTime` updates are consistent
     if (currentTime !== prevProps.currentTime) {
       // Fix issue where reactPlayer didn't populate seek to time when the time was at 0
-      if (prevProps.currentTime === 0 || paused === true) {
+      if ((prevProps.currentTime === 0 || paused === true) && this.playerRef.current) {
         this.playerRef.current.seekTo(currentTime);
       }
     }
@@ -119,25 +117,24 @@ export class VideoViewer extends Component {
 
     const { containerRatio } = this.state;
 
-    const videoResources = flatten(
-      flattenDeep([
-        canvas.getContent().map((annot) => {
-          const annotaion = new AnnotationItem(annot.__jsonld);
-          const temporalfragment = annotaion.temporalfragmentSelector;
-          if (temporalfragment && temporalfragment.length > 0) {
-            const start = temporalfragment[0] || 0;
-            const end = temporalfragment.length > 1 ? temporalfragment[1] : Number.MAX_VALUE;
-            if (start <= currentTime && currentTime < end) {
-              //
-            } else {
-              return {};
-            }
+    const videoResources = canvas
+      .getContent()
+      .map((annot) => {
+        const annotaion = new AnnotationItem(annot.__jsonld);
+        const temporalfragment = annotaion.temporalfragmentSelector;
+        if (temporalfragment && temporalfragment.length > 0) {
+          const start = temporalfragment[0] || 0;
+          const end = temporalfragment.length > 1 ? temporalfragment[1] : Number.MAX_VALUE;
+          if (start <= currentTime && currentTime < end) {
+            //
+          } else {
+            return {};
           }
-          const body = annot.getBody();
-          return { body, temporalfragment };
-        }),
-      ]).filter((resource) => resource.body && resource.body[0].__jsonld && resource.body[0].__jsonld.type === 'Video'),
-    );
+        }
+        const body = annot.getBody();
+        return { body, temporalfragment };
+      })
+      .filter((resource) => resource.body && resource.body[0].__jsonld && resource.body[0].__jsonld.type === 'Video');
 
     // Only one video can be displayed at a time in this implementation.
     const len = videoResources.length;
