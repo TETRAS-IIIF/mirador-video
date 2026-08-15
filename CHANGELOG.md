@@ -10,6 +10,10 @@ Entries types:
 - `SECURITY` to invite users to upgrade in case of vulnerabilities.
 - `UPSTREAM` to indicate code is pulled in from Mirador main repository.
 
+# [ 4.2.0 ]
+
+- UPSTREAM update to 4.2.3 upstream
+
 # [ 4.1.3 ]
 
 - FIXED : `VideoViewer`, `AnnotationsOverlayVideo` and `WorkspaceElastic` crashed with "Element type is invalid" when loading a video manifest under Vite dev-mode dependency pre-bundling (esbuild), which double-wraps the CJS default export of `@celluloid/react-player` and `react-resize-observer` as `{ default: { default: Component } }` instead of unwrapping it in one step. Added `src/lib/unwrapDefault.js` to robustly peel through however many `default` layers a given bundler leaves behind.
