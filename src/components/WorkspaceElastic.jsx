@@ -5,13 +5,6 @@ import { Rnd } from 'react-rnd';
 import useResizeObserver from '@react-hook/resize-observer';
 import WorkspaceElasticWindow from '../containers/WorkspaceElasticWindow';
 import ns from '../config/css-ns';
-import unwrapDefault from '../lib/unwrapDefault';
-
-// TODO Merge 2026-08-20
-// Some bundler/CJS-interop combinations (notably esbuild's dependency
-// pre-bundling in Vite dev mode) leave this double-wrapped as
-// { default: { default: Component } } instead of unwrapping to Component.
-//const ResizeObserver = unwrapDefault(ResizeObserverModule);
 
 const Root = styled('div', { name: 'WorkspaceElastic', slot: 'root' })({
   height: '100%',
