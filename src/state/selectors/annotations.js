@@ -85,7 +85,9 @@ export const getAnnotationResourcesByMotivationForCanvas = createSelector(
 export const getAnnotationResourcesDataForCanvas = createSelector([getAnnotationResourcesByMotivationForCanvas], (resources) =>
   resources.map((resource) => ({
     content: resource.chars,
+    creator: resource?.resource?.creator,
     id: resource.id,
+    lastEditor: resource?.resource?.lastEditor,
     tags: resource.tags,
     targetId: resource.targetId,
   })),

@@ -11,25 +11,9 @@ import {
 } from '../state/selectors';
 import { CanvasAnnotations } from '../components/CanvasAnnotations';
 
-/**
- * @param {Array} resources
- * @return {Array} [{ id: 'abc123', content: 'Annotation Content' }, ...]
- * TODO it's not the best to add creator and creationDate here, but it's the easiest way to get it
- */
-function getIdAndContentOfResources(resources) {
-  return resources.map((resource, i) => ({
-    content: resource.chars,
-    creator: resource?.resource?.creator,
-    id: resource.id,
-    lastEditor: resource?.resource?.lastEditor,
-    tags: resource.tags,
-    targetId: resource.targetId,
-  }));
-}
-
 /** For connect */
 const mapStateToProps = (state, { canvasId, windowId }) => ({
-  annotations: getIdAndContentOfResources(getAnnotationResourcesDataForCanvas(state, { canvasId, windowId })),
+  annotations: getAnnotationResourcesDataForCanvas(state, { canvasId, windowId }),
   annotationTagsSuggestion: getConfig(state)?.annotation?.tagsSuggestions ?? [],
   autoScroll: getWindow(state, { windowId }).autoScrollAnnotationList, // TODO merge 4.2 is this always usefull ?
   htmlSanitizationRuleSet: getConfig(state).annotations.htmlSanitizationRuleSet,
