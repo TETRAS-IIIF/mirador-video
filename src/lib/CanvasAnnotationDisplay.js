@@ -95,8 +95,6 @@ export default class CanvasAnnotationDisplay {
         this.context.globalAlpha = currentPalette.globalAlpha;
       }
 
-      this.context.stroke(p);
-
       // Wait to set the fill, so we can adjust the globalAlpha value if we need to
       if (element.attributes.fill && element.attributes.fill.nodeValue !== 'none') {
         if (element.attributes['fill-opacity']) {
@@ -106,6 +104,8 @@ export default class CanvasAnnotationDisplay {
         }
         this.context.fill(p);
       }
+
+      this.context.stroke(p);
       this.context.restore();
     });
   }

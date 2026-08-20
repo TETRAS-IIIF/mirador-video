@@ -1,18 +1,21 @@
 import PropTypes from 'prop-types';
+import { useState, useRef, useLayoutEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { Rnd } from 'react-rnd';
-import * as ResizeObserverModule from 'react-resize-observer';
+import useResizeObserver from '@react-hook/resize-observer';
 import WorkspaceElasticWindow from '../containers/WorkspaceElasticWindow';
 import ns from '../config/css-ns';
 import unwrapDefault from '../lib/unwrapDefault';
 
+// TODO Merge 2026-08-20
 // Some bundler/CJS-interop combinations (notably esbuild's dependency
 // pre-bundling in Vite dev mode) leave this double-wrapped as
 // { default: { default: Component } } instead of unwrapping to Component.
-const ResizeObserver = unwrapDefault(ResizeObserverModule);
+//const ResizeObserver = unwrapDefault(ResizeObserverModule);
 
 const Root = styled('div', { name: 'WorkspaceElastic', slot: 'root' })({
   height: '100%',
+  overflow: 'hidden',
   position: 'relative',
   width: '100%',
 });
@@ -36,16 +39,18 @@ function WorkspaceElastic({ workspace, elasticLayout, setWorkspaceViewportDimens
   const { viewportPosition } = workspace;
   const offsetX = workspace.width / 2;
   const offsetY = workspace.height / 2;
+  const target = useRef(null);
+
+  useLayoutEffect(() => {
+    if (target.current) setWorkspaceViewportDimensions(target.current.getBoundingClientRect());
+  }, [target, setWorkspaceViewportDimensions]);
+
+  useResizeObserver(target, (entry) => {
+    setWorkspaceViewportDimensions(entry.contentRect);
+  });
 
   return (
-    <Root>
-      <ResizeObserver
-        onReflow={() => {}}
-        onResize={(rect) => {
-          setWorkspaceViewportDimensions(rect);
-        }}
-      />
-
+    <Root ref={target}>
       <StyledRnd
         size={{
           height: workspace.height,
