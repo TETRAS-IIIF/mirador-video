@@ -5,18 +5,11 @@ import debounce from 'lodash/debounce';
 import flatten from 'lodash/flatten';
 import sortBy from 'lodash/sortBy';
 import xor from 'lodash/xor';
-import * as ResizeObserverModule from 'react-resize-observer';
 import CircularProgress from '@mui/material/CircularProgress';
 import CanvasOverlayVideo from '../lib/CanvasOverlayVideo';
 import CanvasWorld from '../lib/CanvasWorld';
 import CanvasAnnotationDisplay from '../lib/CanvasAnnotationDisplay';
 import { VideosReferences } from '../plugins/VideosReferences';
-import unwrapDefault from '../lib/unwrapDefault';
-
-// Some bundler/CJS-interop combinations (notably esbuild's dependency
-// pre-bundling in Vite dev mode) leave this double-wrapped as
-// { default: { default: Component } } instead of unwrapping to Component.
-const ResizeObserver = unwrapDefault(ResizeObserverModule);
 
 /** AnnotationsOverlayVideo - based on AnnotationsOverlay */
 export class AnnotationsOverlayVideo extends Component {
@@ -508,6 +501,11 @@ export class AnnotationsOverlayVideo extends Component {
     const canvasSize = canvasWorld.canvasToWorldCoordinates(canvas.id);
     this.canvasOverlay = new CanvasOverlayVideo(this.player, this.ref, canvasSize);
 
+    if (this.ref.current) {
+      this.resizeObserver = new ResizeObserver(() => this.onCanvasResize());
+      this.resizeObserver.observe(this.ref.current);
+    }
+
     this.updateCanvas = this.canvasUpdateCallback();
 
     // Prefetch annotation images
@@ -655,7 +653,6 @@ export class AnnotationsOverlayVideo extends Component {
             width: '100%',
           }}
         />
-        <ResizeObserver onResize={this.onCanvasResize} />
         {debug && (
           <div
             style={{

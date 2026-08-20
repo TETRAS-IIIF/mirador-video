@@ -2,7 +2,6 @@ import flatten from 'lodash/flatten';
 import flattenDeep from 'lodash/flattenDeep';
 import { createRef, Component } from 'react';
 import PropTypes from 'prop-types';
-import * as ResizeObserverModule from 'react-resize-observer';
 import * as ReactPlayerModule from '@celluloid/react-player';
 import unwrapDefault from '../lib/unwrapDefault';
 import AnnotationItem from '../lib/AnnotationItem';
@@ -11,9 +10,8 @@ import WindowCanvasNavigationControlsVideo from '../containers/WindowCanvasNavig
 import { setWindowSeekTo } from '../state/actions';
 
 // Some bundler/CJS-interop combinations (notably esbuild's dependency
-// pre-bundling in Vite dev mode) leave these double-wrapped as
+// pre-bundling in Vite dev mode) leave this double-wrapped as
 // { default: { default: Component } } instead of unwrapping to Component.
-const ResizeObserver = unwrapDefault(ResizeObserverModule);
 const ReactPlayer = unwrapDefault(ReactPlayerModule);
 
 // TODO Merge 4.1 capptions and func compo
@@ -73,6 +71,9 @@ export class VideoViewer extends Component {
   /** */
   componentWillUnmount() {
     this.timerStop();
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 
   /**
@@ -84,6 +85,17 @@ export class VideoViewer extends Component {
 
   setContainerRatio = (ref) => {
     this.setState({ containerRatio: ref.width / ref.height });
+  };
+
+  setContainerRef = (node) => {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    if (node) {
+      this.resizeObserver = new ResizeObserver(([entry]) => this.setContainerRatio(entry.contentRect));
+      this.resizeObserver.observe(node);
+    }
   };
 
   /** */
@@ -178,6 +190,7 @@ export class VideoViewer extends Component {
         {video && (
           <>
             <div
+              ref={this.setContainerRef}
               style={{
                 alignItems: 'center',
                 backgroundColor: 'black',
@@ -190,7 +203,6 @@ export class VideoViewer extends Component {
                 width: '100%',
               }}
             >
-              <ResizeObserver onResize={this.setContainerRatio} />
               <div
                 style={{
                   aspectRatio: playerStyle.aspectRatio,
