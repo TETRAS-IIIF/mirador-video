@@ -10,8 +10,6 @@ vi.mock('../../../src/lib/CanvasOverlayVideo', () => ({
   },
 }));
 
-vi.mock('react-resize-observer', () => ({ default: () => null }));
-
 /** create wrapper */
 function createWrapper(props) {
   const canvasWorld = new CanvasWorld([]);

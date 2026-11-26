@@ -3,18 +3,11 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import * as ResizeObserverModule from 'react-resize-observer';
 import ViewerInfo from '../containers/ViewerInfo';
 import ViewerNavigation from '../containers/ViewerNavigation';
 import ViewerNavigationVideo from '../containers/ViewerNavigationVideo';
 import ns from '../config/css-ns';
 import { PluginHook } from './PluginHook';
-import unwrapDefault from '../lib/unwrapDefault';
-
-// Some bundler/CJS-interop combinations (notably esbuild's dependency
-// pre-bundling in Vite dev mode) leave this double-wrapped as
-// { default: { default: Component } } instead of unwrapping to Component.
-const ResizeObserver = unwrapDefault(ResizeObserverModule);
 
 /**
  * WindowCanvasNavigationControlsVideo - based on WindowCanvasNavigationControls
@@ -37,8 +30,28 @@ export class WindowCanvasNavigationControlsVideo extends Component {
   }
 
   /** */
-  setSize = (size) => {
-    this.setState({ size });
+  componentWillUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  }
+
+  /** */
+  setSize = ({ height, width }) => {
+    this.setState({ size: { height, width } });
+  };
+
+  /** Measure the container on mount, then on every resize. */
+  setContainerRef = (node) => {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    if (node) {
+      this.setSize(node.getBoundingClientRect());
+      this.resizeObserver = new ResizeObserver(([entry]) => this.setSize(entry.contentRect));
+      this.resizeObserver.observe(node);
+    }
   };
 
   /** */
@@ -47,6 +60,7 @@ export class WindowCanvasNavigationControlsVideo extends Component {
 
     return (
       <Paper
+        ref={this.setContainerRef}
         square
         className={classNames(
           ns('canvas-nav'),
@@ -67,7 +81,6 @@ export class WindowCanvasNavigationControlsVideo extends Component {
           zIndex: 50,
         })}
       >
-        <ResizeObserver onResize={this.setSize} />
         <ViewerNavigation windowId={windowId} beforeClick={setPaused} />
         <ViewerInfo windowId={windowId} />
         <ViewerNavigationVideo windowId={windowId} />

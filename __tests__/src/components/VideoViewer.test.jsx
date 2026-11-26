@@ -22,8 +22,6 @@ vi.mock('@celluloid/react-player', () => {
   return { default: MockReactPlayer };
 });
 
-vi.mock('react-resize-observer', () => ({ default: () => null }));
-
 vi.mock('../../../src/containers/AnnotationsOverlayVideo', () => ({
   default: () => <div data-testid="annotations-overlay-video-mock" />,
 }));
