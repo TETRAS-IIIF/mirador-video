@@ -14,14 +14,45 @@ import { PluginHook } from './PluginHook';
  * Represents the viewer controls in the mirador workspace.
  */
 export class WindowCanvasNavigationControlsVideo extends Component {
+  /** */
+  constructor(props) {
+    super(props);
+    this.state = { size: {} };
+  }
+
   /**
    * Determine if canvasNavControls are stacked (based on a hard-coded width)
    */
   canvasNavControlsAreStacked() {
-    const { size } = this.props;
+    const { size } = this.state;
 
     return size && size.width && size.width <= 253;
   }
+
+  /** */
+  componentWillUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  }
+
+  /** */
+  setSize = ({ height, width }) => {
+    this.setState({ size: { height, width } });
+  };
+
+  /** Measure the container on mount, then on every resize. */
+  setContainerRef = (node) => {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    if (node) {
+      this.setSize(node.getBoundingClientRect());
+      this.resizeObserver = new ResizeObserver(([entry]) => this.setSize(entry.contentRect));
+      this.resizeObserver.observe(node);
+    }
+  };
 
   /** */
   render() {
@@ -29,6 +60,7 @@ export class WindowCanvasNavigationControlsVideo extends Component {
 
     return (
       <Paper
+        ref={this.setContainerRef}
         square
         className={classNames(
           ns('canvas-nav'),
@@ -53,7 +85,7 @@ export class WindowCanvasNavigationControlsVideo extends Component {
         <ViewerInfo windowId={windowId} />
         <ViewerNavigationVideo windowId={windowId} />
 
-        <PluginHook {...this.props} />
+        <PluginHook {...this.props} size={this.state.size} />
       </Paper>
     );
   }
@@ -62,7 +94,6 @@ export class WindowCanvasNavigationControlsVideo extends Component {
 WindowCanvasNavigationControlsVideo.propTypes = {
   classes: PropTypes.objectOf(PropTypes.string),
   setPaused: PropTypes.func,
-  size: PropTypes.shape({ width: PropTypes.number }).isRequired,
   visible: PropTypes.bool,
   windowId: PropTypes.string.isRequired,
 };
