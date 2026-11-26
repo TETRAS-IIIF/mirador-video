@@ -108,4 +108,39 @@ describe('drawAnnotationsToContext', () => {
       );
     });
   });
+
+  describe('drafts', () => {
+    const draftMarker = { property: 'status', value: 'draft' };
+    const palette = { default: { globalAlpha: 1 }, draft: { globalAlpha: 0.8 }, hidden: { globalAlpha: 0.2 } };
+    // As in AnnotationList / AnnotationPage: the marker is on each annotation's own JSON (resource.resource).
+    const page = () => ({
+      json: { id: 'page-1' },
+      resources: [
+        { id: 'r1', resource: { id: 'r1', status: 'draft' }, targetId: 'canvas-1' },
+        { id: 'r2', resource: { id: 'r2', status: 'published' }, targetId: 'canvas-1' },
+      ],
+    });
+
+    it('marks only the annotations carrying the draft marker', () => {
+      drawAnnotationsToContext([page()], palette, baseOptions({ draftMarker }));
+
+      const drafts = CanvasAnnotationDisplay.mock.calls.map(([args]) => [args.resource.id, args.draft]);
+      expect(drafts).toEqual([
+        ['r1', true],
+        ['r2', false],
+      ]);
+    });
+
+    it('marks nothing without a draft marker', () => {
+      drawAnnotationsToContext([page()], palette, baseOptions());
+
+      expect(CanvasAnnotationDisplay.mock.calls.every(([args]) => args.draft === false)).toBe(true);
+    });
+
+    it('hides drafts like other annotations when highlightAllAnnotations is false', () => {
+      drawAnnotationsToContext([page()], palette, baseOptions({ draftMarker }));
+
+      expect(CanvasAnnotationDisplay.mock.calls[0][0].palette.draft).toEqual({ globalAlpha: 0.2 });
+    });
+  });
 });

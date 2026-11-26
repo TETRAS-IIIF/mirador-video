@@ -23,7 +23,7 @@ export function drawAnnotationsToContext(
 
       const canvasAnnotationDisplay = new CanvasAnnotationDisplay({
         canvasWorld,
-        draft: isDraftAnnotation(annotation.resource, draftMarker),
+        draft: isDraftAnnotation(resource.resource, draftMarker),
         hovered: hoveredAnnotationIds.includes(resource.id),
         overlayScale,
         palette: {

@@ -603,7 +603,7 @@ export class AnnotationsOverlayVideo extends Component {
         const canvasSize = canvasWorld.canvasToWorldCoordinates(resource.targetId);
         const canvasAnnotationDisplay = new CanvasAnnotationDisplay({
           canvasSize,
-          draft: isDraftAnnotation(annotation.resource, draftMarker),
+          draft: isDraftAnnotation(resource.resource, draftMarker),
           hovered: hoveredAnnotationIds.includes(resource.id),
           imageSource,
           offset,
