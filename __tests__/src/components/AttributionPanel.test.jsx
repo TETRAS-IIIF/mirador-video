@@ -3,7 +3,7 @@
  */
 import { render, screen, waitFor } from '@tests/utils/test-utils';
 
-import { AttributionPanel } from '../../../src/components/AttributionPanel';
+import { AttributionPanel } from '@src/components/AttributionPanel';
 
 /**
  * Helper function to create a shallow wrapper around AttributionPanel
@@ -37,7 +37,7 @@ describe('AttributionPanel', () => {
   });
 
   // Requires canvas to handle img loading.
-  it.skip('renders the manifest logo', async () => {
+  it('renders the manifest logo', async () => {
     const manifestLogo =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mMMDQmtBwADgwF/Op8FmAAAAABJRU5ErkJggg==';
 
@@ -47,7 +47,6 @@ describe('AttributionPanel', () => {
       expect(container.querySelector('img')).toBeInTheDocument();
     });
 
-    // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-    expect(container.querySelector('img')).toHaveAttribute('src', manifestLogo);
+    expect(container.querySelector('img')).toHaveAttribute('src', manifestLogo); // eslint-disable-line testing-library/no-container, testing-library/no-node-access
   });
 });

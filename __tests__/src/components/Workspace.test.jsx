@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@tests/utils/test-utils';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
-import { Workspace } from '../../../src/components/Workspace';
+import { Workspace } from '@src/components/Workspace';
 
 /**
  * Utility function to create a Worksapce
@@ -35,6 +35,13 @@ function createWrapper(props) {
     },
   );
 }
+
+// Mock PrimaryWindow to prevent its React.lazy viewer imports from resolving
+// asynchronously outside of act(...) during synchronous WorkspaceMosaic unit tests.
+// Prevents warnings in test run
+vi.mock('../../../src/containers/PrimaryWindow', () => ({
+  default: () => <div className="mirador-primary-window" data-testid="mock-primary-window" />,
+}));
 
 /* eslint-disable testing-library/no-container, testing-library/no-node-access */
 describe('Workspace', () => {

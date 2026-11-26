@@ -424,6 +424,9 @@ export default {
     },
   },
   language: 'en', // The default language set in the application
+  // defaults as empty to all availableLanguages.
+  // If language code values are provided (such as ['ja', 'en']), *only* these languages will appear as options in the UI.
+  enabledLanguages: [],
   availableLanguages: {
     // All the languages available in the language switcher
     ar: 'العربية',
@@ -561,8 +564,12 @@ export default {
     enabled: true, // Configure if the control panel should be rendered.  Useful if you want to lock the viewer down to only the configured manifests
   },
   galleryView: {
+    // height and width here define a box that thumbnails are scaled to fit within,
+    // preserving their own aspect ratio. Height is the practical constraint for most images.
+    // With these default values, width only comes into play for extreme images wider than 5:1 (600:120)
+    // See GalleryViewThumbnail and IIIFThumbnail
     height: 120, // height of gallery view thumbnails
-    width: null, // width of gallery view thumbnails (or null, to auto-calculate an aspect-ratio appropriate size)
+    width: 600, // effective ceiling on width
   },
   osdConfig: {
     // Default config used for OpenSeadragon

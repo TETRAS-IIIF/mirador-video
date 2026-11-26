@@ -1,5 +1,5 @@
 import { Utils } from 'manifesto.js';
-import MiradorCanvas from '../../../src/lib/MiradorCanvas';
+import MiradorCanvas from '@src/lib/MiradorCanvas';
 import fixture from '../../fixtures/version-2/019.json';
 import serviceFixture from '../../fixtures/version-2/canvasService.json';
 import otherContentFixture from '../../fixtures/version-2/299843.json';
@@ -90,6 +90,46 @@ describe('MiradorCanvas', () => {
       expect(
         instance.onFragment('https://images.prtd.app/iiif/2/hamilton%2fHL_524_1r_00_PC17/full/739,521/0/default.jpg'),
       ).toEqual([552, 1584, 3360, 2368]);
+    });
+
+    // Object targets are valid in v3 and are the norm in Presentation 4
+    // (https://preview.iiif.io/cookbook/v4-0005-image-svc-single-image/recipe/0005-image-service/)
+    const canvasPage = 'https://dvp.prtd.app/hamilton/canvas/p1.json';
+    const pc17 = 'https://images.prtd.app/iiif/2/hamilton%2fHL_524_1r_00_PC17/full/739,521/0/default.jpg';
+    /** the v3 Hamilton canvas, with the annotation painting `bodyId` given a new target */
+    const hamiltonWithTarget = (bodyId, target) => {
+      const manifest = structuredClone(fragmentFixtureV3);
+      manifest.items[0].items[0].items.find((anno) => anno.body.id === bodyId).target = target;
+      return new MiradorCanvas(Utils.parseManifest(manifest).getSequences()[0].getCanvases()[0]);
+    };
+
+    it('fills the canvas for an object target with no fragment (as in Presentation 4)', () => {
+      instance = hamiltonWithTarget(pc17, { id: canvasPage, type: 'Canvas' });
+      expect(instance.onFragment(pc17)).toBeUndefined();
+    });
+    it('places the image using a SpecificResource fragment selector', () => {
+      instance = hamiltonWithTarget(pc17, {
+        selector: { type: 'FragmentSelector', value: 'xywh=552,1584,3360,2368' },
+        source: { id: canvasPage, type: 'Canvas' },
+        type: 'SpecificResource',
+      });
+      expect(instance.onFragment(pc17)).toEqual([552, 1584, 3360, 2368]);
+    });
+  });
+  describe('xywhFragment', () => {
+    const c = 'https://example.org/c1';
+    it.each([
+      ['a string with a fragment', `${c}#xywh=1,2,3,4`, '1,2,3,4'],
+      ['an { id } with a fragment', { id: `${c}#xywh=1,2,3,4` }, '1,2,3,4'],
+      ['a SpecificResource selector', { selector: { value: 'xywh=1,2,3,4' }, source: c }, '1,2,3,4'],
+      ['a v2 { full, selector }', { full: c, selector: { value: 'xywh=1,2,3,4' } }, '1,2,3,4'],
+      ['an array of targets', [{ id: `${c}#xywh=1,2,3,4` }], '1,2,3,4'],
+      ['a plain canvas URI', c, undefined],
+      ['an { id } without a fragment', { id: c, type: 'Canvas' }, undefined],
+      ['a non-fragment selector', { selector: { type: 'SvgSelector', value: '<svg/>' }, source: c }, undefined],
+      ['no target', undefined, undefined],
+    ])('%s', (_name, target, expected) => {
+      expect(MiradorCanvas.xywhFragment(target)).toEqual(expected);
     });
   });
   describe('videoResources', () => {

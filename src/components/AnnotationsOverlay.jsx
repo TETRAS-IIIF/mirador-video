@@ -1,24 +1,29 @@
-import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { useDebouncedCallback } from 'use-debounce';
 import sortBy from 'lodash/sortBy';
 import xor from 'lodash/xor';
+import { useOsdEvent } from '../hooks';
 import OpenSeadragonCanvasOverlay from '../lib/OpenSeadragonCanvasOverlay';
 import CanvasWorld from '../lib/CanvasWorld';
-import CanvasAnnotationDisplay from '../lib/CanvasAnnotationDisplay';
-import { isDraftAnnotation } from '../lib/draftAnnotations';
-import { buildPath2D } from '../lib/svgShapesToPath';
+import { drawAnnotationsToContext } from '../lib/drawAnnotationsToContext';
+import { buildPath2D, svgShapeElements } from '../lib/svgShapesToPath';
 
 /** @private */
 function isAnnotationAtPoint(canvasWorld, osdCanvasOverlay, resource, canvas, point) {
   const [canvasX, canvasY] = canvasWorld.canvasToWorldCoordinates(canvas.id);
-  const relativeX = point.x - canvasX;
-  const relativeY = point.y - canvasY;
+  // point is already in OSD viewport/world units (see onCanvasClick's use of
+  // viewport.pointFromPixel), so only the world -> native-pixel conversion
+  // is needed here -- unlike CanvasAnnotationDisplay's drawing code, there's
+  // no separate screen-pixel step (overlayScale) left to undo.
+  const scale = canvasWorld.canvasScale(canvas.id);
+  const relativeX = (point.x - canvasX) / scale;
+  const relativeY = (point.y - canvasY) / scale;
 
   if (resource.svgSelector) {
     const context = osdCanvasOverlay.context2d;
-    const { svgPaths } = new CanvasAnnotationDisplay({ resource });
+    const svgPaths = svgShapeElements(resource);
     return [...svgPaths].some((path) => context.isPointInPath(buildPath2D(path), relativeX, relativeY));
   }
 
@@ -83,38 +88,16 @@ export function AnnotationsOverlay({
    */
   const annotationsToContext = useCallback(
     (renderedAnnotations, currentPalette) => {
-      const context = osdCanvasOverlay.context2d;
-      const zoomRatio = viewer.viewport.getZoom(true) / viewer.viewport.getMaxZoom();
-      renderedAnnotations.forEach((annotation) => {
-        annotation.resources.forEach((resource) => {
-          if (!canvasWorld.canvasIds.includes(resource.targetId)) return;
-          const offset = canvasWorld.offsetByCanvas(resource.targetId);
-          const canvasAnnotationDisplay = new CanvasAnnotationDisplay({
-            draft: isDraftAnnotation(annotation.resource, draftMarker),
-            hovered: hoveredAnnotationIds.includes(resource.id),
-            offset,
-            palette: {
-              ...currentPalette,
-              default: {
-                ...currentPalette.default,
-                ...(!highlightAllAnnotations && currentPalette.hidden),
-              },
-              ...(currentPalette.draft && {
-                draft: {
-                  ...currentPalette.draft,
-                  ...(!highlightAllAnnotations && currentPalette.hidden),
-                },
-              }),
-            },
-            resource,
-            selected: selectedAnnotationId === resource.id,
-            zoomRatio,
-          });
-          canvasAnnotationDisplay.toContext(context);
-        });
+      drawAnnotationsToContext(renderedAnnotations, currentPalette, {
+        canvasWorld,
+        draftMarker,
+        highlightAllAnnotations,
+        hoveredAnnotationIds,
+        osdCanvasOverlay,
+        selectedAnnotationId,
       });
     },
-    [osdCanvasOverlay, viewer, canvasWorld, draftMarker, highlightAllAnnotations, hoveredAnnotationIds, selectedAnnotationId],
+    [osdCanvasOverlay, canvasWorld, draftMarker, highlightAllAnnotations, hoveredAnnotationIds, selectedAnnotationId],
   );
 
   const renderAnnotations = useCallback(() => {
@@ -258,21 +241,10 @@ export function AnnotationsOverlay({
     updateCanvas();
   }, [updateCanvas]);
 
-  useEffect(() => {
-    if (!viewer) return undefined;
-
-    viewer.addHandler('canvas-click', onCanvasClick);
-    viewer.addHandler('canvas-exit', onCanvasExit);
-    viewer.addHandler('mouse-move', onCanvasMouseMove);
-    viewer.addHandler('update-viewport', onUpdateViewport);
-
-    return () => {
-      viewer.removeHandler('canvas-click', onCanvasClick);
-      viewer.removeHandler('canvas-exit', onCanvasExit);
-      viewer.removeHandler('mouse-move', onCanvasMouseMove);
-      viewer.removeHandler('update-viewport', onUpdateViewport);
-    };
-  }, [onCanvasClick, onCanvasExit, onCanvasMouseMove, onUpdateViewport, viewer]);
+  useOsdEvent(viewer, 'canvas-click', onCanvasClick);
+  useOsdEvent(viewer, 'canvas-exit', onCanvasExit);
+  useOsdEvent(viewer, 'mouse-move', onCanvasMouseMove);
+  useOsdEvent(viewer, 'update-viewport', onUpdateViewport);
 
   useEffect(() => {
     if (viewer) viewer.forceRedraw();

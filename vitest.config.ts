@@ -18,10 +18,19 @@ export default defineConfig({
   resolve: {
     alias: {
       '@tests': fileURLToPath(new URL('./__tests__', import.meta.url)),
+      '@src': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
   test: {
     environment: 'happy-dom',
+    environmentOptions: {
+      happyDOM: {
+        settings: {
+          // don't load real pages into iframes (e.g. IIIF auth token iframes)
+          navigation: { disableChildFrameNavigation: true },
+        },
+      },
+    },
     exclude: ['node_modules'],
     globals: true,
     include: ['**/*.test.js', '**/*.test.jsx'],

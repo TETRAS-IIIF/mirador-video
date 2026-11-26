@@ -5,6 +5,38 @@ import { useDebouncedCallback } from 'use-debounce';
 import { useTranslation } from 'react-i18next';
 import OpenSeadragonViewerContext from '../contexts/OpenSeadragonViewerContext';
 
+/**
+ * Applies x/y/zoom/rotation/flip to viewport. `immediately` snaps
+ * unconditionally (there's nothing yet to compare against the first time
+ * this runs). Otherwise each value is only touched if it differs from
+ * where the camera is already headed, to avoid restarting an animation
+ * that's already correct.
+ */
+function applyExplicitViewport(viewport, { x, y, zoom, rotation, flip }, immediately) {
+  const point = new Openseadragon.Point(x, y);
+
+  if (
+    x != null &&
+    y != null &&
+    (immediately ||
+      Math.round(x) !== Math.round(viewport.centerSpringX.target.value) ||
+      Math.round(y) !== Math.round(viewport.centerSpringY.target.value))
+  ) {
+    viewport.panTo(point, immediately);
+  }
+
+  // Independent of x/y -- zoom can be applied on its own.
+  if (zoom != null && (immediately || zoom !== viewport.zoomSpring.target.value)) {
+    viewport.zoomTo(zoom, point, immediately);
+    // OSD's own zoom buttons always pair a zoom call with applyConstraints.
+    // Because we have custom buttons, we must apply it here to enforce min/max zoom.
+    viewport.applyConstraints();
+  }
+
+  if (rotation != null && rotation !== viewport.getRotation()) viewport.setRotation(rotation);
+  if (flip != null && (flip || false) !== viewport.getFlip()) viewport.setFlip(flip);
+}
+
 /** Handle setting up OSD for use in mirador + react */
 function OpenSeadragonComponent({
   children = undefined,
@@ -62,21 +94,7 @@ function OpenSeadragonComponent({
       if (initialViewportSet.current) return;
       initialViewportSet.current = true;
 
-      if (viewerConfig.x != null && viewerConfig.y != null) {
-        viewport.panTo(new Openseadragon.Point(viewerConfig.x, viewerConfig.y), true);
-      }
-
-      if (viewerConfig.zoom != null) {
-        viewport.zoomTo(viewerConfig.zoom, new Openseadragon.Point(viewerConfig.x, viewerConfig.y), true);
-      }
-
-      if (viewerConfig.rotation != null && viewerConfig.rotation !== viewport.getRotation()) {
-        viewport.setRotation(viewerConfig.rotation);
-      }
-
-      if (viewerConfig.flip != null && (viewerConfig.flip || false) !== viewport.getFlip()) {
-        viewport.setFlip(viewerConfig.flip);
-      }
+      applyExplicitViewport(viewport, viewerConfig, true);
 
       if (!viewerConfig.x && !viewerConfig.y && !viewerConfig.zoom) {
         if (viewerConfig.bounds) {
@@ -89,6 +107,12 @@ function OpenSeadragonComponent({
     },
     [initialViewportSet, viewerConfig],
   );
+
+  // Route through a ref, updated every render, so add-item handler
+  // always calls the current setInitialBounds -- and therefore reads the
+  // current viewerConfig -- instead of whatever it was on the very first render.
+  const setInitialBoundsRef = useRef(setInitialBounds);
+  setInitialBoundsRef.current = setInitialBounds;
 
   useEffect(() => {
     const viewer = viewerRef.current;
@@ -131,29 +155,7 @@ function OpenSeadragonComponent({
       return;
     }
 
-    // @ts-expect-error
-    if (
-      viewerConfig.x != null &&
-      viewerConfig.y != null &&
-      (Math.round(viewerConfig.x) !== Math.round(viewport.centerSpringX.target.value) ||
-        // @ts-expect-error
-        Math.round(viewerConfig.y) !== Math.round(viewport.centerSpringY.target.value))
-    ) {
-      viewport.panTo(new Openseadragon.Point(viewerConfig.x, viewerConfig.y), false);
-    }
-
-    // @ts-expect-error
-    if (viewerConfig.zoom != null && viewerConfig.zoom !== viewport.zoomSpring.target.value) {
-      viewport.zoomTo(viewerConfig.zoom, new Openseadragon.Point(viewerConfig.x, viewerConfig.y), false);
-    }
-
-    if (viewerConfig.rotation != null && viewerConfig.rotation !== viewport.getRotation()) {
-      viewport.setRotation(viewerConfig.rotation);
-    }
-
-    if (viewerConfig.flip != null && (viewerConfig.flip || false) !== viewport.getFlip()) {
-      viewport.setFlip(viewerConfig.flip);
-    }
+    applyExplicitViewport(viewport, viewerConfig, false);
   }, [initialViewportSet, setInitialBounds, viewerConfig, viewerRef]);
 
   // initialize OSD stuff when this component is mounted
@@ -186,9 +188,14 @@ function OpenSeadragonComponent({
     viewerRef.current = viewer;
     setViewer(viewer);
 
-    viewer.addOnceHandler('tile-loaded', () => {
+    viewer.world.addHandler('add-item', () => {
       initialViewportSet.current = false;
-      setInitialBounds(viewer);
+      setInitialBoundsRef.current(viewer);
+    });
+
+    viewer.world.addHandler('remove-item', () => {
+      initialViewportSet.current = false;
+      setInitialBoundsRef.current(viewer);
     });
 
     forceUpdate();

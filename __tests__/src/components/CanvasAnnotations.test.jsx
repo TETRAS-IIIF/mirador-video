@@ -1,8 +1,8 @@
 import { render, screen } from '@tests/utils/test-utils';
 import userEvent from '@testing-library/user-event';
 
-import { CanvasAnnotations } from '../../../src/components/CanvasAnnotations';
-import { ScrollTo } from '../../../src/components/ScrollTo';
+import { CanvasAnnotations } from '@src/components/CanvasAnnotations';
+import { ScrollTo } from '@src/components/ScrollTo';
 
 /** Utility function to wrap CanvasAnnotations */
 function createWrapper(props) {
@@ -42,6 +42,23 @@ describe('CanvasAnnotations', () => {
     createWrapper({ annotations });
 
     expect(screen.getByText('Item: [A Canvas Label]')).toBeInTheDocument();
+  });
+
+  it('renders without crashing when a tag is undefined', () => {
+    expect(() =>
+      createWrapper({
+        annotations: [
+          {
+            content: 'First Annotation',
+            id: 'abc123',
+            tags: ['abc123', undefined],
+            targetId: 'example.com/iiif/12345',
+          },
+        ],
+      }),
+    ).not.toThrow();
+
+    expect(screen.getByText('abc123', { container: 'span.MuiChip-label' })).toBeInTheDocument();
   });
 
   it('renders a heading with the appropriate context based on index and totalSize', () => {

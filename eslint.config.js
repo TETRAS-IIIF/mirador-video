@@ -141,8 +141,11 @@ export default [
       'import/resolver': {
         node: {
           extensions: ['.js', '.jsx', '.json'],
+          moduleDirectory: ['node_modules', 'src', '__tests__'],
         },
       },
+      // eyeroll. https://github.com/import-js/eslint-plugin-import/issues/2703
+      'import/core-modules': ['@redux-devtools/extension'],
       react: {
         version: 'detect',
       },
@@ -155,6 +158,13 @@ export default [
     files: ['**/__tests__/**', '**/*.test.js', '**/*.test.jsx', 'setupTest.js'],
     rules: {
       'no-undef': 'off', // Test globals (describe, it, expect, etc.) provided by vitest
+    },
+  },
+  // Ignore alias imports in test files
+  {
+    files: ['__tests__/**/*.{js,jsx}'],
+    rules: {
+      'import/no-unresolved': ['error', { ignore: ['^@src/', '^@tests/'] }],
     },
   },
 ];

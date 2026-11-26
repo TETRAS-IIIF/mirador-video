@@ -117,33 +117,39 @@ export function SearchPanelControls({
           onChange={selectItem}
           onInputChange={handleChange}
           freeSolo
+          slotProps={{ popper: { disablePortal: true } }}
           disableClearable
           renderInput={(params) => (
             <TextField
               {...params}
               label={t('searchInputLabel')}
               variant="standard"
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <InputAdornment sx={{ position: 'relative' }} position="end">
-                    <MiradorMenuButton aria-label={t('searchSubmitAria')} type="submit">
-                      <SearchIcon />
-                    </MiradorMenuButton>
-                    {Boolean(searchIsFetching) && (
-                      <CircularProgress
-                        sx={{
-                          left: '50%',
-                          marginLeft: '-25px',
-                          marginTop: '-25px',
-                          position: 'absolute',
-                          top: '50%',
-                        }}
-                        size={50}
-                      />
-                    )}
-                  </InputAdornment>
-                ),
+              slotProps={{
+                ...params.slotProps,
+
+                input: {
+                  ...params.InputProps,
+                  ...params.slotProps?.input,
+                  endAdornment: (
+                    <InputAdornment sx={{ position: 'relative' }} position="end">
+                      <MiradorMenuButton aria-label={t('searchSubmitAria')} type="submit">
+                        <SearchIcon />
+                      </MiradorMenuButton>
+                      {Boolean(searchIsFetching) && (
+                        <CircularProgress
+                          sx={{
+                            left: '50%',
+                            marginLeft: '-25px',
+                            marginTop: '-25px',
+                            position: 'absolute',
+                            top: '50%',
+                          }}
+                          size={50}
+                        />
+                      )}
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
           )}

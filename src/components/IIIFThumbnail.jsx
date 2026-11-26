@@ -32,20 +32,13 @@ const LazyLoadedImage = ({
   ...props
 }) => {
   const { ref, inView } = useInView();
-  const [loaded, setLoaded] = useState(false);
+  const [loadImage, setLoadImage] = useState(inView);
   const [failed, setFailed] = useState(false);
   const thumbnailService = useThumbnailService(maxHeight, maxWidth);
   const { notifyFailure, fallbackImage } = useContext(FailedImageContext);
 
-  /**
-   * Handles the intersection (visibility) of a given thumbnail, by requesting
-   * the image and then updating the state.
-   */
-  useEffect(() => {
-    if (loaded || !inView) return;
-
-    setLoaded(true);
-  }, [inView, loaded]);
+  // Defer loading the image until it is visible (but, once visible, don't remove it)
+  if (inView && !loadImage) setLoadImage(true);
 
   const image = useMemo(() => {
     if (thumbnail) return thumbnail;
@@ -58,6 +51,22 @@ const LazyLoadedImage = ({
   }, [resource, thumbnail, thumbnailService]);
 
   const imageStyles = useMemo(() => {
+    // Resolves the computed box into a final style object. After a failure,
+    // when using the fallback image, ensure the fallback icon
+    // fills the same box a successful thumbnail would have,
+    // instead of being sized by its own intrinsic aspect ratio.
+    const buildStyles = (box) => {
+      if (failed && fallbackImage) {
+        return {
+          ...style,
+          height: box.height ?? box.maxHeight,
+          width: box.width ?? box.maxWidth,
+          objectFit: 'contain',
+        };
+      }
+      return { ...box, ...style };
+    };
+
     const styleProps = {
       height: undefined,
       maxHeight: undefined,
@@ -65,18 +74,11 @@ const LazyLoadedImage = ({
       width: undefined,
     };
 
-    // If we're using a fallback image due to failure, use object-fit to preserve aspect ratio
-    if (failed && fallbackImage) {
-      return {
-        ...styleProps,
-        ...style,
-        maxWidth,
-        maxHeight,
-        objectFit: 'contain',
-      };
+    if (!image) {
+      styleProps.height = maxHeight;
+      styleProps.width = maxWidth;
+      return buildStyles(styleProps);
     }
-
-    if (!image) return { ...style, height: maxHeight, width: maxWidth };
 
     const { height: thumbHeight, width: thumbWidth } = image;
     if (thumbHeight && thumbWidth) {
@@ -114,13 +116,10 @@ const LazyLoadedImage = ({
       styleProps.height = maxHeight;
     }
 
-    return {
-      ...styleProps,
-      ...style,
-    };
+    return buildStyles(styleProps);
   }, [image, maxWidth, maxHeight, style, failed, fallbackImage]);
 
-  const { url: src = placeholder } = (loaded && (thumbnail || image)) || {};
+  const { url: src = placeholder } = (loadImage && (thumbnail || image)) || {};
   // Decide final image source: normal, failed fallback, or placeholder
   const finalSrc = failed ? fallbackImage || placeholder : src;
 

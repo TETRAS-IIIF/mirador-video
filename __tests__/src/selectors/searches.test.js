@@ -8,16 +8,18 @@ import {
   getResourceAnnotationLabel,
   getSearchIsFetching,
   getNextSearchId,
-} from '../../../src/state/selectors';
+} from '@src/state/selectors';
+
+const mockCanvases = [
+  { id: 'http://example.com/iiif/canvas1' },
+  { id: 'http://example.com/iiif/canvas2' },
+  { id: 'http://example.com/iiif/canvas3' },
+];
 
 vi.mock('../../../src/state/selectors/canvases', async (importOriginal) => ({
   __esModule: true, // Use it when dealing with esModules
   ...(await importOriginal()),
-  getCanvases: () => [
-    { id: 'http://example.com/iiif/canvas1' },
-    { id: 'http://example.com/iiif/canvas2' },
-    { id: 'http://example.com/iiif/canvas3' },
-  ],
+  getCanvases: () => mockCanvases,
 }));
 
 describe('getSearchQuery', () => {

@@ -3,9 +3,9 @@ import { render, screen } from '@tests/utils/test-utils';
 import OpenSeadragon from 'openseadragon';
 import { Utils } from 'manifesto.js';
 import { getCanvasWorld } from '../../utils/mirador-wrappers';
-import { AnnotationsOverlay } from '../../../src/components/AnnotationsOverlay';
-import OpenSeadragonCanvasOverlay from '../../../src/lib/OpenSeadragonCanvasOverlay';
-import AnnotationList from '../../../src/lib/AnnotationList';
+import { AnnotationsOverlay } from '@src/components/AnnotationsOverlay';
+import OpenSeadragonCanvasOverlay from '@src/lib/OpenSeadragonCanvasOverlay';
+import AnnotationList from '@src/lib/AnnotationList';
 import fixture from '../../fixtures/version-2/019.json';
 
 const canvases = Utils.parseManifest(fixture).getSequences()[0].getCanvases();
@@ -86,6 +86,35 @@ describe('AnnotationsOverlay', () => {
       expect(canvasUpdate).toHaveBeenCalled();
       expect(forceRedraw).toHaveBeenCalled();
     });
+
+    // Regression test for https://github.com/ProjectMirador/mirador/issues/4525
+    it('stops responding to update-viewport once unmounted', () => {
+      const clear = vi.fn();
+      const resize = vi.fn();
+      const canvasUpdate = vi.fn();
+
+      OpenSeadragonCanvasOverlay.mockImplementation(function () {
+        return {
+          canvasUpdate,
+          clear,
+          resize,
+        };
+      });
+
+      const { component, rerender, viewer, unmount } = createWrapper({ viewer: null });
+
+      rerender(cloneElement(component, { viewer }));
+
+      unmount();
+
+      // OSD doesn't know the component unmounted -- simulate its animation
+      // loop still firing after the fact.
+      viewer.raiseEvent('update-viewport');
+
+      expect(clear).not.toHaveBeenCalled();
+      expect(resize).not.toHaveBeenCalled();
+      expect(canvasUpdate).not.toHaveBeenCalled();
+    });
   });
 
   describe('annotationsToContext', () => {
@@ -94,7 +123,9 @@ describe('AnnotationsOverlay', () => {
       const context2d = {
         restore: () => {},
         save: () => {},
+        scale: () => {},
         strokeRect,
+        translate: () => {},
       };
 
       OpenSeadragonCanvasOverlay.mockImplementation(function () {
@@ -103,6 +134,7 @@ describe('AnnotationsOverlay', () => {
           clear: vi.fn(),
           context2d,
           resize: vi.fn(),
+          scale: 0.05,
         };
       });
 
@@ -113,9 +145,6 @@ describe('AnnotationsOverlay', () => {
         palette: { annotations: palette },
         viewer: null,
       });
-
-      vi.spyOn(viewer.viewport, 'getMaxZoom').mockImplementation(() => 1);
-      vi.spyOn(viewer.viewport, 'getZoom').mockImplementation(() => 0.05);
 
       rerender(
         cloneElement(component, {
@@ -170,6 +199,49 @@ describe('AnnotationsOverlay', () => {
       });
 
       expect(selectAnnotation).toHaveBeenCalledWith('base', 'http://example.org/identifier/annotation/anno-line');
+    });
+
+    it('triggers a selectAnnotation for a clicked-on svgSelector annotation', () => {
+      const selectAnnotation = vi.fn();
+
+      // isAnnotationAtPoint's svgSelector branch hit-tests via
+      // context2d.isPointInPath, unlike the fragmentSelector branch used by
+      // the other onCanvasClick tests, which never touches osdCanvasOverlay.
+      OpenSeadragonCanvasOverlay.mockImplementation(function () {
+        return { context2d: { isPointInPath: () => true } };
+      });
+
+      const { viewer } = createWrapper({
+        annotations: [
+          new AnnotationList({
+            '@id': 'foo',
+            resources: [
+              {
+                '@id': 'http://example.org/identifier/annotation/anno-svg',
+                '@type': 'oa:Annotation',
+                motivation: 'sc:painting',
+                on: {
+                  full: 'http://iiif.io/api/presentation/2.0/example/fixtures/canvas/24/c1.json',
+                  selector: {
+                    item: {
+                      '@type': 'oa:SvgSelector',
+                      value: '<svg xmlns="http://www.w3.org/2000/svg"><rect x="90" y="90" width="300" height="40" /></svg>',
+                    },
+                  },
+                },
+              },
+            ],
+          }),
+        ],
+        selectAnnotation,
+      });
+
+      viewer.raiseEvent('canvas-click', {
+        eventSource: { viewport: viewer.viewport },
+        position: new OpenSeadragon.Point(101, 101),
+      });
+
+      expect(selectAnnotation).toHaveBeenCalledWith('base', 'http://example.org/identifier/annotation/anno-svg');
     });
 
     it('triggers a deselectAnnotation for an already-selected annotation', () => {

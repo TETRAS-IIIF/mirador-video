@@ -1,5 +1,5 @@
 import { render, screen } from '@tests/utils/test-utils';
-import { AudioViewer } from '../../../src/components/AudioViewer';
+import { AudioViewer } from '@src/components/AudioViewer';
 
 /** create wrapper */
 function createWrapper(props, suspenseFallback) {
@@ -51,6 +51,15 @@ describe('AudioViewer', () => {
       expect(audio.querySelector('track:nth-of-type(1)')).toHaveAttribute('label', 'English');
       expect(audio.querySelector('track:nth-of-type(2)')).toHaveAttribute('srcLang', 'fr');
       expect(audio.querySelector('track:nth-of-type(2)')).toHaveAttribute('label', 'French');
+    });
+
+    it('seeks to startTime once the metadata loads', () => {
+      createWrapper({ canvasId: 'c1', audioResources: [{ getFormat: () => 'video/mp4', id: 1 }], startTime: 30 }, true);
+      const audio = screen.getByTestId('audio');
+
+      audio.dispatchEvent(new Event('loadedmetadata'));
+
+      expect(audio.currentTime).toEqual(30);
     });
   });
 });

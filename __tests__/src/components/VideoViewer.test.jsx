@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import { render, screen } from '@tests/utils/test-utils';
-import { VideoViewer } from '../../../src/components/VideoViewer';
+import { VideoViewer } from '@src/components/VideoViewer';
 
 const { mockGetInternalPlayer, mockSeekTo } = vi.hoisted(() => ({
   mockGetInternalPlayer: vi.fn(() => ({})),
@@ -106,6 +106,15 @@ describe('VideoViewer', () => {
       rerender(<VideoViewer canvas={canvas} currentTime={5} debug={false} paused setSeekTo={() => {}} windowId="window1" />);
 
       expect(mockSeekTo).toHaveBeenCalledWith(5);
+    });
+
+    it('seeks to startTime once the metadata loads', () => {
+      createWrapper({ canvasId: 'c1', videoResources: [{ getFormat: () => 'video/mp4', id: 1 }], startTime: 30 }, true);
+      const video = screen.getByTestId('video');
+
+      video.dispatchEvent(new Event('loadedmetadata'));
+
+      expect(video.currentTime).toEqual(30);
     });
   });
 });

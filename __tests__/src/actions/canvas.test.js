@@ -1,8 +1,7 @@
-import { createStore, applyMiddleware } from 'redux';
-import { thunk } from 'redux-thunk';
+import { configureStore } from '@reduxjs/toolkit';
 
-import * as actions from '../../../src/state/actions';
-import ActionTypes from '../../../src/state/actions/action-types';
+import * as actions from '@src/state/actions';
+import ActionTypes from '@src/state/actions/action-types';
 
 vi.mock('../../../src/state/selectors', () => ({
   getCanvasGrouping: (state, { canvasId }) => [{ id: canvasId }],
@@ -15,9 +14,9 @@ vi.mock('../../../src/state/selectors', () => ({
 }));
 
 /**
- * Builds a real redux store (with thunk support) that records every dispatched
- * action, in place of the deprecated redux-mock-store package. createStore()
- * requires a reducer, so `(state = {}) => state`is no-op here since state is never
+ * Builds a real redux store (with thunk support, via RTK's default middleware) that
+ * records every dispatched action, in place of the deprecated redux-mock-store package.
+ * configureSTore() requires a reducer, so `(state = {}) => state`is no-op here state is never
  * read — the selectors these thunks call are mocked above.
  */
 function createRecordingStore() {
@@ -26,7 +25,10 @@ function createRecordingStore() {
     recordedActions.push(action);
     return next(action);
   };
-  const store = createStore((state = {}) => state, applyMiddleware(thunk, recordAction));
+  const store = configureStore({
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(recordAction),
+    reducer: (state = {}) => state,
+  });
 
   return { ...store, getActions: () => recordedActions };
 }
@@ -38,16 +40,17 @@ describe('canvas actions', () => {
       store = createRecordingStore();
     });
 
-    it('sets to a defined canvas', () => {
+    it('sets to a defined canvas and start time', () => {
       const id = 'abc123';
       const expectedAction = {
         canvasId: 'a',
         preserveViewport: true,
+        startTime: 30,
         type: ActionTypes.SET_CANVAS,
         visibleCanvases: ['a'],
         windowId: id,
       };
-      store.dispatch(actions.setCanvas(id, 'a'));
+      store.dispatch(actions.setCanvas(id, 'a', undefined, { startTime: 30 }));
       expect(store.getActions()[0]).toEqual(expectedAction);
     });
   });

@@ -18,11 +18,11 @@ import { IIIFResourceLabel } from './IIIFResourceLabel';
 function Item({ manifest, canvasNavigation, variant, ...otherProps }) {
   return (
     <MenuItem
-      alignItems="flex-start"
       divider
       component="li"
       variant="multiline"
       sx={{
+        alignItems: 'flex-start',
         paddingRight: 1,
       }}
       {...otherProps}
@@ -89,7 +89,11 @@ export function WindowSideBarCollectionPanel({
                 <ListItemIcon>
                   <ArrowUpwardIcon />
                 </ListItemIcon>
-                <ListItemText primaryTypographyProps={{ variant: 'body1' }}>
+                <ListItemText
+                  slotProps={{
+                    primary: { variant: 'body1' },
+                  }}
+                >
                   <IIIFResourceLabel resource={parentCollection} />
                 </ListItemText>
               </ListItemButton>

@@ -2,7 +2,7 @@ import { Utils } from 'manifesto.js';
 import { wrapCanvas } from '../../utils/mirador-wrappers';
 import fixture from '../../fixtures/version-2/019.json';
 import fragmentFixture from '../../fixtures/version-2/hamilton.json';
-import CanvasWorld from '../../../src/lib/CanvasWorld';
+import CanvasWorld from '@src/lib/CanvasWorld';
 
 const canvases = Utils.parseManifest(fixture).getSequences()[0].getCanvases().map(wrapCanvas);
 const canvasSubset = [canvases[1], canvases[2]];
@@ -66,6 +66,22 @@ describe('CanvasWorld', () => {
           id: 'https://prtd.app/image/iiif/2/hamilton%2fHL_524_1r_00_PC17/full/739,521/0/default.jpg',
         }),
       ).toEqual([552, 1584, 3360, 2368]);
+    });
+  });
+  describe('canvasScale', () => {
+    it('is 1 when the canvas is laid out at its own size', () => {
+      expect(
+        new CanvasWorld([canvases[1]]).canvasScale('https://purl.stanford.edu/fr426cg9537/iiif/canvas/fr426cg9537_1'),
+      ).toEqual(1);
+    });
+    it('is the ratio the canvas was shrunk by to match its neighbours', () => {
+      const subject = new CanvasWorld(canvasSubset);
+      // 6501x4421 is scaled down to 6305x4288 to match the shorter canvas
+      expect(subject.canvasScale('https://purl.stanford.edu/fr426cg9537/iiif/canvas/fr426cg9537_1')).toEqual(6305 / 6501);
+      expect(subject.canvasScale('https://purl.stanford.edu/rz176rt6531/iiif/canvas/rz176rt6531_1')).toEqual(1);
+    });
+    it('is 1 for a canvas that is not in the world', () => {
+      expect(new CanvasWorld(canvasSubset).canvasScale('https://example.com/canvas/1')).toEqual(1);
     });
   });
   describe('canvasToWorldCoordinates', () => {
@@ -170,6 +186,27 @@ describe('CanvasWorld', () => {
     it('returns undefined if the  point is outside the world', () => {
       const canvasWorld = new CanvasWorld(canvasSubset);
       expect(canvasWorld.canvasAtPoint({ x: -1, y: -1 })).toEqual(undefined);
+    });
+  });
+
+  describe('worldBounds with a mismatched sibling', () => {
+    // A canvas sharing a row with a much-shorter sibling (e.g. a manifest's
+    // own 1x1 placeholder for a blank page) previously had its scaled width
+    // floored to 0 by the shared constant-height scale, producing invalid
+    // (zero) content bounds that OpenSeadragon's Viewport rejects.
+    const realPage = wrapCanvas({ getHeight: () => 3972, getWidth: () => 2982 });
+    const tinyPage = wrapCanvas({ getHeight: () => 1, getWidth: () => 1 });
+
+    it('never floors a canvas to zero width when paired with a much-shorter sibling', () => {
+      const world = new CanvasWorld([realPage, tinyPage]);
+
+      const [realDims] = world.canvasDimensions;
+      expect(realDims.width).toBeGreaterThan(0);
+      expect(realDims.height).toBeGreaterThan(0);
+
+      const [, , worldWidth, worldHeight] = world.worldBounds();
+      expect(worldWidth).toBeGreaterThan(0);
+      expect(worldHeight).toBeGreaterThan(0);
     });
   });
 });
