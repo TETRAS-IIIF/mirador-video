@@ -17,7 +17,7 @@ export default defineConfig({
     ? {
         build: {
           rolldownOptions: {
-            external: ['__tests__/*', '__mocks__/*'],
+            external: ['__tests__/*'],
             input: Object.fromEntries(
               globSync('./demo/*.html').map((file) => [
                 // This remove `src/` as well as the file extension from each
@@ -41,7 +41,7 @@ export default defineConfig({
             name: 'Mirador',
           },
           rolldownOptions: {
-            external: (id) => id.startsWith('__tests__/') || id.startsWith('__mocks__/'),
+            external: (id) => id.startsWith('__tests__/'),
             output: {
               assetFileNames: 'mirador.[ext]',
               exports: 'named',
@@ -109,11 +109,6 @@ export default defineConfig({
       name: 'html-url-rewrite',
     },
   ],
-  resolve: {
-    alias: {
-      '@tests/': fileURLToPath(new URL('./__tests__', import.meta.url)),
-    },
-  },
   server: {
     fs: {
       allow: [

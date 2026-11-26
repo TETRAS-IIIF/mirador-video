@@ -41,19 +41,21 @@ export function AnnotationsFilter({ availableTags, setInputSearch, setTagsSearch
         sx={{
           width: '100%',
         }}
-        InputProps={{
-          endAdornment: (
-            <div
-              style={{
-                position: 'absolute',
-                right: 0,
-              }}
-            >
-              <MiradorMenuButton aria-label={t('searchAnnotationTooltip')} type="submit">
-                <SearchIcon />
-              </MiradorMenuButton>
-            </div>
-          ),
+        slotProps={{
+          input: {
+            endAdornment: (
+              <div
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                }}
+              >
+                <MiradorMenuButton aria-label={t('searchAnnotationTooltip')} type="submit">
+                  <SearchIcon />
+                </MiradorMenuButton>
+              </div>
+            ),
+          },
         }}
       />
       {availableTags.length > 0 && (

@@ -8,6 +8,7 @@ import WindowViewSettings from '../containers/WindowViewSettings';
 import { PluginHook } from './PluginHook';
 import WorkspaceContext from '../contexts/WorkspaceContext';
 import { usePlugins } from '../extend/usePlugins';
+import ns from '../config/css-ns';
 
 /** Renders plugins */
 function PluginHookWithHeader({ targetName, ...props }) {
@@ -53,14 +54,19 @@ export function WindowTopMenu({
         vertical: 'top',
       }}
       onClose={handleClose}
-      TransitionProps={{
-        onEntering: toggleDraggingEnabled,
-        onExit: toggleDraggingEnabled,
-      }}
       orientation="horizontal"
       anchorEl={anchorEl}
       open={open}
       role="menu"
+      slotProps={{
+        transition: {
+          onEntering: toggleDraggingEnabled,
+          onExit: toggleDraggingEnabled,
+        },
+        paper: {
+          className: ns('window-top-menu'),
+        },
+      }}
     >
       <WindowViewSettings windowId={windowId} handleClose={handleClose} />
       {showThumbnailNavigationSettings && <WindowThumbnailSettings windowId={windowId} handleClose={handleClose} />}

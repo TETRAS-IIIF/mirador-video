@@ -1,7 +1,7 @@
 import { MosaicWindowContext } from 'react-mosaic-component';
 import { render, screen } from '@tests/utils/test-utils';
 
-import { Window } from '../../../src/components/Window';
+import { Window } from '@src/components/Window';
 
 /** create wrapper */
 function createWrapper(props, state, renderOptions) {
@@ -20,6 +20,13 @@ function createWrapper(props, state, renderOptions) {
     { renderOptions },
   );
 }
+
+// Mock PrimaryWindow to prevent its React.lazy viewer imports from resolving
+// asynchronously outside of act(...) during synchronous Window unit tests.
+// Removes test warnings
+vi.mock('../../../src/containers/PrimaryWindow', () => ({
+  default: () => <div className="mirador-primary-window" data-testid="mock-primary-window" />,
+}));
 
 describe('Window', () => {
   it('should render outer element', () => {

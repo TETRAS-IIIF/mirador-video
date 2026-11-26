@@ -2,8 +2,8 @@ import { call, select } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 import { Utils } from 'manifesto.js';
 
-import ActionTypes from '../../../src/state/actions/action-types';
-import { setCanvas } from '../../../src/state/actions';
+import ActionTypes from '@src/state/actions/action-types';
+import { setCanvas } from '@src/state/actions';
 import {
   getManifests,
   getManifestoInstance,
@@ -21,8 +21,8 @@ import {
   getCanvases,
   selectInfoResponses,
   getWindowConfig,
-} from '../../../src/state/selectors';
-import { fetchManifests } from '../../../src/state/sagas/iiif';
+} from '@src/state/selectors';
+import { fetchManifests } from '@src/state/sagas/iiif';
 import {
   determineAndShowCollectionDialog,
   fetchWindowManifest,
@@ -37,7 +37,7 @@ import {
   fetchInfoResponses,
   setCanvasOnNewSequence,
   setCollectionPath,
-} from '../../../src/state/sagas/windows';
+} from '@src/state/sagas/windows';
 import fixture from '../../fixtures/version-2/019.json';
 import collectionFixture from '../../fixtures/version-2/collection.json';
 
@@ -179,6 +179,53 @@ describe('window-level sagas', () => {
     it('calculates the starting canvas and calls setCanvas', () => {
       const action = {
         window: {
+          id: 'x',
+          manifestId: 'manifest.json',
+        },
+      };
+
+      const manifest = Utils.parseManifest({
+        ...fixture,
+        start: { id: 'https://purl.stanford.edu/fr426cg9537/iiif/canvas/fr426cg9537_1' },
+      });
+
+      return expectSaga(fetchWindowManifest, action)
+        .provide([
+          [select(getManifests), { 'manifest.json': {} }],
+          [select(getManifestoInstance, { manifestId: 'manifest.json' }), manifest],
+          [call(setCanvas, 'x', 'https://purl.stanford.edu/fr426cg9537/iiif/canvas/fr426cg9537_1'), { type: 'setCanvasThunk' }],
+        ])
+        .put({ type: 'setCanvasThunk' })
+        .run();
+    });
+
+    // canvasIndex is not an officially documented/supported window setting --
+    // this only exists to keep older configs/exported state working (see #4071).
+    it('honors a legacy canvasIndex when the manifest has no start canvas', () => {
+      const action = {
+        window: {
+          canvasIndex: 2,
+          id: 'x',
+          manifestId: 'manifest.json',
+        },
+      };
+
+      const manifest = Utils.parseManifest(fixture);
+
+      return expectSaga(fetchWindowManifest, action)
+        .provide([
+          [select(getManifests), { 'manifest.json': {} }],
+          [select(getManifestoInstance, { manifestId: 'manifest.json' }), manifest],
+          [call(setCanvas, 'x', 'https://purl.stanford.edu/rz176rt6531/iiif/canvas/rz176rt6531_1'), { type: 'setCanvasThunk' }],
+        ])
+        .put({ type: 'setCanvasThunk' })
+        .run();
+    });
+
+    it('lets the manifest start canvas override a legacy canvasIndex', () => {
+      const action = {
+        window: {
+          canvasIndex: 2,
           id: 'x',
           manifestId: 'manifest.json',
         },
@@ -403,12 +450,9 @@ describe('window-level sagas', () => {
         .provide([
           [select(getWindow, { windowId }), { canvasId: 'y' }],
           [select(getCanvasGrouping, { canvasId: 'y', windowId }), [{ id: 'y' }, { id: 'z' }]],
+          [call(setCanvas, windowId, 'y', ['y', 'z']), { type: 'expectedThunk' }],
         ])
-        .put({
-          id: windowId,
-          payload: { visibleCanvases: ['y', 'z'] },
-          type: ActionTypes.UPDATE_WINDOW,
-        })
+        .put({ type: 'expectedThunk' })
         .run();
     });
   });

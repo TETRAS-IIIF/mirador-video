@@ -12,6 +12,12 @@ Entries types:
 
 # [ Unreleased ]
 
+- UPSTREAM update to Mirador 4.3.0 (MUI 9, new annotation drawing based on `canvasWorld` / `overlayScale`, `drawAnnotationsToContext`, table of contents timestamps for audio/video)
+- ADDED : The video viewer jumps to the window's `startTime` (table of contents entries with a timestamp)
+- FIXED : Draft annotations were never drawn as drafts: the marker was read on the annotation page instead of each annotation
+- FIXED : Clicking an SVG annotation other than `<path>` (rect, circle, polygon...) on a video threw an error
+- FIXED : SVG annotation outlines on images keep their width when zoomed out (upstream scaling)
+- FIXED : Annotation filter search button (MUI 9 `slotProps.input`)
 - ADDED : Draft annotations: `annotations.draftMarker` setting (`{ property, value }`) and a `draft` entry in `theme.palette.annotations`, drawn as a dashed orange outline unless hovered or selected
 
 # [ 4.2.1 ]

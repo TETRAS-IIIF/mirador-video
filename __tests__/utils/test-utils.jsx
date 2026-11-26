@@ -1,22 +1,19 @@
 import { Provider } from 'react-redux';
 import { render, screen } from '@testing-library/react';
 import PropTypes from 'prop-types';
-import { createStore, applyMiddleware } from 'redux';
-import { thunk } from 'redux-thunk';
+import createStore from '@src/state/store';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { I18nextProvider } from 'react-i18next';
-import createRootReducer from '../../src/state/reducers/rootReducer';
-import settings from '../../src/config/settings';
-import createI18nInstance from '../../src/i18n';
+import settings from '@src/config/settings';
+import createI18nInstance from '@src/i18n';
 import { failIfErrorDialogPresent, safeFindByRole, safeFindAllByRole } from './safe-queries';
 
 /** Mirador viewer setup for Integration tests */
-import { viewer as miradorViewer } from '../../src/index';
+import { viewer as miradorViewer } from '@src/index';
 
 export * from '@testing-library/react';
 export { renderWithProviders as render, safeFindByRole };
 
-const rootReducer = createRootReducer();
 const theme = createTheme(settings.theme);
 
 const i18n = createI18nInstance();
@@ -29,7 +26,7 @@ function renderWithProviders(
   {
     preloadedState = {},
     // Automatically create a store instance if no store was passed in
-    store = createStore(rootReducer, preloadedState, applyMiddleware(thunk)),
+    store = createStore([], [], { preloadedState }),
     ...renderOptions
   } = {},
 ) {
@@ -98,6 +95,13 @@ export const setupIntegrationTestViewer = (config, plugins) => {
 
     if ((config.windows || []).length > 0) {
       await safeFindAllByRole('region', { name: /Window:/i });
+    }
+  });
+
+  afterEach((context) => {
+    // If miradorInstance has a store or unmount method, tear it down here
+    if (context.miradorInstance?.unmount) {
+      context.miradorInstance.unmount();
     }
   });
 };

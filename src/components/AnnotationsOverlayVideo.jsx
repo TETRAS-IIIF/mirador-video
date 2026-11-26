@@ -10,6 +10,7 @@ import CanvasOverlayVideo from '../lib/CanvasOverlayVideo';
 import CanvasWorld from '../lib/CanvasWorld';
 import CanvasAnnotationDisplay from '../lib/CanvasAnnotationDisplay';
 import { isDraftAnnotation } from '../lib/draftAnnotations';
+import { buildPath2D, svgShapeElements } from '../lib/svgShapesToPath';
 import { VideosReferences } from '../plugins/VideosReferences';
 
 /** AnnotationsOverlayVideo - based on AnnotationsOverlay */
@@ -546,8 +547,8 @@ export class AnnotationsOverlayVideo extends Component {
 
     if (resource.svgSelector) {
       const context = this.canvasOverlay.context2d;
-      const { svgPaths } = new CanvasAnnotationDisplay({ resource });
-      return [...svgPaths].some((path) => context.isPointInPath(new Path2D(path.attributes.d.nodeValue), relativeX, relativeY));
+      // Every SVG shape (rect, circle, polygon...), not only <path>.
+      return svgShapeElements(resource).some((shape) => context.isPointInPath(buildPath2D(shape), relativeX, relativeY));
     }
 
     if (resource.fragmentSelector) {
@@ -602,7 +603,7 @@ export class AnnotationsOverlayVideo extends Component {
         const canvasSize = canvasWorld.canvasToWorldCoordinates(resource.targetId);
         const canvasAnnotationDisplay = new CanvasAnnotationDisplay({
           canvasSize,
-          draft: isDraftAnnotation(annotation.resource, draftMarker),
+          draft: isDraftAnnotation(resource.resource, draftMarker),
           hovered: hoveredAnnotationIds.includes(resource.id),
           imageSource,
           offset,

@@ -6,21 +6,15 @@ import CollapsibleSection from '../containers/CollapsibleSection';
 import SanitizedHtml from '../containers/SanitizedHtml';
 import LabelValueMetadata from '../containers/LabelValueMetadata';
 import { PluginHook } from './PluginHook';
+import ns from '../config/css-ns';
 
 /**
  * ManifestInfo
  */
-export function ManifestInfo({
-  manifestDescription = null,
-  manifestLabel = null,
-  manifestMetadata = [],
-  manifestSummary = null,
-  ...rest
-}) {
+export function ManifestInfo({ manifestLabel = null, manifestMetadata = [], manifestSummary = null, ...rest }) {
   const { t } = useTranslation();
   const id = useId();
   const pluginProps = {
-    manifestDescription,
     manifestLabel,
     manifestMetadata,
     manifestSummary,
@@ -33,16 +27,11 @@ export function ManifestInfo({
         <Typography
           aria-labelledby={`${id}-resource ${id}-resource-heading`}
           id={`${id}-resource-heading`}
+          className={ns('manifest-label')}
           variant="h4"
           component="h5"
         >
           {manifestLabel}
-        </Typography>
-      )}
-
-      {manifestDescription && (
-        <Typography variant="body1">
-          <SanitizedHtml htmlString={manifestDescription} ruleSet="iiif" />
         </Typography>
       )}
 
@@ -60,7 +49,6 @@ export function ManifestInfo({
 }
 
 ManifestInfo.propTypes = {
-  manifestDescription: PropTypes.string,
   manifestLabel: PropTypes.string,
   manifestMetadata: PropTypes.array,
   manifestSummary: PropTypes.string,

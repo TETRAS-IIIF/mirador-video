@@ -88,7 +88,13 @@ export function* fetchCollectionManifests(action) {
   yield call(fetchManifests, ...collectionPath);
 }
 
-/** @private */
+/**
+ * @private
+ * `canvasIndex` is not an officially documented/supported window setting --
+ * prefer `canvasId` (see the example window config in config/settings.js).
+ * It's only read here for backwards compatibility with older configs/exported
+ * state that may already set it.
+ */
 export function* setWindowStartingCanvas(action) {
   const { canvasId, canvasIndex, manifestId } = action.payload || action.window;
 
@@ -205,7 +211,14 @@ export function* panToFocusedWindow({ pan, windowId }) {
 export function* updateVisibleCanvases({ windowId }) {
   const { canvasId } = yield select(getWindow, { windowId });
   const visibleCanvases = yield select(getCanvasGrouping, { canvasId, windowId });
-  yield put(updateWindow(windowId, { visibleCanvases: (visibleCanvases || []).map((c) => c.id) }));
+
+  const thunk = yield call(
+    setCanvas,
+    windowId,
+    canvasId,
+    (visibleCanvases || []).map((c) => c.id),
+  );
+  yield put(thunk);
 }
 
 /** @private */

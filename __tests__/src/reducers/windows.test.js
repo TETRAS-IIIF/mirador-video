@@ -1,5 +1,5 @@
-import { windowsReducer } from '../../../src/state/reducers/windows';
-import ActionTypes from '../../../src/state/actions/action-types';
+import { windowsReducer } from '@src/state/reducers/windows';
+import ActionTypes from '@src/state/actions/action-types';
 
 describe('windows reducer', () => {
   it('should handle ADD_WINDOW', () => {
@@ -138,6 +138,35 @@ describe('windows reducer', () => {
         id: 'def456',
       },
     });
+  });
+
+  it('stores the startTime from SET_CANVAS', () => {
+    const state = windowsReducer(
+      { abc123: { canvasId: 'http://example.com/canvas/1', id: 'abc123' } },
+      {
+        canvasId: 'http://example.com/canvas/5',
+        startTime: 30,
+        type: ActionTypes.SET_CANVAS,
+        visibleCanvases: ['http://example.com/canvas/5'],
+        windowId: 'abc123',
+      },
+    );
+
+    expect(state.abc123.startTime).toEqual(30);
+  });
+
+  it('clears a previous startTime when SET_CANVAS has none', () => {
+    const state = windowsReducer(
+      { abc123: { canvasId: 'http://example.com/canvas/1', id: 'abc123', startTime: 30 } },
+      {
+        canvasId: 'http://example.com/canvas/5',
+        type: ActionTypes.SET_CANVAS,
+        visibleCanvases: ['http://example.com/canvas/5'],
+        windowId: 'abc123',
+      },
+    );
+
+    expect(state.abc123.startTime).toBeUndefined();
   });
 
   describe('UPDATE_WINDOW', () => {

@@ -1,7 +1,7 @@
 import { render, screen } from '@tests/utils/test-utils';
 import userEvent from '@testing-library/user-event';
 
-import WorkspaceElastic from '../../../src/components/WorkspaceElastic';
+import WorkspaceElastic from '@src/components/WorkspaceElastic';
 
 /** create wrapper */
 function createWrapper({ elasticLayout = {}, ...props }) {
@@ -34,6 +34,12 @@ function createWrapper({ elasticLayout = {}, ...props }) {
     },
   );
 }
+
+// Mock PrimaryWindow to prevent its React.lazy viewer imports from resolving
+// asynchronously outside of act(...) during synchronous unit tests.
+vi.mock('../../../src/containers/PrimaryWindow', () => ({
+  default: () => <div className="mirador-primary-window" data-testid="mock-primary-window" />,
+}));
 
 /* eslint-disable testing-library/no-node-access, testing-library/no-container */
 describe('WorkspaceElastic', () => {

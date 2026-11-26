@@ -1,4 +1,4 @@
-import { PRIMARY_MANIFEST_FIXTURE_URL } from './constants';
+import { PRIMARY_MANIFEST_FIXTURE_URL, PRIMARY_CANVAS_FIXTURE_URL } from './constants';
 
 /**
  * Creates a Mirador config object with two windows:
@@ -15,11 +15,11 @@ export default function createConfig(id) {
     id: id || 'mirador',
     windows: [
       {
-        canvasIndex: 2,
-        loadedManifest: PRIMARY_MANIFEST_FIXTURE_URL,
+        canvasId: PRIMARY_CANVAS_FIXTURE_URL,
+        manifestId: PRIMARY_MANIFEST_FIXTURE_URL,
       },
       {
-        loadedManifest: 'https://media.nga.gov/public/manifests/nga_highlights.json',
+        manifestId: 'https://media.nga.gov/public/manifests/nga_highlights.json',
         thumbnailNavigationPosition: 'off',
       },
     ],

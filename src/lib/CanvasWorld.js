@@ -21,7 +21,10 @@ export default class CanvasWorld {
     return this.canvases.map((canvas) => canvas.id);
   }
 
-  /** */
+  /**
+   * Returns an array [{ canvas, x, y, width, height }]
+   * with one entry per input canvas, in world coordinates.
+   */
   get canvasDimensions() {
     if (this._canvasDimensions) {
       return this._canvasDimensions;
@@ -41,11 +44,14 @@ export default class CanvasWorld {
         if (dirY === 0) {
           // constant height
           canvasHeight = scale;
-          canvasWidth = Math.floor(scale * canvas.aspectRatio);
+          // A canvas sharing a row with a much-shorter sibling can have its
+          // scaled width floored to 0, which OpenSeadragon rejects as invalid
+          // content bounds -- keep at least 1 world unit on each side.
+          canvasWidth = Math.max(1, Math.floor(scale * canvas.aspectRatio));
         } else {
           // constant width
           canvasWidth = scale;
-          canvasHeight = Math.floor(scale * (1 / canvas.aspectRatio));
+          canvasHeight = Math.max(1, Math.floor(scale * (1 / canvas.aspectRatio)));
         }
       }
 
@@ -101,6 +107,17 @@ export default class CanvasWorld {
     const canvasDimensions = this.canvasDimensions.find((c) => c.canvas.id === canvasId);
 
     return [canvasDimensions.x, canvasDimensions.y, canvasDimensions.width, canvasDimensions.height];
+  }
+
+  /** */
+  canvasScale(canvasId) {
+    const canvasDimensions = this.canvasDimensions.find((c) => c.canvas.id === canvasId);
+    if (!canvasDimensions) return 1;
+
+    const canvasWidth = canvasDimensions.canvas.getWidth();
+    if (!canvasWidth || !canvasDimensions.width) return 1;
+
+    return canvasDimensions.width / canvasWidth;
   }
 
   /** */

@@ -2,8 +2,8 @@ import { render, screen, fireEvent } from '@tests/utils/test-utils';
 import { PropTypes } from 'prop-types';
 import { Utils } from 'manifesto.js';
 
-import { ThumbnailNavigation } from '../../../src/components/ThumbnailNavigation';
-import CanvasGroupings from '../../../src/lib/CanvasGroupings';
+import { ThumbnailNavigation } from '@src/components/ThumbnailNavigation';
+import CanvasGroupings from '@src/lib/CanvasGroupings';
 import manifestJson from '../../fixtures/version-2/019.json';
 import zeroWidthFixture from '../../fixtures/version-2/zeroWidthCanvas.json';
 
@@ -33,6 +33,16 @@ describe('ThumbnailNavigation', () => {
     render(<Subject />);
 
     expect(screen.getByRole('grid')).toBeInTheDocument();
+  });
+
+  it('restores focus without scrolling the page into view', () => {
+    const focusSpy = vi.spyOn(HTMLElement.prototype, 'focus');
+
+    render(<Subject />);
+
+    expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+
+    focusSpy.mockRestore();
   });
   it('renders containers based off of number of canvases', () => {
     render(<Subject />);

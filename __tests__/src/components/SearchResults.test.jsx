@@ -1,7 +1,7 @@
 import { render, screen } from '@tests/utils/test-utils';
 import userEvent from '@testing-library/user-event';
 
-import { SearchResults } from '../../../src/components/SearchResults';
+import { SearchResults } from '@src/components/SearchResults';
 
 /**
  * Helper function to create a shallow wrapper around SearchResults
@@ -94,6 +94,8 @@ describe('SearchResults', () => {
         searchAnnotations: [{ id: 'x' }, { id: 'y' }],
         searchHits: [],
       });
+
+      expect(screen.getAllByRole('listitem')).toHaveLength(2);
 
       expect(screen.getByRole('heading', { level: 4, name: 'The Anno Label' })).toBeInTheDocument();
       expect(screen.getByRole('heading', { level: 4, name: 'Annother Anno Label' })).toBeInTheDocument();

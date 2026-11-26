@@ -2,17 +2,37 @@
  * CanvasAnnotationDisplay - class used to display a SVG and fragment based
  * annotations.
  */
-import { buildPath2D } from '../lib/svgShapesToPath';
+import { buildPath2D, svgShapeElements } from '../lib/svgShapesToPath';
 
 export default class CanvasAnnotationDisplay {
-  /** */
-  constructor({ resource, palette, zoomRatio, offset, selected, hovered, imageSource, canvasSize, draft = false }) {
+  /**
+   * `canvasWorld` and `overlayScale` come from the image viewer. The video
+   * overlay has neither: it passes `offset`, `zoomRatio`, the canvas size
+   * (`canvasSize`, used when the annotation has no selector) and an optional
+   * `imageSource` drawn into the fragment.
+   */
+  constructor({
+    resource,
+    palette,
+    canvasWorld,
+    overlayScale,
+    selected,
+    hovered,
+    zoomRatio,
+    offset,
+    imageSource,
+    canvasSize,
+    draft = false,
+  }) {
     this.resource = resource;
     this.palette = palette;
-    this.zoomRatio = zoomRatio;
-    this.offset = offset;
+    this.canvasWorld = canvasWorld;
     this.selected = selected;
     this.hovered = hovered;
+    this.overlayScale = overlayScale;
+    // these variables have to be kept for plugins
+    this.zoomRatio = zoomRatio;
+    this.offset = offset || this.canvasWorld?.offsetByCanvas(this.resource.targetId) || { x: 0, y: 0 };
     this.imageSource = imageSource;
     this.canvasSize = canvasSize;
     this.draft = draft;
@@ -35,8 +55,7 @@ export default class CanvasAnnotationDisplay {
     this.context = context;
     if (this.resource.svgSelector) {
       this.svgContext();
-    } else if (this.resource.fragmentSelector) {
-      // TODO Merge 4.1, subtil change in condition
+    } else if (this.resource.fragmentSelector || this.canvasSize) {
       this.fragmentContext();
     }
   }
@@ -44,6 +63,33 @@ export default class CanvasAnnotationDisplay {
   /** */
   get svgString() {
     return this.resource.svgSelector.value;
+  }
+
+  /**
+   * Two scale factors compose here: `overlayScale` (screen pixels per OSD
+   * viewport unit -- already applied to the context by
+   * OpenSeadragonCanvasOverlay before toContext() runs) and `scale`
+   * (native image pixels per CanvasWorld unit -- applied explicitly below
+   * via context.scale()). Both apply automatically to drawn geometry, but
+   * not to a plain lineWidth number -- lineWidthScale pre-divides that
+   * back out so strokes render at their native width.
+   * Without an overlayScale (video overlay), the zoomRatio plays that role.
+   */
+  get lineWidthScale() {
+    const screenScale = this.overlayScale ?? this.zoomRatio ?? 1;
+    return this.scale * screenScale || 1;
+  }
+
+  /** Native image pixels -> CanvasWorld world units, for this canvas. */
+  get scale() {
+    return this.canvasWorld ? this.canvasWorld.canvasScale(this.resource.targetId) : 1;
+  }
+
+  parseOpacity(value) {
+    if (typeof value === 'string' && value.trim().endsWith('%')) {
+      return parseFloat(value) / 100;
+    }
+    return parseFloat(value);
   }
 
   /** */
@@ -67,12 +113,13 @@ export default class CanvasAnnotationDisplay {
        */
       this.context.save();
       this.context.translate(this.offset.x, this.offset.y);
+      this.context.scale(this.scale, this.scale);
       const p = buildPath2D(element);
 
       // Setup styling from SVG -> Canvas
       this.context.strokeStyle = this.color;
-      if (element.attributes['stroke-dasharray']) {
-        this.context.setLineDash(element.attributes['stroke-dasharray'].nodeValue.split(','));
+      if (element.getAttribute('stroke-dasharray')) {
+        this.context.setLineDash(element.getAttribute('stroke-dasharray').split(','));
       }
       const svgToCanvasMap = {
         fill: 'fillStyle',
@@ -84,43 +131,43 @@ export default class CanvasAnnotationDisplay {
         'stroke-width': 'lineWidth',
       };
       Object.keys(svgToCanvasMap).forEach((key) => {
-        if (element.attributes[key]) {
-          const value = element.attributes[key].nodeValue;
-          if (key === 'stroke-width') {
-            const parsedStrokeWidth = Number.parseFloat(value);
-            this.context.lineWidth = Number.isFinite(parsedStrokeWidth) ? parsedStrokeWidth : this.context.lineWidth;
-          } else {
-            this.context[svgToCanvasMap[key]] = value;
-          }
+        const value = element.getAttribute(key);
+        if (!value) return;
+        if (key === 'stroke-width') {
+          // Units such as "2px" parse to 2; anything unparsable keeps the current width.
+          const parsedStrokeWidth = Number.parseFloat(value);
+          if (Number.isFinite(parsedStrokeWidth)) this.context.lineWidth = parsedStrokeWidth;
+        } else {
+          this.context[svgToCanvasMap[key]] = value;
         }
       });
 
-      this.context.lineWidth = Number.isFinite(this.context.lineWidth) ? this.context.lineWidth : 1;
+      // Resize the stroke based off of the canvasScale * overlayScale
+      this.context.lineWidth /= this.lineWidthScale;
+      if (!Number.isFinite(this.context.lineWidth)) this.context.lineWidth = 1;
 
       // Reset the color if it is selected or hovered on, or a draft
       if (this.selected || this.hovered) {
         this.context.strokeStyle = currentPalette.strokeStyle || currentPalette.fillStyle;
       } else if (currentPalette === this.draftPalette) {
         this.context.strokeStyle = currentPalette.strokeStyle || this.context.strokeStyle;
-        this.applyLineDash(currentPalette);
+        this.applyLineDash(currentPalette, 1 / this.lineWidthScale);
       }
 
-      if (element.attributes['stroke-opacity']) {
-        this.context.globalAlpha = currentPalette.globalAlpha * element.attributes['stroke-opacity'].nodeValue;
-      } else {
-        this.context.globalAlpha = currentPalette.globalAlpha;
-      }
-
-      // Wait to set the fill, so we can adjust the globalAlpha value if we need to
-      if (element.attributes.fill && element.attributes.fill.nodeValue !== 'none') {
-        if (element.attributes['fill-opacity']) {
-          this.context.globalAlpha = currentPalette.globalAlpha * element.attributes['fill-opacity'].nodeValue;
-        } else {
-          this.context.globalAlpha = currentPalette.globalAlpha;
+      this.context.globalAlpha = currentPalette.globalAlpha;
+      // Set the globalAlpha for fill, draw the fill and then update the globalAlpha for stroke
+      if (element.getAttribute('fill') && element.getAttribute('fill') !== 'none') {
+        if (element.getAttribute('fill-opacity')) {
+          this.context.globalAlpha = currentPalette.globalAlpha * this.parseOpacity(element.getAttribute('fill-opacity'));
         }
         this.context.fill(p);
       }
 
+      if (element.getAttribute('stroke-opacity')) {
+        this.context.globalAlpha = currentPalette.globalAlpha * this.parseOpacity(element.getAttribute('stroke-opacity'));
+      } else {
+        this.context.globalAlpha = currentPalette.globalAlpha;
+      }
       this.context.stroke(p);
       this.context.restore();
     });
@@ -128,12 +175,11 @@ export default class CanvasAnnotationDisplay {
 
   /** */
   fragmentContext() {
-    const fragment = this.resource.fragmentSelector || this.canvasSize;
-    if (!fragment) {
-      return;
-    }
-    fragment[0] += this.offset.x;
-    fragment[1] += this.offset.y;
+    // Without a selector (video overlay), the annotation targets the whole
+    // canvas. canvasSize is in world coordinates, offset included: the offset
+    // is applied by translate() below, so draw from the canvas origin.
+    const fragment = this.resource.fragmentSelector || (this.canvasSize && [0, 0, this.canvasSize[2], this.canvasSize[3]]);
+    if (!fragment) return;
 
     let currentPalette;
     if (this.selected) {
@@ -149,14 +195,16 @@ export default class CanvasAnnotationDisplay {
       if (key === 'lineDash') return;
       this.context[key] = currentPalette[key];
     });
-    this.applyLineDash(currentPalette, 1 / this.zoomRatio);
+    this.applyLineDash(currentPalette, 1 / this.lineWidthScale);
 
     if (currentPalette.globalAlpha === 0) return;
+    this.context.translate(this.offset.x, this.offset.y);
+    this.context.scale(this.scale, this.scale);
 
     if (currentPalette.fillStyle) {
       this.context.fillRect(...fragment);
     } else {
-      this.context.lineWidth = 1 / this.zoomRatio;
+      this.context.lineWidth = 1 / this.lineWidthScale;
       this.context.strokeRect(...fragment);
     }
 
@@ -169,8 +217,6 @@ export default class CanvasAnnotationDisplay {
 
   /** */
   get svgPaths() {
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(this.svgString, 'text/xml');
-    return Array.from(xmlDoc.querySelectorAll('circle, ellipse, rect, line, polygon, polyline, path'));
+    return svgShapeElements(this.resource);
   }
 }

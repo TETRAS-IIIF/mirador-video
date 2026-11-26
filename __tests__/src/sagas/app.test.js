@@ -1,10 +1,10 @@
 import { call } from 'redux-saga/effects';
 import { expectSaga, testSaga } from 'redux-saga-test-plan';
 
-import { fetchCollectionManifests, importConfig, importState } from '../../../src/state/sagas/app';
-import { fetchManifests } from '../../../src/state/sagas/iiif';
-import { fetchWindowManifest } from '../../../src/state/sagas/windows';
-import { addWindow } from '../../../src/state/actions';
+import { fetchCollectionManifests, importConfig, importState } from '@src/state/sagas/app';
+import { fetchManifests } from '@src/state/sagas/iiif';
+import { fetchWindowManifest } from '@src/state/sagas/windows';
+import { addWindow } from '@src/state/actions';
 
 describe('app-level sagas', () => {
   describe('importState', () => {
@@ -83,6 +83,32 @@ describe('app-level sagas', () => {
         ])
         .put({ type: 'thunk1' })
         .put({ type: 'thunk2' })
+        .run();
+    });
+
+    // loadedManifest is not an officially documented/supported window setting --
+    // this only exists to keep older configs working.
+    it('falls back to loadedManifest when manifestId is not provided', () => {
+      const action = {
+        config: {
+          thumbnailNavigation: {},
+          windows: [{ id: 'x', loadedManifest: 'a' }],
+        },
+      };
+
+      return expectSaga(importConfig, action)
+        .provide([
+          [
+            call(addWindow, {
+              id: 'x',
+              loadedManifest: 'a',
+              manifestId: 'a',
+              thumbnailNavigationPosition: undefined,
+            }),
+            { type: 'thunk1' },
+          ],
+        ])
+        .put({ type: 'thunk1' })
         .run();
     });
   });

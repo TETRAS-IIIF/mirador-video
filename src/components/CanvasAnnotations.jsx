@@ -138,26 +138,21 @@ export function CanvasAnnotations({
               onMouseEnter={() => handleAnnotationHover(annotation)}
               onMouseLeave={handleAnnotationBlur}
             >
-              <ListItemText component="div" variant="body2">
-                <SanitizedHtml ruleSet={htmlSanitizationRuleSet} htmlString={annotation.content} />
-                <div>
-                  {annotation.tags.map((tag) => (
-                    <Chip
-                      size="small"
-                      variant="outlined"
-                      label={tag}
-                      id={tag}
-                      sx={(theme) => ({
-                        backgroundColor: theme.palette.background.paper,
-                        marginRight: theme.spacing(0.5),
-                        marginTop: theme.spacing(1),
-                      })}
-                      key={tag.toString()}
-                    />
-                  ))}
-                  <AnnotationManifestsAccordion annotation={annotation} t={t} />
-                </div>
-              </ListItemText>
+              <ListItemText
+                primary={<SanitizedHtml ruleSet={htmlSanitizationRuleSet} htmlString={annotation.content} />}
+                secondary={
+                  <>
+                    {annotation.tags.filter(Boolean).map((tag) => (
+                      <Chip component="span" size="small" variant="outlined" label={tag} id={tag} key={String(tag)} />
+                    ))}
+                    <AnnotationManifestsAccordion annotation={annotation} t={t} />
+                  </>
+                }
+                slotProps={{
+                  primary: { variant: 'body2' },
+                  secondary: { component: 'div' },
+                }}
+              />
             </MenuItem>
           </ScrollTo>
         ))}

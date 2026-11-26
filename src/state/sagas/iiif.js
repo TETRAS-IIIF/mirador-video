@@ -15,6 +15,11 @@ import {
 } from '../actions';
 import { getManifests, getRequestsConfig, getAccessTokens, selectInfoResponse } from '../selectors';
 
+/** Normalize a caught error (e.g. DOMException, TypeError) to a plain, serializable string. */
+function stringifyError(error) {
+  return typeof error === 'object' ? String(error) : error;
+}
+
 /** */
 function fetchWrapper(url, options, { success, degraded, failure }) {
   return fetch(url, options)
@@ -131,7 +136,7 @@ function* fetchIiifResourceWithAuth(url, iiifResource, options, { degraded, fail
 /** */
 export function* fetchManifest({ manifestId }) {
   const callbacks = {
-    failure: ({ error, json, response }) => receiveManifestFailure(manifestId, typeof error === 'object' ? String(error) : error),
+    failure: ({ error, json, response }) => receiveManifestFailure(manifestId, stringifyError(error)),
     success: ({ json, response }) => receiveManifest(manifestId, json),
   };
   const dispatch = yield call(fetchIiifResource, manifestId, {}, callbacks);
@@ -142,7 +147,7 @@ export function* fetchManifest({ manifestId }) {
 function* getAccessTokenService(resource) {
   const manifestoCompatibleResource = resource && resource.__jsonld ? resource : { ...resource, options: {} };
   const services = Utils.getServices(manifestoCompatibleResource).filter((s) =>
-    s.getProfile().match(/http:\/\/iiif.io\/api\/auth\//),
+    (s.getProfile() || '').match(/http:\/\/iiif.io\/api\/auth\//),
   );
   if (services.length === 0) return undefined;
 
@@ -171,7 +176,8 @@ export function* fetchInfoResponse({ imageResource, infoId, windowId }) {
   const callbacks = {
     degraded: ({ json, response, tokenServiceId }) =>
       receiveDegradedInfoResponse(infoId, json, response.ok, tokenServiceId, windowId),
-    failure: ({ error, json, response, tokenServiceId }) => receiveInfoResponseFailure(infoId, error, tokenServiceId),
+    failure: ({ error, json, response, tokenServiceId }) =>
+      receiveInfoResponseFailure(infoId, stringifyError(error), tokenServiceId),
     success: ({ json, response, tokenServiceId }) => receiveInfoResponse(infoId, json, response.ok, tokenServiceId),
   };
 
@@ -181,7 +187,7 @@ export function* fetchInfoResponse({ imageResource, infoId, windowId }) {
 /** @private */
 export function* fetchSearchResponse({ windowId, companionWindowId, query, searchId }) {
   const callbacks = {
-    failure: ({ error, json, response }) => receiveSearchFailure(windowId, companionWindowId, searchId, error),
+    failure: ({ error, json, response }) => receiveSearchFailure(windowId, companionWindowId, searchId, stringifyError(error)),
     success: ({ json, response }) => receiveSearch(windowId, companionWindowId, searchId, json),
   };
   const dispatch = yield call(fetchIiifResource, searchId, {}, callbacks);
@@ -191,7 +197,7 @@ export function* fetchSearchResponse({ windowId, companionWindowId, query, searc
 /** @private */
 export function* fetchAnnotation({ targetId, annotationId }) {
   const callbacks = {
-    failure: ({ error, json, response }) => receiveAnnotationFailure(targetId, annotationId, error),
+    failure: ({ error, json, response }) => receiveAnnotationFailure(targetId, annotationId, stringifyError(error)),
     success: ({ json, response }) => receiveAnnotation(targetId, annotationId, json),
   };
   const dispatch = yield call(fetchIiifResource, annotationId, {}, callbacks);

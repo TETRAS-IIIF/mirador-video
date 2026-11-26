@@ -1,6 +1,6 @@
 import { render, screen } from '@tests/utils/test-utils';
-import CanvasAnnotations from '../../../src/containers/CanvasAnnotations';
-import WindowSideBarAnnotationsPanel from '../../../src/components/WindowSideBarAnnotationsPanel';
+import CanvasAnnotations from '@src/containers/CanvasAnnotations';
+import { WindowSideBarAnnotationsPanel } from '@src/components/WindowSideBarAnnotationsPanel';
 
 /** */
 function createWrapper(props, state) {
@@ -16,19 +16,19 @@ function createWrapper(props, state) {
 describe('WindowSideBarAnnotationsPanel', () => {
   let wrapper;
 
-  it.skip('has a heading', () => {
+  it('has a heading', () => {
     createWrapper();
 
     expect(screen.getByRole('heading')).toHaveTextContent('Annotations');
   });
 
-  it.skip('has the AnnotationSettings component', () => {
+  it('has the AnnotationSettings component', () => {
     createWrapper();
 
     expect(screen.getByRole('button', { name: 'Highlight all' })).toBeInTheDocument();
   });
 
-  it.skip('renders the annotationsCount', () => {
+  it('renders the annotationsCount', () => {
     createWrapper();
 
     expect(screen.getByText('Showing 4 annotations')).toHaveClass('MuiTypography-subtitle2');

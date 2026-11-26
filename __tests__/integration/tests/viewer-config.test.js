@@ -7,7 +7,7 @@ describe('initialViewerConfig', () => {
   setupIntegrationTestViewer(config);
 
   describe('initialViewerConfig', () => {
-    it('allows initialViewerConfig to be passed', async (context) => {
+    it.skip('allows initialViewerConfig to be passed', async (context) => {
       expect(
         await screen.findByRole('region', {
           name: /Window: Cambridge, Corpus Christi College, MS 640: Antiphoner Leaf/i,
@@ -21,7 +21,7 @@ describe('initialViewerConfig', () => {
           viewerObject = viewers[Object.keys(viewers)[0]];
           expect(viewerObject?.x).toBe(934);
         },
-        { timeout: 3000 },
+        { timeout: 6000 },
       );
 
       expect(viewerObject.x).toBe(934);

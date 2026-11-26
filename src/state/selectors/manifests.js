@@ -34,9 +34,9 @@ const defaultManifestStatus = Object.freeze({ missing: true });
  * @param {object} state
  * @param {object} props
  * @param {string} props.windowId
- * @returns {object} {error: null: id: string, isFetching: boolean, json: {...}}
+ * @returns {object} {error: null, id: string, isFetching: boolean, json: {...}}
  */
-export const getManifestStatus = createSelector([getManifest], (manifest) => manifest || defaultManifestStatus);
+export const getManifestStatus = (state, props) => getManifest(state, props) || defaultManifestStatus;
 
 /**
  * Convenience selector to get a manifest loading error
@@ -90,8 +90,6 @@ export const getManifestProviderName = createSelector(
   (provider, locale) => provider && provider[0].label && PropertyValue.parse(provider[0].label).getValue(locale),
 );
 
-const EMPTY_LOGO_OPTS = Object.freeze({});
-
 /**
  * Return the IIIF v3 provider logo.
  * @param {object} state
@@ -99,7 +97,9 @@ const EMPTY_LOGO_OPTS = Object.freeze({});
  * @returns {string|null}
  */
 export const getProviderLogo = createSelector(
-  [getProperty('provider'), (state) => getThumbnailFactory(state, EMPTY_LOGO_OPTS)],
+  // getThumbnailFactory takes (state, maxHeight, maxWidth); the provider logo is
+  // rendered at its natural size, so no dimensions are requested here.
+  [getProperty('provider'), (state) => getThumbnailFactory(state)],
   (provider, thumbnailFactory) => {
     const logo = provider && provider[0] && provider[0].logo && provider[0].logo[0];
     if (!logo) return null;
@@ -220,15 +220,15 @@ export const getManifestRelated = createSelector(
  * @returns {string|null}
  */
 export const getRequiredStatement = createSelector(
-  [getManifestoInstance],
-  (manifest) =>
+  [getLocale, getManifestoInstance],
+  (locale, manifest) =>
     manifest &&
     asArray(manifest.getRequiredStatement()).flatMap((labelValuePair) => {
-      const values = labelValuePair?.getValues() ?? [];
+      const values = labelValuePair?.getValues(locale) ?? [];
       if (!values.length) {
         return [];
       }
-      const labels = labelValuePair?.getLabels() ?? [];
+      const labels = labelValuePair?.getLabels(locale) ?? [];
       return Array.from({ length: Math.max(labels.length, values.length) }, (_, idx) => idx)
         .filter((idx) => values[idx])
         .map((idx) => ({
@@ -284,30 +284,24 @@ export const getManifestTitle = createSelector(
 );
 
 /**
- * Return manifest description (IIIF v2) -- distinct from any description field nested under metadata.
- * @param {object} state
- * @param {object} props
- * @param {string} props.manifestId
- * @param {string} props.windowId
- * @returns {string|null}
- */
-export const getManifestDescription = createSelector(
-  [getLocale, getManifestoInstance],
-  (locale, manifest) => manifest && manifest.getDescription().getValue(locale),
-);
-
-/**
- * Return manifest summary (IIIF v3).
+ * manifesto.js getSummary method handles fallback for presentation 3 and 2
  * @param {object} state
  * @param {object} props
  * @param {string} props.manifestId
  * @param {string} props.windowId
  * @return {string|null}
  */
-export const getManifestSummary = createSelector(
-  [getProperty('summary'), getManifestLocale],
-  (summary, locale) => summary && PropertyValue.parse(summary).getValue(locale),
+const getManifestSummary = createSelector(
+  [getLocale, getManifestoInstance],
+  (locale, manifest) => manifest && manifest.getSummary().getValue(locale),
 );
+
+export { getManifestSummary };
+
+/**
+ * @deprecated Use `getManifestSummary` instead
+ */
+export const getManifestDescription = getManifestSummary;
 
 /**
  * Return manifest title.

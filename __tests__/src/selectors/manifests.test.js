@@ -16,7 +16,6 @@ import {
   getDestructuredMetadata,
   getManifestStatus,
   getManifestLogo,
-  getManifestDescription,
   getManifestHomepage,
   getProviderLogo,
   getManifestProviderName,
@@ -34,7 +33,7 @@ import {
   getRights,
   getManifestSearchService,
   getManifestAutocompleteService,
-} from '../../../src/state/selectors/manifests';
+} from '@src/state/selectors/manifests';
 
 describe('getManifestStatus', () => {
   const state = {
@@ -132,22 +131,15 @@ describe('getManifestTitle', () => {
   });
 });
 
-describe('getManifestDescription', () => {
-  it('should return manifest description', () => {
-    const state = { manifests: { x: { json: manifestFixture001 } } };
-    const received = getManifestDescription(state, { manifestId: 'x' });
-    expect(received).toBe('[Handbill of Mr. Becket, [1787] ]');
-  });
-
-  it('should return undefined if manifest undefined', () => {
-    const received = getManifestDescription({ manifests: {} }, { manifestId: 'x' });
-    expect(received).toBeUndefined();
-  });
-});
-
 describe('getManifestSummary', () => {
   it('should return manifest summary', () => {
     const state = { manifests: { x: { json: manifestFixturev3001 } } };
+    const received = getManifestSummary(state, { manifestId: 'x' });
+    expect(received).toBe('[Handbill of Mr. Becket, [1787] ]');
+  });
+
+  it('should fall back to the v2 description when summary is absent', () => {
+    const state = { manifests: { x: { json: manifestFixture001 } } };
     const received = getManifestSummary(state, { manifestId: 'x' });
     expect(received).toBe('[Handbill of Mr. Becket, [1787] ]');
   });
@@ -163,6 +155,35 @@ describe('getProviderLogo', () => {
     const state = { manifests: { x: { json: manifestFixtureWithAProvider } } };
     const received = getProviderLogo(state, { manifestId: 'x' });
     expect(received).toBe('https://example.org/images/logo.png');
+  });
+
+  it('should return a valid image request when the logo has a IIIF image service', () => {
+    // use the fixture but overwrite the logo with the one from the IIIF Presentation 3 spec,
+    // which offers an image service rather than a plain image
+    const provider = [
+      {
+        ...manifestFixtureWithAProvider.provider[0],
+        logo: [
+          {
+            format: 'image/png',
+            height: 100,
+            id: 'https://example.org/images/logo.png/full/max/0/default.png',
+            service: [
+              {
+                id: 'https://example.org/images/logo.png',
+                profile: 'level2',
+                type: 'ImageService3',
+              },
+            ],
+            type: 'Image',
+            width: 120,
+          },
+        ],
+      },
+    ];
+    const state = { manifests: { x: { json: { ...manifestFixtureWithAProvider, provider } } } };
+    const received = getProviderLogo(state, { manifestId: 'x' });
+    expect(received).toBe('https://example.org/images/logo.png/full/,100/0/default.jpg');
   });
 
   it('should return null if no logo', () => {
