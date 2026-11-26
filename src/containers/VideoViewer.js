@@ -15,6 +15,7 @@ import {
   getWindowCurrentTime,
   getWindowTextTrackDisabledStatus,
   getPresentAnnotationsOnSelectedCanvases,
+  getWindow,
 } from '../state/selectors';
 
 /** */
@@ -27,6 +28,7 @@ const mapStateToProps = (state, { windowId }) => ({
   debug: getConfig(state).debug || false,
   muted: getWindowMutedStatus(state, { windowId }),
   paused: getWindowPausedStatus(state, { windowId }),
+  startTime: getWindow(state, { windowId })?.startTime,
   textTrackDisabled: getWindowTextTrackDisabledStatus(state, { windowId }),
   videoOptions: getConfig(state).videoOptions,
   videoResources: getVisibleCanvasVideoResources(state, { windowId }) || [],

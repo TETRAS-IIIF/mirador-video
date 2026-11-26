@@ -35,13 +35,18 @@ export class VideoViewer extends Component {
   componentDidMount() {
     const { setPaused } = this.props;
     setPaused(true);
+    this.applyStartTime();
 
     // TODO Implement text track support
   }
 
   /** */
   componentDidUpdate(prevProps) {
-    const { canvas, currentTime, paused, setCurrentTime, setPaused, setSeekTo } = this.props;
+    const { canvas, currentTime, paused, setCurrentTime, setPaused, setSeekTo, startTime } = this.props;
+    // A new start time (e.g. a table of contents entry with a timestamp) or a new canvas.
+    if (startTime !== prevProps.startTime || canvas.id !== prevProps.canvas.id) {
+      this.applyStartTime();
+    }
     if (paused !== prevProps.paused) {
       if (paused) {
         this.timerStop();
@@ -64,6 +69,15 @@ export class VideoViewer extends Component {
       setSeekTo(0);
       this.timerReset();
     }
+  }
+
+  /** Moves playback to the window's start time, when one is set. */
+  applyStartTime() {
+    const { setCurrentTime, setSeekTo, startTime } = this.props;
+    if (typeof startTime !== 'number' || !Number.isFinite(startTime)) return;
+    setCurrentTime(startTime);
+    setSeekTo(startTime);
+    if (this.playerRef.current) this.playerRef.current.seekTo(startTime);
   }
 
   /** */
@@ -280,6 +294,7 @@ VideoViewer.propTypes = {
   setCurrentTime: PropTypes.func,
   setPaused: PropTypes.func,
   setSeekTo: PropTypes.func.isRequired,
+  startTime: PropTypes.number,
   windowId: PropTypes.string.isRequired,
 };
 
@@ -290,4 +305,5 @@ VideoViewer.defaultProps = {
   paused: true,
   setCurrentTime: () => {},
   setPaused: () => {},
+  startTime: undefined,
 };

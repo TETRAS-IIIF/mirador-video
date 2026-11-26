@@ -108,13 +108,26 @@ describe('VideoViewer', () => {
       expect(mockSeekTo).toHaveBeenCalledWith(5);
     });
 
-    it('seeks to startTime once the metadata loads', () => {
-      createWrapper({ canvasId: 'c1', videoResources: [{ getFormat: () => 'video/mp4', id: 1 }], startTime: 30 }, true);
-      const video = screen.getByTestId('video');
+    it('moves playback to the window startTime (table of contents timestamps)', () => {
+      const canvas = { ...buildCanvas([buildVideoAnnotation()]), id: 'c1' };
+      const setCurrentTime = vi.fn();
+      const setSeekTo = vi.fn();
+      const props = { canvas, debug: false, paused: true, setCurrentTime, setSeekTo, windowId: 'window1' };
+      const { rerender } = render(<VideoViewer {...props} />);
+      expect(setSeekTo).not.toHaveBeenCalled();
 
-      video.dispatchEvent(new Event('loadedmetadata'));
+      rerender(<VideoViewer {...props} startTime={30} />);
 
-      expect(video.currentTime).toEqual(30);
+      expect(setCurrentTime).toHaveBeenCalledWith(30);
+      expect(setSeekTo).toHaveBeenCalledWith(30);
+      expect(mockSeekTo).toHaveBeenCalledWith(30);
+    });
+
+    it('applies a startTime given on mount', () => {
+      const setSeekTo = vi.fn();
+      createWrapper({ canvas: buildCanvas([buildVideoAnnotation()]), setSeekTo, startTime: 12 });
+
+      expect(setSeekTo).toHaveBeenCalledWith(12);
     });
   });
 });
