@@ -10,7 +10,7 @@ Entries types:
 - `SECURITY` to invite users to upgrade in case of vulnerabilities.
 - `UPSTREAM` to indicate code is pulled in from Mirador main repository.
 
-# [ Unreleased ]
+# [ 4.3.0 ]
 
 - UPSTREAM update to Mirador 4.3.0 (MUI 9, new annotation drawing based on `canvasWorld` / `overlayScale`, `drawAnnotationsToContext`, table of contents timestamps for audio/video)
 - ADDED : The video viewer jumps to the window's `startTime` (table of contents entries with a timestamp)
