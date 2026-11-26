@@ -5,18 +5,12 @@ import debounce from 'lodash/debounce';
 import flatten from 'lodash/flatten';
 import sortBy from 'lodash/sortBy';
 import xor from 'lodash/xor';
-import * as ResizeObserverModule from 'react-resize-observer';
 import CircularProgress from '@mui/material/CircularProgress';
 import CanvasOverlayVideo from '../lib/CanvasOverlayVideo';
 import CanvasWorld from '../lib/CanvasWorld';
 import CanvasAnnotationDisplay from '../lib/CanvasAnnotationDisplay';
+import { isDraftAnnotation } from '../lib/draftAnnotations';
 import { VideosReferences } from '../plugins/VideosReferences';
-import unwrapDefault from '../lib/unwrapDefault';
-
-// Some bundler/CJS-interop combinations (notably esbuild's dependency
-// pre-bundling in Vite dev mode) leave this double-wrapped as
-// { default: { default: Component } } instead of unwrapping to Component.
-const ResizeObserver = unwrapDefault(ResizeObserverModule);
 
 /** AnnotationsOverlayVideo - based on AnnotationsOverlay */
 export class AnnotationsOverlayVideo extends Component {
@@ -507,6 +501,11 @@ export class AnnotationsOverlayVideo extends Component {
     const canvasSize = canvasWorld.canvasToWorldCoordinates(canvas.id);
     this.canvasOverlay = new CanvasOverlayVideo(this.player, this.ref, canvasSize);
 
+    if (this.ref.current) {
+      this.resizeObserver = new ResizeObserver(() => this.onCanvasResize());
+      this.resizeObserver.observe(this.ref.current);
+    }
+
     this.updateCanvas = this.canvasUpdateCallback();
 
     // Prefetch annotation images
@@ -589,7 +588,8 @@ export class AnnotationsOverlayVideo extends Component {
    * annotationsToContext - converts anontations to a canvas context
    */
   annotationsToContext(annotations, palette) {
-    const { highlightAllAnnotations, hoveredAnnotationIds, selectedAnnotationId, canvasWorld, currentTime } = this.props;
+    const { draftMarker, highlightAllAnnotations, hoveredAnnotationIds, selectedAnnotationId, canvasWorld, currentTime } =
+      this.props;
     const context = this.canvasOverlay.context2d;
     const zoomRatio = 1;
     annotations.forEach((annotation) => {
@@ -602,6 +602,7 @@ export class AnnotationsOverlayVideo extends Component {
         const canvasSize = canvasWorld.canvasToWorldCoordinates(resource.targetId);
         const canvasAnnotationDisplay = new CanvasAnnotationDisplay({
           canvasSize,
+          draft: isDraftAnnotation(annotation.resource, draftMarker),
           hovered: hoveredAnnotationIds.includes(resource.id),
           imageSource,
           offset,
@@ -611,6 +612,12 @@ export class AnnotationsOverlayVideo extends Component {
               ...palette.default,
               ...(!highlightAllAnnotations && palette.hidden),
             },
+            ...(palette.draft && {
+              draft: {
+                ...palette.draft,
+                ...(!highlightAllAnnotations && palette.hidden),
+              },
+            }),
           },
           resource,
           selected: selectedAnnotationId === resource.id,
@@ -654,7 +661,6 @@ export class AnnotationsOverlayVideo extends Component {
             width: '100%',
           }}
         />
-        <ResizeObserver onResize={this.onCanvasResize} />
         {debug && (
           <div
             style={{
@@ -689,6 +695,7 @@ AnnotationsOverlayVideo.defaultProps = {
   highlightAllAnnotations: false,
   hoverAnnotation: () => {},
   hoveredAnnotationIds: [],
+  draftMarker: null,
   palette: {},
   paused: true,
   searchAnnotations: [],
@@ -716,6 +723,7 @@ AnnotationsOverlayVideo.propTypes = {
   iiifVideoInfos: PropTypes.object.isRequired,
   onFunctionsReady: PropTypes.func.isRequired,
   palette: PropTypes.object,
+  draftMarker: PropTypes.shape({ property: PropTypes.string, value: PropTypes.any }),
   paused: PropTypes.bool,
   playerRef: PropTypes.object.isRequired,
   searchAnnotations: PropTypes.arrayOf(PropTypes.object),

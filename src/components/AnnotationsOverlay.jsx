@@ -2,12 +2,12 @@ import { useRef, useEffect, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { useDebouncedCallback } from 'use-debounce';
-import flatten from 'lodash/flatten';
 import sortBy from 'lodash/sortBy';
 import xor from 'lodash/xor';
 import OpenSeadragonCanvasOverlay from '../lib/OpenSeadragonCanvasOverlay';
 import CanvasWorld from '../lib/CanvasWorld';
 import CanvasAnnotationDisplay from '../lib/CanvasAnnotationDisplay';
+import { isDraftAnnotation } from '../lib/draftAnnotations';
 import { buildPath2D } from '../lib/svgShapesToPath';
 
 /** @private */
@@ -30,6 +30,19 @@ function isAnnotationAtPoint(canvasWorld, osdCanvasOverlay, resource, canvas, po
 }
 
 /**
+ * See: https://openseadragon.github.io/docs/OpenSeadragon.Viewer.html#.event:canvas-click
+ * Gestures returned from this method are likely viewer interactions such as pan and zoom,
+ * not taps and clicks targeted to an annotation.
+ * In deciding whether to change the display of the annotation overlay,
+ * we want to ignore these irrelevant gestures.
+ * @private
+ */
+function isIgnoredGesture(event) {
+  const pointerType = event.originalEvent?.pointerType;
+  return (pointerType === 'touch' || pointerType === 'pen') && event.quick === false;
+}
+
+/**
  * Represents a OpenSeadragonViewer in the mirador workspace. Responsible for mounting
  * and rendering OSD.
  */
@@ -39,6 +52,7 @@ export function AnnotationsOverlay({
   deselectAnnotation = () => {},
   drawAnnotations = true,
   drawSearchAnnotations = true,
+  draftMarker = null,
   highlightAllAnnotations = false,
   hoverAnnotation = () => {},
   hoveredAnnotationIds = [],
@@ -76,6 +90,7 @@ export function AnnotationsOverlay({
           if (!canvasWorld.canvasIds.includes(resource.targetId)) return;
           const offset = canvasWorld.offsetByCanvas(resource.targetId);
           const canvasAnnotationDisplay = new CanvasAnnotationDisplay({
+            draft: isDraftAnnotation(annotation.resource, draftMarker),
             hovered: hoveredAnnotationIds.includes(resource.id),
             offset,
             palette: {
@@ -84,6 +99,12 @@ export function AnnotationsOverlay({
                 ...currentPalette.default,
                 ...(!highlightAllAnnotations && currentPalette.hidden),
               },
+              ...(currentPalette.draft && {
+                draft: {
+                  ...currentPalette.draft,
+                  ...(!highlightAllAnnotations && currentPalette.hidden),
+                },
+              }),
             },
             resource,
             selected: selectedAnnotationId === resource.id,
@@ -93,7 +114,7 @@ export function AnnotationsOverlay({
         });
       });
     },
-    [osdCanvasOverlay, viewer, canvasWorld, highlightAllAnnotations, hoveredAnnotationIds, selectedAnnotationId],
+    [osdCanvasOverlay, viewer, canvasWorld, draftMarker, highlightAllAnnotations, hoveredAnnotationIds, selectedAnnotationId],
   );
 
   const renderAnnotations = useCallback(() => {
@@ -117,11 +138,13 @@ export function AnnotationsOverlay({
   const annotationsAtPoint = useCallback(
     (canvas, point) => {
       const lists = [...annotations, ...searchAnnotations];
-      const annos = flatten(lists.map((l) => l.resources)).filter((resource) => {
-        if (canvas.id !== resource.targetId) return false;
+      const annos = lists
+        .flatMap((l) => l.resources)
+        .filter((resource) => {
+          if (canvas.id !== resource.targetId) return false;
 
-        return isAnnotationAtPoint(canvasWorld, osdCanvasOverlay, resource, canvas, point);
-      });
+          return isAnnotationAtPoint(canvasWorld, osdCanvasOverlay, resource, canvas, point);
+        });
 
       return annos;
     },
@@ -130,6 +153,8 @@ export function AnnotationsOverlay({
 
   const onCanvasClick = useCallback(
     (event) => {
+      if (isIgnoredGesture(event)) return;
+
       const {
         position: webPosition,
         eventSource: { viewport },
@@ -301,6 +326,7 @@ AnnotationsOverlay.propTypes = {
   hoverAnnotation: PropTypes.func,
   hoveredAnnotationIds: PropTypes.arrayOf(PropTypes.string),
   palette: PropTypes.object,
+  draftMarker: PropTypes.shape({ property: PropTypes.string, value: PropTypes.any }),
   searchAnnotations: PropTypes.arrayOf(PropTypes.object),
   selectAnnotation: PropTypes.func,
   selectedAnnotationId: PropTypes.string,
